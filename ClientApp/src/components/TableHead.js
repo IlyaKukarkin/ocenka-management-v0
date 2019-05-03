@@ -1,8 +1,10 @@
 ﻿import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    Table, TableHead, TableCell, TableRow, Checkbox, Tooltip, TableSortLabel
+    TableHead, TableCell, TableRow, Checkbox, Tooltip, TableSortLabel
 } from '@material-ui/core';
+
+const addressLabel = ["Город", "Район", "Улица", "Дом", "Квартира"];
 
 class MyTableHead extends React.Component {
     createSortHandler = property => event => {
@@ -15,11 +17,12 @@ class MyTableHead extends React.Component {
         return (
             <TableHead>
                 <TableRow>
-                    <TableCell padding="checkbox">
+                    <TableCell padding="none" style={{ minWidth: 30, maxWidth: 30 }}>
                         <Checkbox
                             indeterminate={numSelected > 0 && numSelected < rowCount}
                             checked={numSelected === rowCount}
                             onChange={onSelectAllClick}
+                            color="primary"
                         />
                     </TableCell>
                     {rows.map(
@@ -29,9 +32,10 @@ class MyTableHead extends React.Component {
                                 align={'center'}
                                 padding={row.disablePadding ? 'none' : 'default'}
                                 sortDirection={orderBy === row.id ? order : false}
+                                style={{maxWidth: 125, whiteSpace: "normal", wordWrap: "break-word" }}
                             >
                                 <Tooltip
-                                    title="Sort"
+                                    title="Сортировать"
                                     placement={row.numeric ? 'bottom-end' : 'bottom-start'}
                                     enterDelay={300}
                                 >
@@ -40,13 +44,14 @@ class MyTableHead extends React.Component {
                                         direction={order}
                                         onClick={this.createSortHandler(row.id)}
                                     >
-                                        {row.label}
+                                        {addressLabel[row.label]}
                                     </TableSortLabel>
                                 </Tooltip>
                             </TableCell>
                         ),
                         this,
                     )}
+                    <TableCell />
                 </TableRow>
             </TableHead>
         );

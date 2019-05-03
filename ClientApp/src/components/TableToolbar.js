@@ -11,16 +11,19 @@ import { lighten } from '@material-ui/core/styles/colorManipulator';
 const toolbarStyles = theme => ({
     root: {
         paddingRight: theme.spacing.unit,
+        display: 'none'
     },
     highlight:
         theme.palette.type === 'light'
             ? {
-                color: theme.palette.secondary.main,
-                backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+                color: theme.palette.primary.main,
+                backgroundColor: lighten(theme.palette.primary.light, 0.85),
+                display: 'flex'
             }
             : {
                 color: theme.palette.text.primary,
-                backgroundColor: theme.palette.secondary.dark,
+                backgroundColor: theme.palette.primary.dark,
+                display: 'flex'
             },
     spacer: {
         flex: '1 1 100%',
@@ -52,13 +55,13 @@ let TableToolbar = props => {
             <div className={classes.spacer} />
             <div className={classes.actions}>
                 {numSelected > 0 ? (
-                    <Tooltip title="Delete">
+                    <Tooltip title="Удалить">
                         <IconButton aria-label="Delete">
                             <Delete />
                         </IconButton>
                     </Tooltip>
                 ) : (
-                        <Tooltip title="Filter list">
+                        <Tooltip title="Сортировка списка">
                             <IconButton aria-label="Filter list">
                                 <FilterList />
                             </IconButton>

@@ -20,14 +20,22 @@ const styles = theme => ({
     progress: {
         margin: theme.spacing.unit * 2
     },
+    narrowCell: {
+        width: '30px'
+    },
+    cell: {
+        maxWidth: '125px',
+        whiteSpace: "normal",
+        wordWrap: "break-word"
+    }
 });
 
 const rows = [
-    { id: 'city', numeric: false, disablePadding: true, label: 'City' },
-    { id: 'district', numeric: false, disablePadding: true, label: 'District' },
-    { id: 'street', numeric: false, disablePadding: true, label: 'Street' },
-    { id: 'house', numeric: true, disablePadding: true, label: 'House' },
-    { id: 'flat', numeric: true, disablePadding: true, label: 'Flat' },
+    { id: 'city', numeric: false, disablePadding: true, label: '0' },
+    { id: 'district', numeric: false, disablePadding: true, label: '1' },
+    { id: 'street', numeric: false, disablePadding: true, label: '2' },
+    { id: 'house', numeric: true, disablePadding: true, label: '3' },
+    { id: 'numberOfFlat', numeric: true, disablePadding: true, label: '4' },
 ];
 
 class Address extends Component {
@@ -135,14 +143,17 @@ class Address extends Component {
                                                 key={n.id}
                                                 selected={isSelected}
                                             >
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox checked={isSelected} />
+                                                <TableCell padding="none" className={classes.narrowCell}>
+                                                    <Checkbox checked={isSelected} color="primary"/>
                                                 </TableCell>
-                                                <TableCell align="center">{n.city}</TableCell>
-                                                <TableCell align="center">{n.district}</TableCell>
-                                                <TableCell align="center">{n.street}</TableCell>
-                                                <TableCell align="center">{n.house}</TableCell>
-                                                <TableCell align="center">{n.numberOfFlat}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.city}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.district}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.street}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.house}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.numberOfFlat}</TableCell>
+                                                <TableCell align="center">{<IconButton>
+                                                    <Edit fontSize="small" />
+                                                </IconButton>}</TableCell>
                                             </TableRow>
                                         );
                                     })}

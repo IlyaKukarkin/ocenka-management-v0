@@ -54,7 +54,7 @@ class TableCardLayout extends Component {
                             alignItems="center"
                         >
                             <Grid item xs>
-                                <Typography variant="h5">
+                                <Typography variant="h5" style={{ paddingLeft: 40 }}>
                                     <b>{headers[headerIndex]}</b>
                                 </Typography>
                             </Grid>
