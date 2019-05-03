@@ -16,7 +16,9 @@
     "react-scripts": "1.0.17",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "roboto-fontface": "^0.10.0",
+    "typeface-roboto": "0.0.54"
   },
   "scripts": {
     "start": "rimraf ./build && react-scripts start",
