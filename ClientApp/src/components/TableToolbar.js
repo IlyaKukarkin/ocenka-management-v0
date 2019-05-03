@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {
-    Toolbar, IconButton, Typography, Tooltip
+    Toolbar, IconButton, Typography, Tooltip, Button
 } from '@material-ui/core';
 import { FilterList, Delete } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
@@ -34,10 +34,13 @@ const toolbarStyles = theme => ({
     title: {
         flex: '0 0 auto',
     },
+    leftIcon: {
+        marginRight: theme.spacing.unit,
+    },
 });
 
 let TableToolbar = props => {
-    const { numSelected, classes } = props;
+    const { numSelected, classes, deleteClick } = props;
 
     return (
         <Toolbar
@@ -55,11 +58,10 @@ let TableToolbar = props => {
             <div className={classes.spacer} />
             <div className={classes.actions}>
                 {numSelected > 0 ? (
-                    <Tooltip title="Удалить">
-                        <IconButton aria-label="Delete">
-                            <Delete />
-                        </IconButton>
-                    </Tooltip>
+                    <Button color="primary" onClick={deleteClick}>
+                        <Delete className={classes.leftIcon} />
+                        Удалить
+                    </Button>
                 ) : (
                         <Tooltip title="Сортировка списка">
                             <IconButton aria-label="Filter list">

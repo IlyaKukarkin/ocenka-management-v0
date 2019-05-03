@@ -5,6 +5,7 @@ import { actionCreators } from '../store/AddressReducer';
 import TableCardLayout from './TableCardLayout';
 import MyTableHead from './TableHead';
 import TableToolbar from './TableToolbar';
+import DeleteDialog from './DeleteDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
     Table, TableHead, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
@@ -39,6 +40,14 @@ const rows = [
 ];
 
 class Address extends Component {
+    constructor(props) {
+        super(props)
+
+        this.handleDeleteClick = this.handleDeleteClick.bind(this);
+        this.showDeleteDialog = this.showDeleteDialog.bind(this);
+        this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
+    }
+
     state = {
         order: 'asc',
         orderBy: 'city',
@@ -46,6 +55,7 @@ class Address extends Component {
         data: this.props.addresses,
         page: 0,
         rowsPerPage: 5,
+        showDeleteDialog: false
     };
 
     componentWillMount() {
@@ -105,6 +115,27 @@ class Address extends Component {
         this.setState({ rowsPerPage: event.target.value });
     };
 
+    handleDeleteClick = () => {
+        const { DeleteAddressSet } = this.props;
+
+        this.setState({ showDeleteDialog: false });
+        this.state.selected.forEach(function (address) {
+            DeleteAddressSet(address);
+        });
+    }
+
+    showDeleteDialog = () => {
+        this.setState({ showDeleteDialog: true });
+    }
+
+    closeDeleteDialog = () => {
+        this.setState({ showDeleteDialog: false });
+    }
+
+    handleEditClick = (event, id) => {
+        console.dir(id);
+    }
+
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
@@ -114,8 +145,9 @@ class Address extends Component {
 
         return (
             <TableCardLayout headerIndex={0} isLoading={isLoading}>
+                <DeleteDialog header={0} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
                 <div style={{ width: "100%" }}>
-                    <TableToolbar numSelected={selected.length} />
+                    <TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />
                     <div className={classes.tableWrapper}>
 
                         <Table className={classes.table}>
@@ -136,7 +168,6 @@ class Address extends Component {
                                         return (
                                             <TableRow
                                                 hover
-                                                onClick={event => this.handleClick(event, n.id)}
                                                 role="checkbox"
                                                 aria-checked={isSelected}
                                                 tabIndex={-1}
@@ -144,14 +175,14 @@ class Address extends Component {
                                                 selected={isSelected}
                                             >
                                                 <TableCell padding="none" className={classes.narrowCell}>
-                                                    <Checkbox checked={isSelected} color="primary"/>
+                                                    <Checkbox onClick={event => this.handleClick(event, n.id)} checked={isSelected} color="primary"/>
                                                 </TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.city}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.district}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.street}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.house}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.numberOfFlat}</TableCell>
-                                                <TableCell align="center">{<IconButton>
+                                                <TableCell align="center">{<IconButton onClick={event => this.handleEditClick(event, n.id)}>
                                                     <Edit fontSize="small" />
                                                 </IconButton>}</TableCell>
                                             </TableRow>
