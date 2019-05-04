@@ -2,6 +2,8 @@
 const getAddressesFinish = 'GET_ADDRESSES_FINISH';
 const deleteAddressStart = 'DELETE_ADDRESS_START';
 const deleteAddressFinish = 'DELETE_ADDRESS_FINISH';
+const addAddressStart = 'ADD_ADDRESS_START';
+const addAddressFinish = 'ADD_ADDRESS_FINISH';
 const deleteAddressesStart = 'DELETE_ADDRESSES_START';
 const deleteAddressesFinish = 'DELETE_ADDRESSES_FINISH';
 const initialState = { addresses: [], isLoading: false };
@@ -33,6 +35,21 @@ export const actionCreators = {
         });
 
         dispatch({ type: deleteAddressesFinish, idSet });
+    },
+    AddAddressSet: (data) => async (dispatch) => {
+        dispatch({ type: addAddressStart });
+
+        let response = [];
+
+        const url = `api/AddressSets`;
+        let myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
+            .then(function (response) {
+                return response.json();
+            }).then(function (newAddress) {
+                dispatch({ type: addAddressFinish, newAddress });
+            });
     }
 };
 
@@ -101,6 +118,28 @@ export const reducer = (state, action) => {
         return {
             ...state,
             addresses: newAddresses,
+            isLoading: false
+        };
+    }
+
+    if (action.type === addAddressStart) {
+        return {
+            ...state,
+            isLoading: true
+        };
+    }
+
+    if (action.type === addAddressFinish) {
+
+        let addresses = state.addresses;
+
+        const newAddress = action.newAddress;
+
+        addresses.push(newAddress);
+
+        return {
+            ...state,
+            addresses: addresses,
             isLoading: false
         };
     }

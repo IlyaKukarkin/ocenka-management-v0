@@ -6,6 +6,7 @@ import TableCardLayout from './TableCardLayout';
 import MyTableHead from './TableHead';
 import TableToolbar from './TableToolbar';
 import DeleteDialog from './DeleteDialog';
+import AddAddressDialog from './AddAddressDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
     Table, TableHead, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
@@ -41,11 +42,14 @@ const rows = [
 
 class Address extends Component {
     constructor(props) {
-        super(props)
+        super(props);
 
         this.handleDeleteClick = this.handleDeleteClick.bind(this);
         this.showDeleteDialog = this.showDeleteDialog.bind(this);
+        this.showAddDialog = this.showAddDialog.bind(this);
         this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
+        this.handleAddClick = this.handleAddClick.bind(this);
+        this.closeAddDialog = this.closeAddDialog.bind(this);
     }
 
     state = {
@@ -55,7 +59,8 @@ class Address extends Component {
         data: this.props.addresses,
         page: 0,
         rowsPerPage: 5,
-        showDeleteDialog: false
+        showDeleteDialog: false,
+        showAddDialog: false,
     };
 
     componentWillMount() {
@@ -127,12 +132,34 @@ class Address extends Component {
         this.setState({ selected: [] });
     }
 
+    handleAddClick = (data) => {
+        //const { DeleteAddressSet, DeleteAddressesSet } = this.props;
+
+        //this.setState({ showDeleteDialog: false });
+        //if (this.state.selected.length === 1) {
+        //    DeleteAddressSet(this.state.selected[0]);
+        //} else {
+        //    DeleteAddressesSet(this.state.selected);
+        //}
+        this.props.AddAddressSet(data);
+
+        this.setState({ showAddDialog: false });
+    }
+
     showDeleteDialog = () => {
         this.setState({ showDeleteDialog: true });
     }
 
+    showAddDialog = () => {
+        this.setState({ showAddDialog: true });
+    }
+
     closeDeleteDialog = () => {
         this.setState({ showDeleteDialog: false });
+    }
+
+    closeAddDialog = () => {
+        this.setState({ showAddDialog: false });
     }
 
     handleEditClick = (event, id) => {
@@ -147,8 +174,9 @@ class Address extends Component {
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
         return (
-            <TableCardLayout headerIndex={0} isLoading={isLoading} footer={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />}>
+            <TableCardLayout headerIndex={0} isLoading={isLoading} header={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
                 <DeleteDialog header={0} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
+                <AddAddressDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={this.state.showAddDialog} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
 
@@ -184,14 +212,14 @@ class Address extends Component {
                                                 <TableCell align="center" className={classes.cell}>{n.street}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.house}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.numberOfFlat}</TableCell>
-                                                <TableCell align="center">{<IconButton onClick={event => this.handleEditClick(event, n.id)}>
+                                                <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.handleEditClick(event, n.id)}>
                                                     <Edit fontSize="small" />
                                                 </IconButton>}</TableCell>
                                             </TableRow>
                                         );
                                     })}
                                 {emptyRows > 0 && (
-                                    <TableRow style={{ height: 49 * emptyRows }}>
+                                    <TableRow style={{ height: 52.8 * emptyRows }}>
                                         <TableCell colSpan={6} />
                                     </TableRow>
                                 )}

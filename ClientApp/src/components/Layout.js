@@ -8,7 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { Menu } from '@material-ui/icons';
 import { compose } from 'recompose';
 
-const drawerWidth = 240;
+const drawerWidth = 200;
 
 const styles = theme => ({
     root: {

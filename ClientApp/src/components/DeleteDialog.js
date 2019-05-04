@@ -11,7 +11,7 @@ function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-const headers = ["адреса", "оценщиков"];
+const headers = ["выбранные адреса", "выбранных оценщиков"];
 
 class DeleteDialog extends React.Component {
     render() {
@@ -27,11 +27,11 @@ class DeleteDialog extends React.Component {
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle id="alert-dialog-slide-title">
-                    Удалить выбранные {headers[header]} ?
+                    Удалить {headers[header]}?
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-slide-description">
-                        Нажав на кнопку "Удалить" вы навсегда удалите выбранные {headers[header]} из базы данных.
+                        Нажав на кнопку "Удалить" вы навсегда удалите {headers[header]} из базы данных.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

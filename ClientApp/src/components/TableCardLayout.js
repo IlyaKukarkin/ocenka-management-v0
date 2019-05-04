@@ -39,7 +39,7 @@ const headers = ["Адреса", "Оценщики"];
 class TableCardLayout extends Component {
 
     render() {
-        const { classes, children, headerIndex, isLoading, footer } = this.props;
+        const { classes, children, headerIndex, isLoading, header, addClick } = this.props;
 
         return <Fragment>
             <CssBaseline />
@@ -59,10 +59,10 @@ class TableCardLayout extends Component {
                                 </Typography>
                             </Grid>
                             <Grid item xs>
-                                {footer}
+                                {header}
                             </Grid>
                             <Grid container xs justify="flex-end">
-                                <Button color="primary">
+                                <Button color="primary" onClick={addClick}>
                                     <Add className={classes.leftIcon} />
                                     Добавить
                                 </Button>
