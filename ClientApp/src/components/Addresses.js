@@ -116,12 +116,15 @@ class Address extends Component {
     };
 
     handleDeleteClick = () => {
-        const { DeleteAddressSet } = this.props;
+        const { DeleteAddressSet, DeleteAddressesSet } = this.props;
 
         this.setState({ showDeleteDialog: false });
-        this.state.selected.forEach(function (address) {
-            DeleteAddressSet(address);
-        });
+        if (this.state.selected.length === 1) {
+            DeleteAddressSet(this.state.selected[0]);
+        } else {
+            DeleteAddressesSet(this.state.selected);
+        }
+        this.setState({ selected: [] });
     }
 
     showDeleteDialog = () => {
@@ -144,10 +147,9 @@ class Address extends Component {
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
         return (
-            <TableCardLayout headerIndex={0} isLoading={isLoading}>
+            <TableCardLayout headerIndex={0} isLoading={isLoading} footer={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />}>
                 <DeleteDialog header={0} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
                 <div style={{ width: "100%" }}>
-                    <TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />
                     <div className={classes.tableWrapper}>
 
                         <Table className={classes.table}>

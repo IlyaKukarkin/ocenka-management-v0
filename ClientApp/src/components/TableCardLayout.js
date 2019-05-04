@@ -39,7 +39,7 @@ const headers = ["Адреса", "Оценщики"];
 class TableCardLayout extends Component {
 
     render() {
-        const { classes, children, headerIndex, isLoading } = this.props;
+        const { classes, children, headerIndex, isLoading, footer } = this.props;
 
         return <Fragment>
             <CssBaseline />
@@ -54,9 +54,12 @@ class TableCardLayout extends Component {
                             alignItems="center"
                         >
                             <Grid item xs>
-                                <Typography variant="h5" style={{ paddingLeft: 40 }}>
+                                <Typography variant="h5" style={{ marginLeft: '40px' }}>
                                     <b>{headers[headerIndex]}</b>
                                 </Typography>
+                            </Grid>
+                            <Grid item xs>
+                                {footer}
                             </Grid>
                             <Grid container xs justify="flex-end">
                                 <Button color="primary">

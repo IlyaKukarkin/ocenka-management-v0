@@ -11,7 +11,9 @@ import { lighten } from '@material-ui/core/styles/colorManipulator';
 const toolbarStyles = theme => ({
     root: {
         paddingRight: theme.spacing.unit,
-        display: 'none'
+        display: 'none',
+        minHeight: '0',
+        borderRadius: '18px'
     },
     highlight:
         theme.palette.type === 'light'
@@ -37,6 +39,9 @@ const toolbarStyles = theme => ({
     leftIcon: {
         marginRight: theme.spacing.unit,
     },
+    deleteButton: {
+        borderRadius: '18px',
+    },
 });
 
 let TableToolbar = props => {
@@ -58,7 +63,7 @@ let TableToolbar = props => {
             <div className={classes.spacer} />
             <div className={classes.actions}>
                 {numSelected > 0 ? (
-                    <Button color="primary" onClick={deleteClick}>
+                    <Button color="primary" className={classes.deleteButton} onClick={deleteClick}>
                         <Delete className={classes.leftIcon} />
                         Удалить
                     </Button>
