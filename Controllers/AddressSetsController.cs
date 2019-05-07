@@ -13,7 +13,12 @@ namespace ocenka_management.Controllers
     [ApiController]
     public class AddressSetsController : ControllerBase
     {
-        OcenkaManagementContext _context = new OcenkaManagementContext();
+        private readonly OcenkaManagementContext _context;
+
+        public AddressSetsController(OcenkaManagementContext context)
+        {
+            _context = context;
+        }
 
         // GET: api/AddressSets
         [HttpGet]

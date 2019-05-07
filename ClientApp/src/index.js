@@ -18,8 +18,6 @@ const store = configureStore(history, initialState);
 
 const rootElement = document.getElementById('root');
 
-document.title = "Ocenka Management";
-
 ReactDOM.render(
   <Provider store={store}>
     <ConnectedRouter history={history}>

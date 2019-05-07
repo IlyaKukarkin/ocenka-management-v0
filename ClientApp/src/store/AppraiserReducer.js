@@ -1,52 +1,52 @@
-﻿const getAddressesStart = 'GET_ADDRESSES_START';
-const getAddressesFinish = 'GET_ADDRESSES_FINISH';
-const deleteAddressStart = 'DELETE_ADDRESS_START';
-const deleteAddressFinish = 'DELETE_ADDRESS_FINISH';
-const addAddressStart = 'ADD_ADDRESS_START';
-const addAddressFinish = 'ADD_ADDRESS_FINISH';
-const deleteAddressesStart = 'DELETE_ADDRESSES_START';
-const deleteAddressesFinish = 'DELETE_ADDRESSES_FINISH';
-const initialState = { addresses: [], isLoading: false };
+﻿const getAppraisersStart = 'GET_APPRAISERS_START';
+const getAppraisersFinish = 'GET_APPRAISERS_FINISH';
+const deleteAppraiserStart = 'DELETE_APPRAISER_START';
+const deleteAppraiserFinish = 'DELETE_APPRAISER_FINISH';
+const addAppraiserStart = 'ADD_APPRAISER_START';
+const addAppraiserFinish = 'ADD_APPRAISER_FINISH';
+const deleteAppraisersStart = 'DELETE_APPRAISERS_START';
+const deleteAppraisersFinish = 'DELETE_APPRAISERS_FINISH';
+const initialState = { appraisers: [], isLoading: false };
 
 export const actionCreators = {
-    GetAddressSet: () => async (dispatch) => {
-        dispatch({ type: getAddressesStart });
+    GetAppraisersSet: () => async (dispatch) => {
+        dispatch({ type: getAppraisersStart });
 
-        const url = `api/AddressSets`;
+        const url = `api/AppraiserSets`;
         const response = await fetch(url);
-        const adresses = await response.json();
+        const appraisers = await response.json();
 
-        dispatch({ type: getAddressesFinish, adresses });
+        dispatch({ type: getAppraisersFinish, appraisers });
     },
-    DeleteAddressSet: (id) => async (dispatch) => {
-        dispatch({ type: deleteAddressStart });
+    DeleteAppraiserSet: (id) => async (dispatch) => {
+        dispatch({ type: deleteAppraiserStart });
 
-        const url = `api/AddressSets/${id}`;
+        const url = `api/AppraiserSets/${id}`;
         const response = await fetch(url, { method: 'delete' });
 
-        dispatch({ type: deleteAddressFinish, id });
+        dispatch({ type: deleteAppraiserFinish, id });
     },
-    DeleteAddressesSet: (idSet) => async (dispatch) => {
-        dispatch({ type: deleteAddressesStart });
+    DeleteAppraisersSet: (idSet) => async (dispatch) => {
+        dispatch({ type: deleteAppraisersStart });
 
         idSet.forEach(async function (id) {
-            const url = `api/AddressSets/${id}`;
+            const url = `api/AppraiserSets/${id}`;
             const response = await fetch(url, { method: 'delete' });
         });
 
-        dispatch({ type: deleteAddressesFinish, idSet });
+        dispatch({ type: deleteAppraisersFinish, idSet });
     },
-    AddAddressSet: (data) => async (dispatch) => {
-        dispatch({ type: addAddressStart });
+    AddAppraiserSet: (data) => async (dispatch) => {
+        dispatch({ type: addAppraiserStart });
 
-        const url = `api/AddressSets`;
+        const url = `api/AppraiserSets`;
         let myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
             .then(function (response) {
                 return response.json();
             }).then(function (newAddress) {
-                dispatch({ type: addAddressFinish, newAddress });
+                dispatch({ type: addAppraiserFinish, newAddress });
             });
     }
 };
@@ -54,29 +54,29 @@ export const actionCreators = {
 export const reducer = (state, action) => {
     state = state || initialState;
 
-    if (action.type === getAddressesStart) {
+    if (action.type === getAppraisersStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === getAddressesFinish) {
+    if (action.type === getAppraisersFinish) {
         return {
             ...state,
-            addresses: action.adresses,
+            appraisers: action.appraisers,
             isLoading: false
         };
     }
 
-    if (action.type === deleteAddressStart) {
+    if (action.type === deleteAppraiserStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === deleteAddressFinish) {
+    if (action.type === deleteAppraiserFinish) {
 
         let newAddresses = state.addresses;
 
@@ -88,19 +88,19 @@ export const reducer = (state, action) => {
 
         return {
             ...state,
-            addresses: newAddresses,
+            appraisers: newAddresses,
             isLoading: false
         };
     }
 
-    if (action.type === deleteAddressesStart) {
+    if (action.type === deleteAppraiserStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === deleteAddressesFinish) {
+    if (action.type === deleteAppraiserFinish) {
 
         let newAddresses = state.addresses;
 
@@ -115,19 +115,19 @@ export const reducer = (state, action) => {
 
         return {
             ...state,
-            addresses: newAddresses,
+            appraisers: newAddresses,
             isLoading: false
         };
     }
 
-    if (action.type === addAddressStart) {
+    if (action.type === addAppraiserStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === addAddressFinish) {
+    if (action.type === addAppraiserFinish) {
 
         let addresses = state.addresses;
 

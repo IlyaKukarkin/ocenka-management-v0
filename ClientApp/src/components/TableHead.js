@@ -4,7 +4,10 @@ import {
     TableHead, TableCell, TableRow, Checkbox, Tooltip, TableSortLabel
 } from '@material-ui/core';
 
-const addressLabel = ["Город", "Район", "Улица", "Дом", "Квартира"];
+// Адрес [0-4], Оценщик [5-10], фыв
+
+const addressLabel = ["Город", "Район", "Улица", "Дом", "Квартира",
+    "Фамилия", "Имя", "Отчество", "День рождения", "Год начала работы", "Категория"];
 
 class MyTableHead extends React.Component {
     createSortHandler = property => event => {
@@ -30,9 +33,9 @@ class MyTableHead extends React.Component {
                             <TableCell
                                 key={row.id}
                                 align={'center'}
-                                padding={row.disablePadding ? 'none' : 'default'}
+                                padding={'none'}
                                 sortDirection={orderBy === row.id ? order : false}
-                                style={{maxWidth: 125, whiteSpace: "normal", wordWrap: "break-word" }}
+                                style={{ maxWidth: 125, whiteSpace: "normal", wordWrap: "break-word", paddingLeft: "10px" }}
                             >
                                 <Tooltip
                                     title="Сортировать"

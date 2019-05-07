@@ -13,7 +13,12 @@ namespace ocenka_management.Controllers
     [ApiController]
     public class UserSetsController : ControllerBase
     {
-        OcenkaManagementContext _context = new OcenkaManagementContext();
+        private readonly OcenkaManagementContext _context;
+
+        public UserSetsController(OcenkaManagementContext context)
+        {
+            _context = context;
+        }
 
         // GET: api/UserSets
         [HttpGet]

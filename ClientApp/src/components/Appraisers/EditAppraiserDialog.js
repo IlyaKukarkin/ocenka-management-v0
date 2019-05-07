@@ -189,7 +189,6 @@ class AddAddressDialog extends React.Component {
         return (
             <Dialog
                 open={showDialog}
-                onClose={this.myHandleClose}
                 TransitionComponent={Transition}
                 keepMounted
                 aria-labelledby="alert-dialog-slide-title"
@@ -261,7 +260,7 @@ class AddAddressDialog extends React.Component {
                         Отмена
                     </Button>
                     <Button onClick={this.submitHandler} color="secondary">
-                        Сохранить
+                        Добавить
                     </Button>
                 </DialogActions>
             </Dialog>

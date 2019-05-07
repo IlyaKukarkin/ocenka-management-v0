@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { actionCreators } from '../store/AddressReducer';
-import TableCardLayout from './TableCardLayout';
-import MyTableHead from './TableHead';
-import TableToolbar from './TableToolbar';
-import DeleteDialog from './DeleteDialog';
-import AddAddressDialog from './AddAddressDialog';
+import { actionCreators } from '../../store/AppraiserReducer';
+import TableCardLayout from '../TableCardLayout';
+import MyTableHead from '../TableHead';
+import TableToolbar from '../TableToolbar';
+import DeleteDialog from '../DeleteDialog';
+import AddAppraiserDialog from './AddAppraiserDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
     Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
@@ -26,6 +26,7 @@ const styles = theme => ({
         width: '30px'
     },
     cell: {
+        padding: '0',
         maxWidth: '125px',
         whiteSpace: "normal",
         wordWrap: "break-word"
@@ -33,14 +34,15 @@ const styles = theme => ({
 });
 
 const rows = [
-    { id: 'city', numeric: false, disablePadding: true, label: '0' },
-    { id: 'district', numeric: false, disablePadding: true, label: '1' },
-    { id: 'street', numeric: false, disablePadding: true, label: '2' },
-    { id: 'house', numeric: true, disablePadding: true, label: '3' },
-    { id: 'numberOfFlat', numeric: true, disablePadding: true, label: '4' },
+    { id: 'idNavigation.surname', numeric: false, label: '5' },
+    { id: 'idNavigation.name', numeric: false, label: '6' },
+    { id: 'idNavigation.patronymic', numeric: false, label: '7' },
+    { id: 'idNavigation.birthday', numeric: false, label: '8' },
+    { id: 'idNavigation.worksSince', numeric: false, label: '9' },
+    { id: 'position', numeric: false, label: '10' },
 ];
 
-class Address extends Component {
+class Appraisers extends Component {
     constructor(props) {
         super(props);
 
@@ -54,9 +56,9 @@ class Address extends Component {
 
     state = {
         order: 'asc',
-        orderBy: 'city',
+        orderBy: 'idNavigation.surname',
         selected: [],
-        data: this.props.addresses,
+        data: [],
         page: 0,
         rowsPerPage: 5,
         showDeleteDialog: false,
@@ -64,12 +66,12 @@ class Address extends Component {
     };
 
     componentWillMount() {
-        this.props.GetAddressSet();
+        this.props.GetAppraisersSet();
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.addresses !== nextProps.addresses)
-            this.setState({ data: nextProps.addresses });
+        if (this.props.appraisers !== nextProps.appraisers)
+            this.setState({ data: nextProps.appraisers });
     }
 
     handleRequestSort = (event, property) => {
@@ -166,9 +168,9 @@ class Address extends Component {
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
         return (
-            <TableCardLayout headerIndex={0} isLoading={isLoading} header={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
-                <DeleteDialog header={0} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
-                <AddAddressDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={this.state.showAddDialog} />
+            <TableCardLayout headerIndex={1} isLoading={isLoading} header={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+                <DeleteDialog header={1} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
+                <AddAppraiserDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={this.state.showAddDialog} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
 
@@ -199,11 +201,12 @@ class Address extends Component {
                                                 <TableCell padding="none" className={classes.narrowCell}>
                                                     <Checkbox onClick={event => this.handleClick(event, n.id)} checked={isSelected} color="primary"/>
                                                 </TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.city}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.district}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.street}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.house}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.numberOfFlat}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.idNavigation.surname}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.idNavigation.name}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.idNavigation.patronymic}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{getDate(n.idNavigation.birthday)}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{getYear(n.idNavigation.worksSince)}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.position}</TableCell>
                                                 <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.handleEditClick(event, n.id)}>
                                                     <Edit fontSize="small" />
                                                 </IconButton>}</TableCell>
@@ -212,7 +215,7 @@ class Address extends Component {
                                     })}
                                 {emptyRows > 0 && (
                                     <TableRow style={{ height: 52.8 * emptyRows }}>
-                                        <TableCell colSpan={6} />
+                                        <TableCell colSpan={8} />
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -237,6 +240,22 @@ class Address extends Component {
             </TableCardLayout>
         );
     }
+}
+
+function getDate(date) {
+    let result = "";
+
+    result = date.substring(8, 10) + "." + date.substring(5, 7) + "." + date.substring(0, 4);
+
+    return result;
+}
+
+function getYear(date) {
+    let result = "";
+
+    result = date.substring(0, 4);
+
+    return result;
 }
 
 function desc(a, b, orderBy) {
@@ -264,6 +283,6 @@ function getSorting(order, orderBy) {
 }
 
 export default withStyles(styles)(connect(
-    state => state.address,
+    state => state.appraisers,
     dispatch => bindActionCreators(actionCreators, dispatch)
-)(Address));
+)(Appraisers));
