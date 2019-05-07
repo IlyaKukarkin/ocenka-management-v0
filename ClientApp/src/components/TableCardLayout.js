@@ -1,8 +1,8 @@
 ﻿import React, { Component, Fragment } from 'react';
 import {
-    Card, CardContent, Typography, CssBaseline, Grid, Button, CircularProgress
+    Card, CardContent, Typography, CssBaseline, Grid, Button, CircularProgress, IconButton, Input
 } from '@material-ui/core';
-import { Add, SaveAlt } from '@material-ui/icons';
+import { Add, SaveAlt, Search } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { compose } from 'recompose';
 
@@ -31,15 +31,33 @@ const styles = theme => ({
     loading: {
         height: '400px',
         marginUp: '180px'
+    },
+    buttons: {
+        minWidth: '237px'
+    },
+    search: {
+        maxWidth: '130px'
     }
 })
 
 const headers = ["Адреса", "Оценщики"];
 
 class TableCardLayout extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            showSearchbar: false,            
+        };
+    }
+
+    showSearchbar = () => {
+        this.setState({ showSearchbar: true });
+    }
 
     render() {
-        const { classes, children, headerIndex, isLoading, header, addClick } = this.props;
+        const { classes, children, headerIndex, isLoading, deleteToolbar, addClick } = this.props;
+        const { showSearchbar } = this.state;
 
         return <Fragment>
             <CssBaseline />
@@ -54,14 +72,20 @@ class TableCardLayout extends Component {
                             alignItems="center"
                         >
                             <Grid item xs>
-                                <Typography variant="h5" style={{ marginLeft: '40px' }}>
+                                <Typography variant="h5">
                                     <b>{headers[headerIndex]}</b>
                                 </Typography>
                             </Grid>
                             <Grid item xs>
-                                {header}
+                                {!showSearchbar ? <IconButton onClick={this.showSearchbar}>
+                                    <Search fontSize="small" />
+                                </IconButton> :
+                                    <Input defaultValue="Поиск" id="search" className={classes.search}/>}
                             </Grid>
-                            <Grid container xs justify="flex-end">
+                            <Grid item xs>
+                                {deleteToolbar}
+                            </Grid>
+                            <Grid container xs justify="flex-end" className={classes.buttons}>
                                 <Button color="primary" onClick={addClick}>
                                     <Add className={classes.leftIcon} />
                                     Добавить
