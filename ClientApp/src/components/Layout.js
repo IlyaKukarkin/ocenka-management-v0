@@ -8,6 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { Menu } from '@material-ui/icons';
 import { compose } from 'recompose';
 import LoginDialog from './LoginDialog';
+import LoginButton from './Home/LoginButton';
 
 const drawerWidth = 200;
 
@@ -143,8 +144,8 @@ class Layout extends Component {
                             Ocenka Management
                         </Typography>
                         <div className={classes.grow} />
-                        <div className={classes.login}>
-                            <Button color="inherit" onClick={this.showLoginDialog}>Login</Button>
+                        <div className={classes.login}>                            
+                            <LoginButton onButtonClick={this.showLoginDialog.bind(this)} />
                         </div>
                     </Toolbar>
                 </AppBar>
@@ -174,10 +175,10 @@ class Layout extends Component {
                         {drawer}
                     </Drawer>
                 </Hidden>
-                <main className={classes.content}>
+                <div className={classes.content}>
                     <div className={classes.toolbar} />
                     {children}
-                </main>
+                </div>
             </div>
         </Fragment>
     }

@@ -1,6 +1,6 @@
 ﻿import React, { Component, Fragment } from 'react';
 import {
-    Card, CardContent, Typography, CssBaseline, Grid, Button, CircularProgress, IconButton, Input
+    Card, CardContent, Typography, CssBaseline, Grid, Button, CircularProgress, IconButton, Input, ClickAwayListener
 } from '@material-ui/core';
 import { Add, SaveAlt, Search } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
@@ -55,6 +55,10 @@ class TableCardLayout extends Component {
         this.setState({ showSearchbar: true });
     }
 
+    hideSearchbar = () => {
+        this.setState({ showSearchbar: false });
+    }
+
     render() {
         const { classes, children, headerIndex, isLoading, deleteToolbar, addClick } = this.props;
         const { showSearchbar } = this.state;
@@ -77,10 +81,10 @@ class TableCardLayout extends Component {
                                 </Typography>
                             </Grid>
                             <Grid item xs>
-                                {!showSearchbar ? <IconButton onClick={this.showSearchbar}>
-                                    <Search fontSize="small" />
+                                {!showSearchbar ? <IconButton onClick={this.showSearchbar} style={{ padding: '6px' }}>
+                                    <Search fontSize="inherit" />
                                 </IconButton> :
-                                    <Input defaultValue="Поиск" id="search" className={classes.search}/>}
+                                    <ClickAwayListener onClickAway={this.hideSearchbar}><Input placeholder="Поиск" id="search" className={classes.search} /></ClickAwayListener>}
                             </Grid>
                             <Grid item xs>
                                 {deleteToolbar}
