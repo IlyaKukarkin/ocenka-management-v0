@@ -47,7 +47,8 @@ class TableCardLayout extends Component {
         super(props);
 
         this.state = {
-            showSearchbar: false,            
+            showSearchbar: false,
+            searchValue: "",
         };
     }
 
@@ -58,6 +59,10 @@ class TableCardLayout extends Component {
     hideSearchbar = () => {
         this.setState({ showSearchbar: false });
     }
+
+    handleChange = event => {
+        this.setState({ searchValue: event.target.value });
+    };
 
     render() {
         const { classes, children, headerIndex, isLoading, deleteToolbar, addClick } = this.props;
@@ -84,7 +89,7 @@ class TableCardLayout extends Component {
                                 {!showSearchbar ? <IconButton onClick={this.showSearchbar} style={{ padding: '6px' }}>
                                     <Search fontSize="inherit" />
                                 </IconButton> :
-                                    <ClickAwayListener onClickAway={this.hideSearchbar}><Input placeholder="Поиск" id="search" className={classes.search} /></ClickAwayListener>}
+                                    <ClickAwayListener onClickAway={this.hideSearchbar}><Input placeholder="Поиск" onChange={this.handleChange} value={this.state.searchValue} id="search" className={classes.search} /></ClickAwayListener>}
                             </Grid>
                             <Grid item xs>
                                 {deleteToolbar}

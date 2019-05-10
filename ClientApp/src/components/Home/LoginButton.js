@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField
+    Button
 } from '@material-ui/core';
 
 class LoginButton extends React.Component {

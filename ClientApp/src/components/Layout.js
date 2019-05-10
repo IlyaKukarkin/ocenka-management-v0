@@ -2,13 +2,14 @@ import React, { Component, Fragment } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import {
     AppBar, Toolbar, IconButton, Typography, Hidden,
-    Drawer, CssBaseline, MenuList, MenuItem, CardMedia, Button
+    Drawer, CssBaseline, MenuList, MenuItem, CardMedia
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { Menu } from '@material-ui/icons';
 import { compose } from 'recompose';
 import LoginDialog from './LoginDialog';
 import LoginButton from './Home/LoginButton';
+import MenuText from './Home/MenuItem';
 
 const drawerWidth = 200;
 
@@ -103,23 +104,19 @@ class Layout extends Component {
                 </Hidden>
                 <MenuList>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/" selected={'/' === pathname}>
-                        Home
+                        <MenuText textIndex={0} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/counter" selected={'/counter' === pathname}>
-                        Contracts
+                        <MenuText textIndex={1} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/fetchdata" selected={'/fetchdata' === pathname}>
-                        <CardMedia
-                            component="img"
-                            height="40"
-                            image="https://codelabs.developers.google.com/codelabs/mobile-vision-ocr/img/c5134dae01ad22a5.png"
-                        />
+                        <MenuText textIndex={2} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/address" selected={'/address' === pathname}>
-                        Addresses
+                        <MenuText textIndex={3} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/appraisers" selected={'/appraisers' === pathname}>
-                        Appraisers
+                        <MenuText textIndex={4} />
                     </MenuItem>
                 </MenuList>
             </div>
