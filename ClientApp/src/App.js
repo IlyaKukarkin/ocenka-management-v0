@@ -6,6 +6,7 @@ import Counter from './components/Counter';
 import FetchData from './components/FetchData';
 import Addresses from './components/Addresses';
 import Appraisers from './components/Appraisers/Appraisers';
+import Users from './components/Users/Users';
 
 export default () => (
     <Layout>
@@ -13,6 +14,7 @@ export default () => (
             <Route exact path='/' component={Home} />
             <Route path='/counter' component={Counter} />
             <Route path='/fetchdata/:startDateIndex?' component={FetchData} />
+            <Route path='/users' component={Users} />
             <Route path='/address' component={Addresses} />
             <Route path='/appraisers' component={Appraisers} />
         </Switch>

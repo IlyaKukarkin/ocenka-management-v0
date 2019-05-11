@@ -5,13 +5,15 @@ import * as Counter from './Counter';
 import * as WeatherForecasts from './WeatherForecasts';
 import * as AddressReducer from './AddressReducer';
 import * as AppraiserReducer from './AppraiserReducer';
+import * as UserReducer from './UserReducer';
 
 export default function configureStore(history, initialState) {
     const reducers = {
         counter: Counter.reducer,
         weatherForecasts: WeatherForecasts.reducer,
         address: AddressReducer.reducer,
-        appraisers: AppraiserReducer.reducer
+        appraisers: AppraiserReducer.reducer,
+        users: UserReducer.reducer
     };
 
     const middleware = [

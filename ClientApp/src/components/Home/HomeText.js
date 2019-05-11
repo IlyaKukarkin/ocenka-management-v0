@@ -23,13 +23,13 @@ const text = ['Добро пожаловать!', 'Для доступа к фу
 
 const HomeText = props => (
     <div>
-        <Typography variant="h4" className={props.classes.header}>
+        <Typography component={'span'} variant="h4" className={props.classes.header}>
             {text[0]}
         </Typography>
-        <Typography variant="body1" className={props.classes.loginInfo}>
+        <Typography component={'span'} variant="body1" className={props.classes.loginInfo}>
             <strong>{text[1]}</strong>
         </Typography>
-        <Typography variant="body1" className={props.classes.body}>
+        <Typography component={'span'} variant="body1" className={props.classes.body}>
             {text[2]}
             <ul>
                 <li>{text[3]}</li>
@@ -38,7 +38,7 @@ const HomeText = props => (
                 <li>{text[6]}</li>
             </ul>  
         </Typography>
-        <Typography variant="body1">
+        <Typography component={'span'} variant="body1">
             <p>{text[7]}<strong>{text[8]}</strong></p>
             <p>{text[9]}<strong>{text[10]}</strong></p>
         </Typography>

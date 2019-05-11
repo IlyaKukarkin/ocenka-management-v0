@@ -4,10 +4,11 @@ import {
     TableHead, TableCell, TableRow, Checkbox, Tooltip, TableSortLabel
 } from '@material-ui/core';
 
-// Адрес [0-4], Оценщик [5-10], фыв
+// Адрес [0-4], Оценщик [5-10], Пользователь [11-15],
 
 const addressLabel = ["Город", "Район", "Улица", "Дом", "Квартира",
-    "Фамилия", "Имя", "Отчество", "День рождения", "Год начала работы", "Категория"];
+    "Фамилия", "Имя", "Отчество", "День рождения", "Год начала работы", "Категория",
+    "ФИО", "Логин", "День рождения", "Год начала работы", "Должность"];
 
 class MyTableHead extends React.Component {
     createSortHandler = property => event => {
