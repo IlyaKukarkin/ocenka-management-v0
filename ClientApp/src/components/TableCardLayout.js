@@ -36,7 +36,8 @@ const styles = theme => ({
         minWidth: '237px'
     },
     search: {
-        maxWidth: '130px'
+        maxWidth: '130px',
+        paddingLeft: '5px'
     }
 })
 

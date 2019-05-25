@@ -11,6 +11,7 @@ import { lighten } from '@material-ui/core/styles/colorManipulator';
 const toolbarStyles = theme => ({
     root: {
         paddingRight: theme.spacing.unit,
+        paddingLeft: theme.spacing.unit,
         display: 'none',
         minHeight: '0',
         borderRadius: '18px'
@@ -53,14 +54,6 @@ let TableToolbar = props => {
                 [classes.highlight]: numSelected > 0,
             })}
         >
-            <div className={classes.title}>
-                {(numSelected > 0 &&
-                    <Typography color="inherit" variant="subtitle1">
-                        Выбрано {numSelected}
-                    </Typography>
-                )}
-            </div>
-            <div className={classes.spacer} />
             <div className={classes.actions}>
                 {numSelected > 0 ? (
                     <Button color="primary" className={classes.deleteButton} onClick={deleteClick}>
