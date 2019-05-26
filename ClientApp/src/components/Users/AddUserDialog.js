@@ -69,7 +69,16 @@ class AddUserDialog extends React.Component {
         // as a prop by the parent (App)
 
         if (!this.validateForm()) {
-            const resultObject = { city: this.state.surname, district: this.state.name, street: this.state.patronymic, house: this.state.birthday, numberOfFlat: this.state.worksSince }
+            let role = 1;
+            if (this.state.position === 'Бухгалтер') {
+                role = 2;
+            }
+
+            const resultObject = {
+                surname: this.state.surname, name: this.state.name, patronymic: this.state.patronymic,
+                login: this.state.login, password: this.state.password, birthday: this.state.birthday,
+                worksSince: this.state.worksSince, roleId: role
+            }
 
 
             this.props.onAddAction(resultObject);

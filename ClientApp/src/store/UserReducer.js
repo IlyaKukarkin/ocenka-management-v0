@@ -18,35 +18,37 @@ export const actionCreators = {
 
         dispatch({ type: getUsersFinish, users });
     },
-    DeleteAppraiserSet: (id) => async (dispatch) => {
+    DeleteUserSet: (id) => async (dispatch) => {
         dispatch({ type: deleteUserStart });
 
-        const url = `api/AppraiserSets/${id}`;
+        const url = `api/UserSets/${id}`;
         const response = await fetch(url, { method: 'delete' });
 
         dispatch({ type: deleteUserFinish, id });
     },
-    DeleteAppraisersSet: (idSet) => async (dispatch) => {
+    DeleteUsersSet: (idSet) => async (dispatch) => {
         dispatch({ type: deleteUsersStart });
 
         idSet.forEach(async function (id) {
-            const url = `api/AppraiserSets/${id}`;
+            const url = `api/UserSets/${id}`;
             const response = await fetch(url, { method: 'delete' });
         });
 
         dispatch({ type: deleteUsersFinish, idSet });
     },
-    AddAppraiserSet: (data) => async (dispatch) => {
+    AddUserSet: (data) => async (dispatch) => {
         dispatch({ type: addUserStart });
 
-        const url = `api/AppraiserSets`;
+        const url = `api/UserSets`;
         let myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
             .then(function (response) {
                 return response.json();
-            }).then(function (newAddress) {
-                dispatch({ type: addUserFinish, newAddress });
+            }).then(function (newUser) {
+                const appr = { position: '1-кат', id: newUser.id };
+                fetch('api/AppraiserSets', { method: 'post', body: JSON.stringify(appr), headers: myHeaders });
+                dispatch({ type: addUserFinish, newUser });
             });
     }
 };
@@ -78,36 +80,36 @@ export const reducer = (state, action) => {
 
     if (action.type === deleteUserFinish) {
 
-        let newAddresses = state.addresses;
+        let newUsers = state.users;
 
-        for (var i = 0; i < newAddresses.length; i++) {
-            if (newAddresses[i].id === action.id) {
-                newAddresses.splice(i, 1);
+        for (var i = 0; i < newUsers.length; i++) {
+            if (newUsers[i].id === action.id) {
+                newUsers.splice(i, 1);
             }
         }
 
         return {
             ...state,
-            users: newAddresses,
+            users: newUsers,
             isLoading: false
         };
     }
 
-    if (action.type === deleteUserStart) {
+    if (action.type === deleteUsersStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === deleteUserFinish) {
+    if (action.type === deleteUsersFinish) {
 
-        let newAddresses = state.addresses;
+        let newUsers = state.users;
 
         for (var j = 0; j < action.idSet.length; j++) {
-            for (var k = 0; k < newAddresses.length; k++) {
-                if (newAddresses[k].id === action.idSet[j]) {
-                    newAddresses.splice(k, 1);
+            for (var k = 0; k < newUsers.length; k++) {
+                if (newUsers[k].id === action.idSet[j]) {
+                    newUsers.splice(k, 1);
                     break;
                 }
             }
@@ -115,7 +117,7 @@ export const reducer = (state, action) => {
 
         return {
             ...state,
-            users: newAddresses,
+            users: newUsers,
             isLoading: false
         };
     }
@@ -129,15 +131,15 @@ export const reducer = (state, action) => {
 
     if (action.type === addUserFinish) {
 
-        let addresses = state.addresses;
+        let users = state.users;
 
-        const newAddress = action.newAddress;
+        const newUser = action.newUser;
 
-        addresses.push(newAddress);
+        users.push(newUser);
 
         return {
             ...state,
-            users: addresses,
+            users: users,
             isLoading: false
         };
     }

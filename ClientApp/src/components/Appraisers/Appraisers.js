@@ -34,11 +34,11 @@ const styles = theme => ({
 });
 
 const rows = [
-    { id: 'idNavigation.surname', numeric: false, label: '5' },
-    { id: 'idNavigation.name', numeric: false, label: '6' },
-    { id: 'idNavigation.patronymic', numeric: false, label: '7' },
-    { id: 'idNavigation.birthday', numeric: false, label: '8' },
-    { id: 'idNavigation.worksSince', numeric: false, label: '9' },
+    { id: 'surname', numeric: false, label: '5' },
+    { id: 'name', numeric: false, label: '6' },
+    { id: 'patronymic', numeric: false, label: '7' },
+    { id: 'birthday', numeric: false, label: '8' },
+    { id: 'worksSince', numeric: false, label: '9' },
     { id: 'position', numeric: false, label: '10' },
 ];
 
@@ -201,11 +201,11 @@ class Appraisers extends Component {
                                                 <TableCell padding="none" className={classes.narrowCell}>
                                                     <Checkbox onClick={event => this.handleClick(event, n.id)} checked={isSelected} color="primary"/>
                                                 </TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.idNavigation.surname}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.idNavigation.name}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.idNavigation.patronymic}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{getDate(n.idNavigation.birthday)}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{getYear(n.idNavigation.worksSince)}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.surname}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.name}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.patronymic}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{getDate(n.birthday)}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{getYear(n.worksSince)}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.position}</TableCell>
                                                 <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.handleEditClick(event, n.id)}>
                                                     <Edit fontSize="small" />

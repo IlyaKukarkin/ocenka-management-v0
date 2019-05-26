@@ -106,9 +106,6 @@ class Layout extends Component {
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/" selected={'/' === pathname}>
                         <MenuText textIndex={0} />
                     </MenuItem>
-                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/counter" selected={'/counter' === pathname}>
-                        <MenuText textIndex={1} />
-                    </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/users" selected={'/users' === pathname}>
                         <MenuText textIndex={6} />
                     </MenuItem>
@@ -116,8 +113,11 @@ class Layout extends Component {
                         <MenuText textIndex={4} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/address" selected={'/address' === pathname}>
+                        <MenuText textIndex={9} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/neural" selected={'/neural' === pathname}>
                         <MenuText textIndex={5} />
-                    </MenuItem>                    
+                    </MenuItem>
                 </MenuList>
             </div>
         );

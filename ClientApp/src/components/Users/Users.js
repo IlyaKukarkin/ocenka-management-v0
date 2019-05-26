@@ -10,7 +10,7 @@ import AddUserDialog from './AddUserDialog';
 import RoleText from '../Home/RoleText';
 import { withStyles } from '@material-ui/core/styles';
 import {
-    Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
+    Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox, Snackbar
 } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 
@@ -123,19 +123,19 @@ class Users extends Component {
     };
 
     handleDeleteClick = () => {
-        const { DeleteAddressSet, DeleteAddressesSet } = this.props;
+        const { DeleteUserSet, DeleteUsersSet } = this.props;
 
         this.setState({ showDeleteDialog: false });
         if (this.state.selected.length === 1) {
-            DeleteAddressSet(this.state.selected[0]);
+            DeleteUserSet(this.state.selected[0]);
         } else {
-            DeleteAddressesSet(this.state.selected);
+            DeleteUsersSet(this.state.selected);
         }
         this.setState({ selected: [] });
     }
 
     handleAddClick = (data) => {
-        this.props.AddAddressSet(data);
+        this.props.AddUserSet(data);
 
         this.setState({ showAddDialog: false });
     }
@@ -164,16 +164,15 @@ class Users extends Component {
 
     render() {
         const { classes, isLoading } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
+        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
         return (
             <TableCardLayout headerIndex={2} isLoading={isLoading} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
-                <DeleteDialog header={1} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
-                <AddUserDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={this.state.showAddDialog} />
+                <DeleteDialog header={1} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
+                <AddUserDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
-
                         <Table className={classes.table}>
                             <MyTableHead
                                 numSelected={selected.length}
