@@ -39,17 +39,31 @@ export const actionCreators = {
     AddUserSet: (data) => async (dispatch) => {
         dispatch({ type: addUserStart });
 
-        const url = `api/UserSets`;
-        let myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
-            .then(function (response) {
-                return response.json();
-            }).then(function (newUser) {
-                const appr = { position: '1-кат', id: newUser.id };
-                fetch('api/AppraiserSets', { method: 'post', body: JSON.stringify(appr), headers: myHeaders });
-                dispatch({ type: addUserFinish, newUser });
-            });
+        if (data.roleId === 1) {
+            const url = `api/UserSets`;
+            let myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
+                .then(function (response) {
+                    return response.json();
+                }).then(function (newUser) {
+                    const appr = { position: data.extra, id: newUser.id };
+                    fetch('api/AppraiserSets', { method: 'post', body: JSON.stringify(appr), headers: myHeaders });
+                    dispatch({ type: addUserFinish, newUser });
+                });
+        } else {
+            const url = `api/UserSets`;
+            let myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
+                .then(function (response) {
+                    return response.json();
+                }).then(function (newUser) {
+                    const acc = { salary: data.extra, id: newUser.id };
+                    fetch('api/AccountantSets', { method: 'post', body: JSON.stringify(acc), headers: myHeaders });
+                    dispatch({ type: addUserFinish, newUser });
+                });
+        }        
     }
 };
 

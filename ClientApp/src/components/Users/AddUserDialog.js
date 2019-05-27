@@ -1,7 +1,8 @@
 ﻿import React from 'react';
 import MaskedInput from 'react-text-mask';
+import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, MenuItem, IconButton, InputAdornment, FormControl, Input, InputLabel
+    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, MenuItem, IconButton, InputAdornment, FormControl, Input, InputLabel, Fade
 } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 
@@ -9,7 +10,14 @@ function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-function TextMaskCustom(props) {
+const numberMask = createNumberMask({
+    prefix: '',
+    suffix: ' ₽',
+    integerLimit: '10000000',
+    allowDecimal: true
+});
+
+function DateMask(props) {
     const { inputRef, ...other } = props;
 
     return (
@@ -19,6 +27,24 @@ function TextMaskCustom(props) {
                 inputRef(ref ? ref.inputElement : null);
             }}
             mask={[/[0-9]/, /[0-9]/, '/', /[0-9]/, /[0-9]/, '/', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
+            placeholderChar={'\u2000'}
+            keepCharPositions={true}
+            guide={false}
+            showMask
+        />
+    );
+}
+
+function SalaryMask(props) {
+    const { inputRef, ...other } = props;
+
+    return (
+        <MaskedInput
+            {...other}
+            ref={ref => {
+                inputRef(ref ? ref.inputElement : null);
+            }}
+            mask={numberMask}
             placeholderChar={'\u2000'}
             keepCharPositions={true}
             guide={false}
@@ -43,6 +69,8 @@ class AddUserDialog extends React.Component {
             birthday: '',
             worksSince: '',
             position: '',
+            category: '',
+            salary: '',
             surnameError: false,
             nameError: false,
             patronymicError: false,
@@ -51,6 +79,8 @@ class AddUserDialog extends React.Component {
             birthdayError: false,
             worksSinceError: false,
             positionError: false,
+            categoryError: false,
+            salaryError: false,
             surnameLabel: "Фамилия",
             nameLabel: "Имя",
             patronymicLabel: "Отчество",
@@ -59,6 +89,8 @@ class AddUserDialog extends React.Component {
             birthdayLabel: "Дата рождения",
             worksSinceLabel: "Дата начала работы",
             positionLabel: "Должность",
+            categoryLabel: "Выберите должность",
+            salaryLabel: "Зарплата",
             showPassword: false
         };
     }
@@ -69,15 +101,16 @@ class AddUserDialog extends React.Component {
         // as a prop by the parent (App)
 
         if (!this.validateForm()) {
-            let role = 1;
+            let role = 1, extra = this.state.category;
             if (this.state.position === 'Бухгалтер') {
                 role = 2;
+                extra = this.clearSalary(this.state.salary);
             }
 
             const resultObject = {
                 surname: this.state.surname, name: this.state.name, patronymic: this.state.patronymic,
                 login: this.state.login, password: this.state.password, birthday: this.state.birthday,
-                worksSince: this.state.worksSince, roleId: role
+                worksSince: this.state.worksSince, roleId: role, extra: extra
             }
 
 
@@ -92,6 +125,8 @@ class AddUserDialog extends React.Component {
                 birthday: '',
                 worksSince: '',
                 position: '',
+                category: '',
+                salary: '',
                 surnameError: false,
                 nameError: false,
                 patronymicError: false,
@@ -100,6 +135,8 @@ class AddUserDialog extends React.Component {
                 birthdayError: false,
                 worksSinceError: false,
                 positionError: false,
+                categoryError: false,
+                salaryError: false,
                 surnameLabel: "Фамилия",
                 nameLabel: "Имя",
                 patronymicLabel: "Отчество",
@@ -108,6 +145,8 @@ class AddUserDialog extends React.Component {
                 birthdayLabel: "Дата рождения",
                 worksSinceLabel: "Дата начала работы",
                 positionLabel: "Должность",
+                categoryLabel: "Выберите должность",
+                salaryLabel: "Зарплата",
                 showPassword: false
             });
         }
@@ -176,8 +215,12 @@ class AddUserDialog extends React.Component {
         return false;
     }
 
+    clearSalary(salary) {
+        return salary.substring(0, this.state.salary.length - 2).replace(/,/g, "");
+    }
+
     validateForm() {
-        let surname = false, name = false, patronymic = false, login = false, password = false, birthday = false, worksSince = false, position = false;
+        let surname = false, name = false, patronymic = false, login = false, password = false, birthday = false, worksSince = false, position = false, category = false, salary = false;
 
         if (this.state.surname !== "") {
             if (this.state.surname.length > 30) {
@@ -311,6 +354,36 @@ class AddUserDialog extends React.Component {
             this.setState({ positionLabel: "Выберите должность" });
             this.setState({ positionError: true });
             position = true;
+        } else {
+            if (this.state.position === "Оценщик") {
+                if (this.state.category === "") {
+                    this.setState({ categoryLabel: "Выберите категорию" });
+                    this.setState({ categoryError: true });
+                    category = true;
+                }
+            } else {
+                if (this.state.salary === "") {
+                    this.setState({ salaryLabel: "Введите зарплату" });
+                    this.setState({ salaryError: true });
+                    salary = true;
+                } else {
+                    let salaryNumber = this.clearSalary(this.state.salary);
+
+                    if (salaryNumber.includes('.')) {
+                        if (salaryNumber.length > 9) {
+                            this.setState({ salaryLabel: "Зарплата слишком большая" });
+                            this.setState({ salaryError: true });
+                            salary = true;
+                        }
+                    } else {
+                        if (salaryNumber.length > 6) {
+                            this.setState({ salaryLabel: "Зарплата слишком большая" });
+                            this.setState({ salaryError: true });
+                            salary = true;
+                        }
+                    }
+                }
+            }
         }
 
         if (!surname) {
@@ -353,6 +426,16 @@ class AddUserDialog extends React.Component {
             this.setState({ positionError: false });
         }
 
+        if (!category) {
+            this.setState({ categoryLabel: "Категория" });
+            this.setState({ categoryError: false });
+        }
+
+        if (!salary) {
+            this.setState({ salaryLabel: "Зарплата" });
+            this.setState({ salaryError: false });
+        }
+
         if (!birthday && !worksSince) {
             if (!this.dateLess(this.state.birthday, this.state.worksSince)) {
                 this.setState({ worksSinceLabel: "Дата начала работы раньше или равна дню рождения" });
@@ -366,7 +449,12 @@ class AddUserDialog extends React.Component {
 
     handleChange(event) {
         if (event.target.id === undefined) {
-            this.setState({ position: event.target.value });
+            if (event.target.value === 'Оценщик' || event.target.value === 'Бухгалтер') {
+                this.setState({ position: event.target.value });
+                this.setState({ categoryLabel: event.target.value === 'Оценщик' ? 'Категория' : 'Зарплата' });
+            } else {
+                this.setState({ category: event.target.value });
+            }
         } else {
             this.setState({
                 [event.target.id]: event.target.value
@@ -391,6 +479,8 @@ class AddUserDialog extends React.Component {
             birthday: '',
             worksSince: '',
             position: '',
+            category: '',
+            salary: '',
             surnameError: false,
             nameError: false,
             patronymicError: false,
@@ -399,6 +489,8 @@ class AddUserDialog extends React.Component {
             birthdayError: false,
             worksSinceError: false,
             positionError: false,
+            categoryError: false,
+            salaryError: false,
             surnameLabel: "Фамилия",
             nameLabel: "Имя",
             patronymicLabel: "Отчество",
@@ -407,6 +499,8 @@ class AddUserDialog extends React.Component {
             birthdayLabel: "Дата рождения",
             worksSinceLabel: "Дата начала работы",
             positionLabel: "Должность",
+            categoryLabel: "Выберите должность",
+            salaryLabel: "Зарплата",
             showPassword: false
         });
 
@@ -417,6 +511,7 @@ class AddUserDialog extends React.Component {
         const { showDialog } = this.props;
 
         const positions = [{ value: 'Оценщик', label: 'Оценщик' }, { value: 'Бухгалтер', label: 'Бухгалтер' }];
+        const categories = [{ value: '1-кат.', label: '1-кат.' }, { value: '2-кат.', label: '2-кат.' }, { value: 'Оценщик', label: 'Оценщик' }];
 
         return (
             <Dialog
@@ -502,7 +597,7 @@ class AddUserDialog extends React.Component {
                             onChange={this.handleChange}
                             error={this.state.birthdayError}
                             InputProps={{
-                                inputComponent: TextMaskCustom
+                                inputComponent: DateMask
                             }}
                             fullWidth
                         />
@@ -515,7 +610,7 @@ class AddUserDialog extends React.Component {
                             onChange={this.handleChange}
                             error={this.state.worksSinceError}
                             InputProps={{
-                                inputComponent: TextMaskCustom
+                                inputComponent: DateMask
                             }}
                             fullWidth
                         />
@@ -536,6 +631,39 @@ class AddUserDialog extends React.Component {
                                 </MenuItem>
                             ))}
                         </TextField>
+                        {
+                            this.state.position === 'Оценщик' ? <TextField
+                                autoFocus
+                                select
+                                margin="dense"
+                                id="category"
+                                label={this.state.categoryLabel}
+                                value={this.state.category}
+                                onChange={this.handleChange}
+                                error={this.state.categoryError}
+                                fullWidth
+                            >
+                                {categories.map(option => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField> : <TextField
+                                    autoFocus
+                                    disabled={this.state.position === ''}
+                                    margin="dense"
+                                    id="salary"
+                                    label={this.state.salaryLabel}
+                                    value={this.state.salary}
+                                    onChange={this.handleChange}
+                                    error={this.state.salaryError}
+                                    InputProps={{
+                                        inputComponent: SalaryMask
+                                    }}
+                                    fullWidth
+                            />
+                        }
+                        
                     </form>
                 </DialogContent>
                 <DialogActions>

@@ -102,7 +102,7 @@ class TableCardLayout extends Component {
                                 </Button>
                                 <Button color="secondary">
                                     <SaveAlt className={classes.leftIcon} />
-                                    В Эксель
+                                    В Excel
                                 </Button>
                             </Grid>
                         </Grid>

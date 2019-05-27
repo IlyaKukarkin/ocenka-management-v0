@@ -21,6 +21,7 @@
     "redux-thunk": "^2.2.0",
     "rimraf": "^2.6.2",
     "roboto-fontface": "^0.10.0",
+    "text-mask-addons": "^3.8.0",
     "typeface-roboto": "0.0.54"
   },
   "scripts": {
