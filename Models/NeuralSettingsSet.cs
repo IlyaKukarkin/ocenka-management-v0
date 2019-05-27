@@ -7,7 +7,7 @@ namespace ocenka_management.Models
     {
         public int Id { get; set; }
         public double RefinancingRate { get; set; }
-        public double AverageSaslary { get; set; }
+        public double AverageSalary { get; set; }
         public double Gdp { get; set; }
         public double Rts { get; set; }
         public double DollarPrice { get; set; }

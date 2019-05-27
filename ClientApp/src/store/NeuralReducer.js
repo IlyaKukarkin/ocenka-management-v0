@@ -2,7 +2,7 @@
 const getSettingsFinish = 'GET_SETTINGS_FINISH';
 const calculateStart = 'CALCULATE_START';
 const calculateFinish = 'CALCULATE_FINISH';
-const initialState = { settings: [], result: 0, isLoading: false };
+const initialState = { settings: [], price: 0, isLoading: false };
 
 export const actionCreators = {
     GetSettings: () => async (dispatch) => {
@@ -57,7 +57,7 @@ export const reducer = (state, action) => {
     if (action.type === calculateFinish) {
         return {
             ...state,
-            result: action.price,
+            price: action.price,
             isLoading: false
         };
     }
