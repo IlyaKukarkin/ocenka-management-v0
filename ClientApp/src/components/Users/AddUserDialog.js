@@ -444,7 +444,7 @@ class AddUserDialog extends React.Component {
             }
         }
 
-        return (surname || name || patronymic || login || password || birthday || worksSince || position);
+        return (surname || name || patronymic || login || password || birthday || worksSince || position || category || salary);
     }
 
     handleChange(event) {

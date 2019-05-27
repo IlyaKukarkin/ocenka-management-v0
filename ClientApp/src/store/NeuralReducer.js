@@ -50,15 +50,13 @@ export const reducer = (state, action) => {
     if (action.type === calculateStart) {
         return {
             ...state,
-            isLoading: true
         };
     }
 
     if (action.type === calculateFinish) {
         return {
             ...state,
-            price: action.price,
-            isLoading: false
+            price: action.price
         };
     }
 

@@ -1,10 +1,11 @@
 ﻿import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import MaskedInput from 'react-text-mask';
 import { actionCreators } from '../../store/NeuralReducer';
 import { withStyles } from '@material-ui/core/styles';
 import {
-    Grid, TextField, Button, Typography, CircularProgress
+    Grid, TextField, Button, Typography, CircularProgress, MenuItem
 } from '@material-ui/core';
 
 const styles = theme => ({
@@ -19,13 +20,89 @@ const styles = theme => ({
         marginBottom: '9px'
     },
     result: {
-        color: '#3f51b5'
+        color: '#3f51b5',
+        marginTop: '20px',
     },
     loading: {
         height: '400px',
         marginUp: '180px'
     },
+    button: {
+        marginLeft: '22px',
+    },
 });
+
+function YearMask(props) {
+    const { inputRef, ...other } = props;
+
+    return (
+        <MaskedInput
+            {...other}
+            ref={ref => {
+                inputRef(ref ? ref.inputElement : null);
+            }}
+            mask={[/[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
+            placeholderChar={'\u2000'}
+            keepCharPositions={true}
+            guide={false}
+            showMask
+        />
+    );
+}
+
+function AreaMask(props) {
+    const { inputRef, ...other } = props;
+
+    return (
+        <MaskedInput
+            {...other}
+            ref={ref => {
+                inputRef(ref ? ref.inputElement : null);
+            }}
+            mask={[/[0-9]/, /[0-9]/, /[0-9]/]}
+            placeholderChar={'\u2000'}
+            keepCharPositions={true}
+            guide={false}
+            showMask
+        />
+    );
+}
+
+function FloorMask(props) {
+    const { inputRef, ...other } = props;
+
+    return (
+        <MaskedInput
+            {...other}
+            ref={ref => {
+                inputRef(ref ? ref.inputElement : null);
+            }}
+            mask={[/[0-9]/, /[0-9]/]}
+            placeholderChar={'\u2000'}
+            keepCharPositions={true}
+            guide={false}
+            showMask
+        />
+    );
+}
+
+function RoomsMask(props) {
+    const { inputRef, ...other } = props;
+
+    return (
+        <MaskedInput
+            {...other}
+            ref={ref => {
+                inputRef(ref ? ref.inputElement : null);
+            }}
+            mask={[/[0-9]/]}
+            placeholderChar={'\u2000'}
+            keepCharPositions={true}
+            guide={false}
+            showMask
+        />
+    );
+}
 
 class Neural extends React.Component {
     constructor(props) {
@@ -70,20 +147,34 @@ class Neural extends React.Component {
     }
 
     submitHandler() {
-        //evt.preventDefault();
-        // pass the input field value to the event handler passed
-        // as a prop by the parent (App)
 
         if (!this.validateForm()) {
-            let role = 1, extra = this.state.category;
-            if (this.state.position === 'Бухгалтер') {
-                role = 2;
-                extra = this.clearSalary(this.state.salary);
+            let walls, distr = this.getDistrictValue(this.state.district);
+
+            switch (this.state.walls) {
+                case 'Блок':
+                    walls = '000001';
+                    break;
+                case 'Шлакоблок':
+                    walls = '000010';
+                    break;
+                case 'Газобетон':
+                    walls = '000100';
+                    break;
+                case 'Монолит':
+                    walls = '001000';
+                    break;
+                case 'Панель':
+                    walls = '010000';
+                    break;
+                case 'Кирпич':
+                    walls = '100000';
+                    break;
             }
 
             const resultObject = {
                 livingArea: this.state.livingArea, kitchenArea: this.state.kitchenArea, numberOfRooms: this.state.numberOfRooms, floor: this.state.floor,
-                numberOfFloors: this.state.numberOfFloors, district: this.state.district, year: this.state.year, walls: this.state.walls,
+                numberOfFloors: this.state.numberOfFloors, district: distr, year: this.state.year, walls: walls,
                 refinancingRate: this.state.data.refinancingRate, averageSalary: this.state.data.averageSalary, gdp: this.state.data.gdp, rts: this.state.data.rts,
                 dollarPrice: this.state.data.dollarPrice, brentPrice: this.state.data.brentPrice, estateBuilding: this.state.data.estateBuilding, creditsAmount: this.state.data.creditsAmount
             };
@@ -93,242 +184,122 @@ class Neural extends React.Component {
     }
 
     validateForm() {
-        let surname = false, name = false, patronymic = false, login = false, password = false, birthday = false, worksSince = false, position = false, category = false, salary = false;
+        let livingArea = false, kitchenArea = false, numberOfRooms = false, floor = false, numberOfFloors = false, district = false, year = false, walls = false;
 
-        return false;
+        if (this.state.livingArea === "") {
+            this.setState({ livingAreaLabel: "Введите жилую площадь" });
+            this.setState({ livingAreaError: true });
+            livingArea = true;
+        }
 
-        if (this.state.surname !== "") {
-            if (this.state.surname.length > 30) {
-                this.setState({ surnameLabel: "Фамилия до 30 символов" });
-                this.setState({ surnameError: true });
-                surname = true;
-            }
+        if (this.state.kitchenArea === "") {
+            this.setState({ kitchenAreaLabel: "Введите площадь кухни" });
+            this.setState({ kitchenAreaError: true });
+            kitchenArea = true;
+        }
+
+        if (this.state.numberOfRooms === "") {
+            this.setState({ numberOfRoomsLabel: "Введите кол-во комнат" });
+            this.setState({ numberOfRoomsError: true });
+            numberOfRooms = true;
+        }
+
+        if (this.state.floor === "") {
+            this.setState({ floorLabel: "Введите этаж" });
+            this.setState({ floorError: true });
+            floor = true;
+        }
+
+        if (this.state.numberOfFloors === "") {
+            this.setState({ numberOfFloorsLabel: "Введите кол-во этажей" });
+            this.setState({ numberOfFloorsError: true });
+            numberOfFloors = true;
+        }
+
+        if (this.state.district === "") {
+            this.setState({ districtLabel: "Выберете микрорайон" });
+            this.setState({ districtError: true });
+            district = true;
+        }
+
+        if (this.state.year === "") {
+            this.setState({ yearLabel: "Введите год постройки" });
+            this.setState({ yearError: true });
+            year = true;
         } else {
-            this.setState({ surnameLabel: "Введите фамилию" });
-            this.setState({ surnameError: true });
-            surname = true;
-        }
+            const today = new Date();
+            const yyyy = today.getFullYear();
 
-        if (this.state.name !== "") {
-            if (this.state.name.length > 30) {
-                this.setState({ nameLabel: "Имя до 30 символов" });
-                this.setState({ nameError: true });
-                name = true;
-            }
-        } else {
-            this.setState({ nameLabel: "Введите имя" });
-            this.setState({ nameError: true });
-            name = true;
-        }
-
-        if (this.state.patronymic !== "") {
-            if (this.state.patronymic.length > 30) {
-                this.setState({ patronymicLabel: "Отчество до 30 символов" });
-                this.setState({ patronymicError: true });
-                patronymic = true;
-            }
-        } else {
-            this.setState({ patronymicLabel: "Введите отчество" });
-            this.setState({ patronymicError: true });
-            patronymic = true;
-        }
-
-        if (this.state.login !== "") {
-            if (this.state.login.length > 30 || this.state.login.length < 8) {
-                this.setState({ loginLabel: "Логин от 8 до 30 символов" });
-                this.setState({ loginError: true });
-                login = true;
-            } else {
-                if (/[А-Я]/.test(this.state.login) || /[а-я]/.test(this.state.login)) {
-                    this.setState({ loginLabel: "Логин не должен содержать русские буквы" });
-                    this.setState({ loginError: true });
-                    login = true;
-                }
-            }
-        } else {
-            this.setState({ loginLabel: "Введите логин" });
-            this.setState({ loginError: true });
-            login = true;
-        }
-
-        if (this.state.password !== "") {
-            if (this.state.password.length > 30) {
-                this.setState({ passwordLabel: "Пароль до 30 символов" });
-                this.setState({ passwordError: true });
-                password = true;
-            } else {
-                if (this.state.password.length < 8) {
-                    this.setState({ passwordLabel: "Пароль от 8 символов" });
-                    this.setState({ passwordError: true });
-                    password = true;
-                } else {
-                    let count = 0;
-
-                    count += /[a-z]/.test(this.state.password) ? 1 : 0;
-                    count += /[A-Z]/.test(this.state.password) ? 1 : 0;
-                    count += /\d/.test(this.state.password) ? 1 : 0;
-
-                    if (count !== 3) {
-                        this.setState({ passwordLabel: "Пароль должен содержать цифры, строчные и заглавные латинские буквы" });
-                        this.setState({ passwordError: true });
-                        password = true;
-                    }
-                }
-            }
-        } else {
-            this.setState({ passwordLabel: "Введите пароль" });
-            this.setState({ passwordError: true });
-            password = true;
-        }
-
-        if (this.state.birthday !== "") {
-            if (this.state.birthday.length < 10) {
-                this.setState({ birthdayLabel: "Введите дату рождения полностью" });
-                this.setState({ birthdayError: true });
-                birthday = true;
-            } else {
-                const day = +this.state.birthday.substring(0, 2);
-                const month = +this.state.birthday.substring(3, 5);
-                const year = +this.state.birthday.substring(6, 10);
-
-                if (this.checkData(day, month, year)) {
-                    this.setState({ birthdayLabel: "Введите дату рождения корректно" });
-                    this.setState({ birthdayError: true });
-                    birthday = true;
-                }
-            }
-        } else {
-            this.setState({ birthdayLabel: "Введите дату рождения" });
-            this.setState({ birthdayError: true });
-            birthday = true;
-        }
-
-        if (this.state.worksSince !== "") {
-            if (this.state.worksSince.length < 10) {
-                this.setState({ worksSinceLabel: "Введите год начала работы полностью" });
-                this.setState({ worksSinceError: true });
-                worksSince = true;
-            } else {
-                const day = +this.state.worksSince.substring(0, 2);
-                const month = +this.state.worksSince.substring(3, 5);
-                const year = +this.state.worksSince.substring(6, 10);
-
-                if (this.checkData(day, month, year)) {
-                    this.setState({ worksSinceLabel: "Введите год начала работы корректно" });
-                    this.setState({ worksSinceError: true });
-                    worksSince = true;
-                }
-            }
-        } else {
-            this.setState({ worksSinceLabel: "Введите дату начала работы" });
-            this.setState({ worksSinceError: true });
-            worksSince = true;
-        }
-
-        if (this.state.position === "") {
-            this.setState({ positionLabel: "Выберите должность" });
-            this.setState({ positionError: true });
-            position = true;
-        } else {
-            if (this.state.position === "Оценщик") {
-                if (this.state.category === "") {
-                    this.setState({ categoryLabel: "Выберите категорию" });
-                    this.setState({ categoryError: true });
-                    category = true;
-                }
-            } else {
-                if (this.state.salary === "") {
-                    this.setState({ salaryLabel: "Введите зарплату" });
-                    this.setState({ salaryError: true });
-                    salary = true;
-                } else {
-                    let salaryNumber = this.clearSalary(this.state.salary);
-
-                    if (salaryNumber.includes('.')) {
-                        if (salaryNumber.length > 9) {
-                            this.setState({ salaryLabel: "Зарплата слишком большая" });
-                            this.setState({ salaryError: true });
-                            salary = true;
-                        }
-                    } else {
-                        if (salaryNumber.length > 6) {
-                            this.setState({ salaryLabel: "Зарплата слишком большая" });
-                            this.setState({ salaryError: true });
-                            salary = true;
-                        }
-                    }
-                }
+            if (this.state.year > yyyy || this.state.year < 1945) {
+                this.setState({ yearLabel: `Год от 1945 до ${yyyy}` });
+                this.setState({ yearError: true });
+                year = true;
             }
         }
 
-        if (!surname) {
-            this.setState({ surnameLabel: "Фамилия" });
-            this.setState({ surnameError: false });
+        if (this.state.walls === "") {
+            this.setState({ wallsLabel: "Выберете тип стен" });
+            this.setState({ wallsError: true });
+            walls = true;
         }
 
-        if (!name) {
-            this.setState({ nameLabel: "Имя" });
-            this.setState({ nameError: false });
+        if (!livingArea) {
+            this.setState({ livingAreaLabel: "Жилая площадь" });
+            this.setState({ livingAreaError: false });
         }
 
-        if (!patronymic) {
-            this.setState({ patronymicLabel: "Отчество" });
-            this.setState({ patronymicError: false });
+        if (!kitchenArea) {
+            this.setState({ kitchenAreaLabel: "Площадь кухни" });
+            this.setState({ kitchenAreaError: false });
         }
 
-        if (!login) {
-            this.setState({ loginLabel: "Логин" });
-            this.setState({ loginError: false });
+        if (!numberOfRooms) {
+            this.setState({ numberOfRoomsLabel: "Кол-во комнат" });
+            this.setState({ numberOfRoomsError: false });
         }
 
-        if (!password) {
-            this.setState({ passwordLabel: "Пароль" });
-            this.setState({ passwordError: false });
+        if (!floor) {
+            this.setState({ floorLabel: "Этаж" });
+            this.setState({ floorError: false });
         }
 
-        if (!birthday) {
-            this.setState({ birthdayLabel: "Дата рождения" });
-            this.setState({ birthdayError: false });
+        if (!numberOfFloors) {
+            this.setState({ numberOfFloorsLabel: "Кол-во этажей" });
+            this.setState({ numberOfFloorsError: false });
         }
 
-        if (!worksSince) {
-            this.setState({ worksSinceLabel: "Дата начала работы" });
-            this.setState({ worksSinceError: false });
+        if (!district) {
+            this.setState({ districtLabel: "Микрорайон" });
+            this.setState({ districtError: false });
         }
 
-        if (!position) {
-            this.setState({ positionLabel: "Должность" });
-            this.setState({ positionError: false });
+        if (!year) {
+            this.setState({ yearLabel: "Год постройки" });
+            this.setState({ yearError: false });
         }
 
-        if (!category) {
-            this.setState({ categoryLabel: "Категория" });
-            this.setState({ categoryError: false });
+        if (!walls) {
+            this.setState({ wallsLabel: "Тип стен" });
+            this.setState({ wallsError: false });
         }
 
-        if (!salary) {
-            this.setState({ salaryLabel: "Зарплата" });
-            this.setState({ salaryError: false });
-        }
-
-        if (!birthday && !worksSince) {
-            if (!this.dateLess(this.state.birthday, this.state.worksSince)) {
-                this.setState({ worksSinceLabel: "Дата начала работы раньше или равна дню рождения" });
-                this.setState({ worksSinceError: true });
-                worksSince = true;
+        if (!floor && !numberOfFloors) {
+            if (+this.state.floor > +this.state.numberOfFloors) {
+                this.setState({ floorLabel: "Этаж больше чем этажность здания" });
+                this.setState({ floorError: true });
+                floor = true;
             }
         }
 
-        return (surname || name || patronymic || login || password || birthday || worksSince || position);
+        return (livingArea || kitchenArea || numberOfRooms || floor || numberOfFloors || district || year || walls);
     }
 
     handleChange(event) {
         if (event.target.id === undefined) {
-            if (event.target.value === 'Оценщик' || event.target.value === 'Бухгалтер') {
-                this.setState({ position: event.target.value });
-                this.setState({ categoryLabel: event.target.value === 'Оценщик' ? 'Категория' : 'Зарплата' });
+            if (event.target.value === 'Блок' || event.target.value === 'Шлакоблок' || event.target.value === 'Газобетон' || event.target.value === 'Монолит' || event.target.value === 'Панель' || event.target.value === 'Кирпич') {
+                this.setState({ walls: event.target.value });
             } else {
-                this.setState({ category: event.target.value });
+                this.setState({ district: event.target.value });
             }
         } else {
             this.setState({
@@ -337,9 +308,117 @@ class Neural extends React.Component {
         }
     }
 
+    getDistrictValue(distr) {
+        switch (distr) {
+            case 'Центр':
+            case 'Разгуляй':
+                return '1000000';
+            case 'Данилиха':
+            case 'Парковый':
+            case 'Плоский':
+            case 'Светлый':
+            case 'Новоплоский':
+            case 'Городские горки':
+            case 'Садовый':
+            case 'Громовский':
+            case 'Зелёное хозяйство':
+            case 'Островский':
+            case 'Свердловский':
+                return '0100000';
+            case 'Балатово':
+            case 'Комплекс ПГТУ':
+            case 'Ива':
+            case 'Рабочий посёлок':
+            case 'Юбилейный':
+                return '0010000';
+            case 'Акулова':
+            case 'Железнодорожный':
+            case 'Комсомольский':
+            case 'Пролетарский':
+            case 'Ераничи':
+            case 'Нагорный':
+            case 'Верхняя курья':
+            case 'Висим':
+            case 'Запруд':
+            case 'Владимирский':
+            case 'Краснова':
+            case 'Крохалева':
+            case 'Южный':
+                return '0001000';
+            case 'Заостровка':
+            case 'Нижняя курья':
+            case 'Новые водники':
+            case 'Старые водники':
+            case 'Судозаводский':
+            case 'Вышка 2':
+            case 'Верхние Муллы':
+            case 'Закамск':
+            case 'Октябрьский':
+            case 'Гайва':
+            case 'Домостроительный':
+            case 'КамГЭС':
+            case 'Камский':
+            case 'Кислотные дачи':
+            case 'Левшино':
+            case 'Молодёжный':
+            case 'Чапаевский':
+            case 'Энергетик':
+            case 'Липовая гора':
+            case 'Ремзавод':
+            case 'Первомайский':
+                return '0000010';
+            case 'Хмели':
+            case 'Крым':
+            case 'Бумкомбинат':
+            case 'Голованово':
+            case 'Заозерье':
+            case 'Новые ляды':
+            case 'Чусовской водозабор':
+                return '0000001';
+        }
+    }
+
     render() {
         const { classes, isLoading, price } = this.props;
         const { data } = this.state;
+
+        const distr = [
+            { value: 'Центр', label: 'Центр' }, { value: 'Разгуляй', label: 'Разгуляй' },
+            { value: 'Данилиха', label: 'Данилиха' }, { value: 'Парковый', label: 'Парковый' },
+            { value: 'Плоский', label: 'Плоский' }, { value: 'Светлый', label: 'Светлый' },
+            { value: 'Новоплоский', label: 'Новоплоский' }, { value: 'Городские горки', label: 'Городские горки' },
+            { value: 'Садовый', label: 'Садовый' }, { value: 'Громовский', label: 'Громовский' },
+            { value: 'Зелёное хозяйство', label: 'Зелёное хозяйство' }, { value: 'Островский', label: 'Островский' },
+            { value: 'Свердловский', label: 'Свердловский' },
+            { value: 'Балатово', label: 'Балатово' }, { value: 'Комплекс ПГТУ', label: 'Комплекс ПГТУ' },
+            { value: 'Ива', label: 'Ива' }, { value: 'Рабочий посёлок', label: 'Рабочий посёлок' },
+            { value: 'Юбилейный', label: 'Юбилейный' },
+            { value: 'Акулова', label: 'Акулова' }, { value: 'Железнодорожный', label: 'Железнодорожный' },
+            { value: 'Комсомольский', label: 'Комсомольский' }, { value: 'Пролетарский', label: 'Пролетарский' },
+            { value: 'Ераничи', label: 'Ераничи' }, { value: 'Нагорный', label: 'Нагорный' },
+            { value: 'Верхняя курья', label: 'Верхняя курья' }, { value: 'Висим', label: 'Висим' },
+            { value: 'Запруд', label: 'Запруд' }, { value: 'Владимирский', label: 'Владимирский' },
+            { value: 'Краснова', label: 'Краснова' }, { value: 'Крохалева', label: 'Крохалева' },
+            { value: 'Южный', label: 'Южный' },
+            { value: 'Заостровка', label: 'Заостровка' }, { value: 'Нижняя курья', label: 'Нижняя курья' },
+            { value: 'Новые водники', label: 'Новые водники' }, { value: 'Старые водники', label: 'Старые водники' },
+            { value: 'Судозаводский', label: 'Судозаводский' }, { value: 'Вышка 2', label: 'Вышка 2' },
+            { value: 'Верхние Муллы', label: 'Верхние Муллы' }, { value: 'Закамск', label: 'Закамск' },
+            { value: 'Октябрьский', label: 'Октябрьский' }, { value: 'Гайва', label: 'Гайва' },
+            { value: 'Домостроительный', label: 'Домостроительный' }, { value: 'КамГЭС', label: 'КамГЭС' },
+            { value: 'Камский', label: 'Камский' }, { value: 'Кислотные дачи', label: 'Кислотные дачи' },
+            { value: 'Левшино', label: 'Левшино' }, { value: 'Молодёжный', label: 'Молодёжный' },
+            { value: 'Чапаевский', label: 'Чапаевский' }, { value: 'Энергетик', label: 'Энергетик' },
+            { value: 'Липовая гора', label: 'Липовая гора' }, { value: 'Ремзавод', label: 'Ремзавод' },
+            { value: 'Первомайский', label: 'Первомайский' },
+            { value: 'Хмели', label: 'Хмели' }, { value: 'Крым', label: 'Крым' },
+            { value: 'Бумкомбинат', label: 'Бумкомбинат' }, { value: 'Голованово', label: 'Голованово' },
+            { value: 'Заозерье', label: 'Заозерье' }, { value: 'Новые ляды', label: 'Новые ляды' },
+            { value: 'Чусовской водозабор', label: 'Чусовской водозабор' }
+        ];
+        const walls = [
+            { value: 'Блок', label: 'Блок' }, { value: 'Шлакоблок', label: 'Шлакоблок' }, { value: 'Газобетон', label: 'Газобетон' },
+            { value: 'Монолит', label: 'Монолит' }, { value: 'Панель', label: 'Панель' }, { value: 'Кирпич', label: 'Кирпич' }];
 
         return (
             <div>
@@ -354,49 +433,54 @@ class Neural extends React.Component {
                 </Grid> :
 
                     <Grid container spacing={24}>
-                        <Grid item xs={6}>
+                        <Grid item xs={5}>
                             <Grid container className={classes.cellFirst} justify="flex-end" alignContent="center">
-                                <Grid item xs={9}>
+                                <Grid item xs>
                                     <Typography>Ставка рефинансирования: <b>{data.refinancingRate}</b></Typography>
                                 </Grid>
                             </Grid>
                             <Grid container className={classes.cell} justify="flex-end" alignContent="center">
-                                <Grid item xs={9}>
+                                <Grid item xs>
                                     <Typography>Средняя зарплата: <b>{data.averageSalary}</b></Typography>
                                 </Grid>
                             </Grid>
                             <Grid container className={classes.cell} justify="flex-end" alignContent="center">
-                                <Grid item xs={9}>
+                                <Grid item xs>
                                     <Typography>ВВП России: <b>{data.gdp}</b></Typography>
                                 </Grid>
                             </Grid>
                             <Grid container className={classes.cell} justify="flex-end" alignItems="center" alignContent="center">
-                                <Grid item xs={9}>
+                                <Grid item xs>
                                     <Typography>РТС: <b>{data.rts}</b></Typography>
                                 </Grid>
                             </Grid>
                             <Grid container className={classes.cell} justify="flex-end" alignItems="center" alignContent="center">
-                                <Grid item xs={9}>
+                                <Grid item xs>
                                     <Typography>Стоимость доллара: <b>{data.dollarPrice}</b></Typography>
                                 </Grid>
                             </Grid>
                             <Grid container className={classes.cell} justify="flex-end" alignItems="center" alignContent="center">
-                                <Grid item xs={9}>
+                                <Grid item xs>
                                     <Typography>Стоимость нефти: <b>{data.brentPrice}</b></Typography>
                                 </Grid>
                             </Grid>
                             <Grid container className={classes.cell} justify="flex-end" alignItems="center" alignContent="center">
-                                <Grid item xs={9}>
+                                <Grid item xs>
                                     <Typography>Ввод жилья: <b>{data.estateBuilding}</b></Typography>
                                 </Grid>
                             </Grid>
                             <Grid container className={classes.cell} justify="flex-end" alignItems="center" alignContent="center">
-                                <Grid item xs={9}>
+                                <Grid item xs>
                                     <Typography>Выданные кредиты: <b>{data.creditsAmount}</b></Typography>
                                 </Grid>
                             </Grid>
+                            <Grid container justify="flex-end" alignItems="center" alignContent="center">
+                                <Grid item xs>
+                                    <Button variant="contained" color="primary" onClick={() => this.submitHandler()}> Рассчитать </Button>
+                                </Grid>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={7}>
                             <TextField
                                 id="livingArea"
                                 autoFocus
@@ -405,6 +489,9 @@ class Neural extends React.Component {
                                 onChange={(e) => this.handleChange(e)}
                                 error={this.state.livingAreaError}
                                 margin="normal"
+                                InputProps={{
+                                    inputComponent: AreaMask
+                                }}
                                 fullWidth
                             />
                             <TextField
@@ -415,6 +502,9 @@ class Neural extends React.Component {
                                 onChange={(e) => this.handleChange(e)}
                                 error={this.state.kitchenAreaError}
                                 margin="normal"
+                                InputProps={{
+                                    inputComponent: AreaMask
+                                }}
                                 fullWidth
                             />
                             <TextField
@@ -425,6 +515,9 @@ class Neural extends React.Component {
                                 onChange={(e) => this.handleChange(e)}
                                 error={this.state.numberOfRoomsError}
                                 margin="normal"
+                                InputProps={{
+                                    inputComponent: RoomsMask
+                                }}
                                 fullWidth
                             />
                             <TextField
@@ -435,6 +528,9 @@ class Neural extends React.Component {
                                 onChange={(e) => this.handleChange(e)}
                                 error={this.state.floorError}
                                 margin="normal"
+                                InputProps={{
+                                    inputComponent: FloorMask
+                                }}
                                 fullWidth
                             />
                             <TextField
@@ -445,10 +541,14 @@ class Neural extends React.Component {
                                 onChange={(e) => this.handleChange(e)}
                                 error={this.state.numberOfFloorsError}
                                 margin="normal"
+                                InputProps={{
+                                    inputComponent: FloorMask
+                                }}
                                 fullWidth
                             />
                             <TextField
                                 id="district"
+                                select
                                 autoFocus
                                 label={this.state.districtLabel}
                                 value={this.state.district}
@@ -456,7 +556,13 @@ class Neural extends React.Component {
                                 error={this.state.districtError}
                                 margin="normal"
                                 fullWidth
-                            />
+                            >
+                                {distr.sort((a, b) => (a.label > b.label) ? 1 : ((b.label > a.label) ? -1 : 0)).map(option => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
                             <TextField
                                 id="year"
                                 autoFocus
@@ -465,10 +571,14 @@ class Neural extends React.Component {
                                 onChange={(e) => this.handleChange(e)}
                                 error={this.state.yearError}
                                 margin="normal"
+                                InputProps={{
+                                    inputComponent: YearMask
+                                }}
                                 fullWidth
                             />
                             <TextField
                                 id="walls"
+                                select
                                 autoFocus
                                 label={this.state.wallsLabel}
                                 value={this.state.walls}
@@ -476,14 +586,14 @@ class Neural extends React.Component {
                                 error={this.state.wallsError}
                                 margin="normal"
                                 fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={3} />
-                        <Grid item xs={3}>
-                            <Button variant="contained" color="primary" onClick={() => this.submitHandler()}> Рассчитать </Button>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Typography className={classes.result} variant="h6">Стоимость квартиры: {price === 0 ? 'Н/Д' : parseInt(price, 10)}</Typography>
+                            >
+                                {walls.sort((a, b) => (a.label > b.label) ? 1 : ((b.label > a.label) ? -1 : 0)).map(option => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                            <Typography className={classes.result} variant="h6">Стоимость квартиры (руб): {price === 0 ? 'Н/Д' : parseInt(price, 10)}</Typography>
                         </Grid>
                     </Grid>
                 }
