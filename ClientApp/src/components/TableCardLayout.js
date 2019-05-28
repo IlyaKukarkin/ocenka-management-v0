@@ -66,7 +66,7 @@ class TableCardLayout extends Component {
     };
 
     render() {
-        const { classes, children, headerIndex, isLoading, deleteToolbar, addClick } = this.props;
+        const { classes, children, headerIndex, isLoading, deleteToolbar, addClick, isPartial, excelClick } = this.props;
         const { showSearchbar } = this.state;
 
         return <Fragment>
@@ -93,14 +93,16 @@ class TableCardLayout extends Component {
                                     <ClickAwayListener onClickAway={this.hideSearchbar}><Input placeholder="Поиск" onChange={this.handleChange} value={this.state.searchValue} id="search" className={classes.search} /></ClickAwayListener>}
                             </Grid>
                             <Grid item xs>
-                                {deleteToolbar}
+                                {!isPartial && deleteToolbar}
                             </Grid>
                             <Grid container xs justify="flex-end" className={classes.buttons}>
-                                <Button color="primary" onClick={addClick}>
+                                {
+                                    !isPartial && <Button color="primary" onClick={addClick}>
                                     <Add className={classes.leftIcon} />
-                                    Добавить
-                                </Button>
-                                <Button color="secondary">
+                                        Добавить
+                                    </Button>
+                                }
+                                <Button color="secondary" onClick={excelClick}>
                                     <SaveAlt className={classes.leftIcon} />
                                     В Excel
                                 </Button>

@@ -16,7 +16,7 @@ class MyTableHead extends React.Component {
     };
 
     render() {
-        const { onSelectAllClick, order, orderBy, numSelected, rowCount, rows } = this.props;
+        const { onSelectAllClick, order, orderBy, numSelected, rowCount, rows, isPartial } = this.props;
 
         return (
             <TableHead>
@@ -36,7 +36,7 @@ class MyTableHead extends React.Component {
                                 align={'center'}
                                 padding={'none'}
                                 sortDirection={orderBy === row.id ? order : false}
-                                style={{ maxWidth: 125, whiteSpace: "normal", wordWrap: "break-word", paddingLeft: "10px" }}
+                                style={{ whiteSpace: "normal", wordWrap: "break-word", paddingLeft: "10px" }}
                             >
                                 <Tooltip
                                     title="Сортировать"
@@ -55,7 +55,7 @@ class MyTableHead extends React.Component {
                         ),
                         this,
                     )}
-                    <TableCell />
+                    {!isPartial && <TableCell />}
                 </TableRow>
             </TableHead>
         );

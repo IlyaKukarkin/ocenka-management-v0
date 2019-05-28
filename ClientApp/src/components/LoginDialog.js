@@ -49,6 +49,8 @@ class LoginDialog extends React.Component {
     validateForm() {
         let city = false, district = false, street = false, house = false, numberOfFlat = false;
 
+        return true;
+
         if (this.state.login !== "") {
             if (this.state.login.length > 30) {
                 this.setState({ surnameLabel: "Город до 30 символов" });

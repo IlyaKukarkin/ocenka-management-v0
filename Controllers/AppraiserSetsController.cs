@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ocenka_management.Models;
+using System.IO;
+using OfficeOpenXml;
+using OfficeOpenXml.Table;
 
 namespace ocenka_management.Controllers
 {
@@ -14,6 +17,7 @@ namespace ocenka_management.Controllers
     public class AppraiserSetsController : ControllerBase
     {
         private readonly OcenkaManagementContext _context;
+        private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         public AppraiserSetsController(OcenkaManagementContext context)
         {
@@ -146,6 +150,75 @@ namespace ocenka_management.Controllers
         private bool UserSetAppraiserExists(int id)
         {
             return _context.UserSetAppraiser.Any(e => e.Id == id);
+        }
+
+        [HttpPost("ToExcel")]
+        public async Task<IActionResult> ToExcel([FromBody] Excel excel)
+        {
+            IEnumerable<UserSet> users = _context.UserSet;
+            IEnumerable<UserSetAppraiser> appraisers = _context.UserSetAppraiser;
+            List<UserSetAppraiser> appraisersRes = new List<UserSetAppraiser>();
+            UserSet usr = new UserSet();
+            UserSetAppraiser apr = new UserSetAppraiser();
+
+            for (int i = 0; i < excel.Ids.Count(); i++)
+            {
+                usr = users.First(u => u.Id == excel.Ids[i]);
+                usr.UserSetAppraiser = null;
+                apr = appraisers.First(u => u.Id == excel.Ids[i]);
+                apr.IdNavigation = usr;
+                appraisersRes.Add(apr);
+            }
+
+            var fileDownloadName = "Оценщики.xlsx";
+
+            using (var package = createExcelPackage(appraisersRes))
+            {
+                package.SaveAs(new FileInfo(Path.Combine(@"C:\Users\user\Downloads", fileDownloadName)));
+            }
+            return Ok();
+        }
+
+        private ExcelPackage createExcelPackage(IEnumerable<UserSetAppraiser> appraisers)
+        {
+            var package = new ExcelPackage();
+            package.Workbook.Properties.Title = "Отчёт - оценщики";
+            package.Workbook.Properties.Author = "Ocenka Management";
+            package.Workbook.Properties.Subject = "Отчёт - оценщики";
+            package.Workbook.Properties.Keywords = "Ocenka Management";
+
+
+            var worksheet = package.Workbook.Worksheets.Add("Оценщики");
+
+            //First add the headers
+            worksheet.Cells[1, 1].Value = "Фамилия";
+            worksheet.Cells[1, 2].Value = "Имя";
+            worksheet.Cells[1, 3].Value = "Отчество";
+            worksheet.Cells[1, 4].Value = "День рождения";
+            worksheet.Cells[1, 5].Value = "Работает с";
+            worksheet.Cells[1, 6].Value = "Категория";
+
+            //Add values
+
+            for (int i = 0; i < appraisers.Count(); i++)
+            {
+                worksheet.Cells[i + 2, 1].Value = appraisers.ElementAt(i).IdNavigation.Surname;
+                worksheet.Cells[i + 2, 2].Value = appraisers.ElementAt(i).IdNavigation.Name;
+                worksheet.Cells[i + 2, 3].Value = appraisers.ElementAt(i).IdNavigation.Patronymic;
+                worksheet.Cells[i + 2, 4].Value = appraisers.ElementAt(i).IdNavigation.Birthday.ToString("MM/dd/yyyy");
+                worksheet.Cells[i + 2, 5].Value = appraisers.ElementAt(i).IdNavigation.WorksSince.ToString("yyyy");
+                worksheet.Cells[i + 2, 6].Value = appraisers.ElementAt(i).Position;
+            }
+
+            // Add to table / Add summary row
+            var tbl = worksheet.Tables.Add(new ExcelAddressBase(fromRow: 1, fromCol: 1, toRow: appraisers.Count() + 1, toColumn: 6), "Data");
+            tbl.ShowHeader = true;
+            tbl.TableStyle = TableStyles.Dark9;
+
+            // AutoFitColumns
+            worksheet.Cells[1, 1, appraisers.Count() + 1, 6].AutoFitColumns();
+
+            return package;
         }
     }
 }

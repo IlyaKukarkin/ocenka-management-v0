@@ -6,12 +6,15 @@ import TableCardLayout from '../TableCardLayout';
 import MyTableHead from '../TableHead';
 import TableToolbar from '../TableToolbar';
 import DeleteDialog from '../DeleteDialog';
+import CreateFileDialog from '../CreateFileDialog';
+import ErrorFileDialog from '../ErrorFileDialog';
+import ErrorExportDialog from '../ErrorExportDialog';
 import AddAppraiserDialog from './AddAppraiserDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
-    Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
+    Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox, Snackbar
 } from '@material-ui/core';
-import { Edit } from '@material-ui/icons';
+import { Edit, Description } from '@material-ui/icons';
 
 const styles = theme => ({
     table: {
@@ -27,7 +30,6 @@ const styles = theme => ({
     },
     cell: {
         padding: '0',
-        maxWidth: '125px',
         whiteSpace: "normal",
         wordWrap: "break-word"
     }
@@ -39,7 +41,7 @@ const rows = [
     { id: 'patronymic', numeric: false, label: '7' },
     { id: 'birthday', numeric: false, label: '8' },
     { id: 'worksSince', numeric: false, label: '9' },
-    { id: 'position', numeric: false, label: '10' },
+    { id: 'position', numeric: false, label: '10' }
 ];
 
 class Appraisers extends Component {
@@ -52,17 +54,22 @@ class Appraisers extends Component {
         this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
         this.handleAddClick = this.handleAddClick.bind(this);
         this.closeAddDialog = this.closeAddDialog.bind(this);
+        this.closeFileDialog = this.closeFileDialog.bind(this);
+        this.closeErrorFileDialog = this.closeErrorFileDialog.bind(this);
+        this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
+        this.handleExcelClick = this.handleExcelClick.bind(this);
     }
 
     state = {
         order: 'asc',
-        orderBy: 'idNavigation.surname',
+        orderBy: 'surname',
         selected: [],
         data: [],
         page: 0,
         rowsPerPage: 5,
         showDeleteDialog: false,
         showAddDialog: false,
+        showErrorExportDialog: false,
     };
 
     componentWillMount() {
@@ -152,6 +159,14 @@ class Appraisers extends Component {
         this.setState({ showDeleteDialog: false });
     }
 
+    closeFileDialog = () => {
+        this.props.ToExcelClose();
+    }
+
+    closeErrorFileDialog = () => {
+        this.props.ToExcelErrorClose();
+    }
+
     closeAddDialog = () => {
         this.setState({ showAddDialog: false });
     }
@@ -160,22 +175,39 @@ class Appraisers extends Component {
         console.dir(id);
     }
 
+    handleExcelClick = () => {
+        if (this.state.selected.length !== 0) {
+            const res = { ids: this.state.selected };            
+            this.props.ToExcel(res);
+        } else {
+            this.setState({ showErrorExportDialog: true });
+        }
+    }
+
+    closeErrorExportDialog = () => {
+        this.setState({ showErrorExportDialog: false });
+    }
+
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
+        const { classes, isLoading, fileSaved, fileError } = this.props;
+        const { data, order, orderBy, selected, rowsPerPage, page, showErrorExportDialog } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
         return (
-            <TableCardLayout headerIndex={1} isLoading={isLoading} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+            <TableCardLayout headerIndex={1} isLoading={isLoading} isPartial excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
                 <DeleteDialog header={1} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
                 <AddAppraiserDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={this.state.showAddDialog} />
+                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={0} />
+                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={0} />
+                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={0} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
 
                         <Table className={classes.table}>
                             <MyTableHead
+                                isPartial
                                 numSelected={selected.length}
                                 order={order}
                                 orderBy={orderBy}
@@ -207,15 +239,12 @@ class Appraisers extends Component {
                                                 <TableCell align="center" className={classes.cell}>{getDate(n.birthday)}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getYear(n.worksSince)}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.position}</TableCell>
-                                                <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.handleEditClick(event, n.id)}>
-                                                    <Edit fontSize="small" />
-                                                </IconButton>}</TableCell>
                                             </TableRow>
                                         );
                                     })}
                                 {emptyRows > 0 && (
                                     <TableRow style={{ height: 52.8 * emptyRows }}>
-                                        <TableCell colSpan={8} />
+                                        <TableCell colSpan={7} />
                                     </TableRow>
                                 )}
                             </TableBody>
