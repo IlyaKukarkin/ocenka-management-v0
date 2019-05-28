@@ -63,10 +63,11 @@ class TableCardLayout extends Component {
 
     handleChange = event => {
         this.setState({ searchValue: event.target.value });
+        this.props.onSearchChange(event.target.value);
     };
 
     render() {
-        const { classes, children, headerIndex, isLoading, deleteToolbar, addClick, isPartial, excelClick } = this.props;
+        const { classes, children, headerIndex, isLoading, deleteToolbar, addClick, isPartial, excelClick, onSearchChange } = this.props;
         const { showSearchbar } = this.state;
 
         return <Fragment>

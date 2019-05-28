@@ -58,6 +58,7 @@ class Appraisers extends Component {
         this.closeErrorFileDialog = this.closeErrorFileDialog.bind(this);
         this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
         this.handleExcelClick = this.handleExcelClick.bind(this);
+        this.handleSearchChange = this.handleSearchChange.bind(this)
     }
 
     state = {
@@ -67,6 +68,7 @@ class Appraisers extends Component {
         data: [],
         page: 0,
         rowsPerPage: 5,
+        search: '',
         showDeleteDialog: false,
         showAddDialog: false,
         showErrorExportDialog: false,
@@ -188,15 +190,19 @@ class Appraisers extends Component {
         this.setState({ showErrorExportDialog: false });
     }
 
+    handleSearchChange = (value) => {
+        this.setState({ search: value });
+    }
+
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
         const { classes, isLoading, fileSaved, fileError } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page, showErrorExportDialog } = this.state;
+        const { data, order, orderBy, selected, rowsPerPage, page, showErrorExportDialog, search } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
         return (
-            <TableCardLayout headerIndex={1} isLoading={isLoading} isPartial excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+            <TableCardLayout headerIndex={1} isLoading={isLoading} isPartial excelClick={this.handleExcelClick.bind(this)} onSearchChange={this.handleSearchChange.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
                 <DeleteDialog header={1} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
                 <AddAppraiserDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={this.state.showAddDialog} />
                 <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={0} />
@@ -219,6 +225,7 @@ class Appraisers extends Component {
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search))
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
                                         return (
