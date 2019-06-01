@@ -10,7 +10,7 @@ import AddUserDialog from './AddUserDialog';
 import RoleText from '../Home/RoleText';
 import { withStyles } from '@material-ui/core/styles';
 import {
-    Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox, Snackbar
+    Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
 } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 

@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {
-    Toolbar, IconButton, Typography, Tooltip, Button
+    Toolbar, IconButton, Tooltip, Button
 } from '@material-ui/core';
 import { FilterList, Delete } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';

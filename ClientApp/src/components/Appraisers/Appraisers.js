@@ -12,9 +12,8 @@ import ErrorExportDialog from '../ErrorExportDialog';
 import AddAppraiserDialog from './AddAppraiserDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
-    Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox, Snackbar
+    Table, TableCell, TableRow, TableBody, TablePagination, Checkbox
 } from '@material-ui/core';
-import { Edit, Description } from '@material-ui/icons';
 
 const styles = theme => ({
     table: {
@@ -225,7 +224,7 @@ class Appraisers extends Component {
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search))
+                                    .filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search) || apr.birthday.includes(search) || apr.worksSince.includes(search) || apr.position.includes(search))
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
                                         return (

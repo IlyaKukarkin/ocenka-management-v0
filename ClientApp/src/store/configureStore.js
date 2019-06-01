@@ -5,13 +5,15 @@ import * as AddressReducer from './AddressReducer';
 import * as AppraiserReducer from './AppraiserReducer';
 import * as UserReducer from './UserReducer';
 import * as NeuralReducer from './NeuralReducer';
+import * as LoginReducer from './LoginReducer';
 
 export default function configureStore(history, initialState) {
     const reducers = {
         address: AddressReducer.reducer,
         appraisers: AppraiserReducer.reducer,
         users: UserReducer.reducer,
-        neural: NeuralReducer.reducer
+        neural: NeuralReducer.reducer,
+        login: LoginReducer.reducer
     };
 
     const middleware = [

@@ -67,7 +67,7 @@ class TableCardLayout extends Component {
     };
 
     render() {
-        const { classes, children, headerIndex, isLoading, deleteToolbar, addClick, isPartial, excelClick, onSearchChange } = this.props;
+        const { classes, children, headerIndex, isLoading, deleteToolbar, addClick, isPartial, excelClick } = this.props;
         const { showSearchbar } = this.state;
 
         return <Fragment>

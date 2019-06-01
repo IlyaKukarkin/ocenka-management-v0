@@ -22,7 +22,7 @@ export const actionCreators = {
         dispatch({ type: deleteAddressStart });
 
         const url = `api/AddressSets/${id}`;
-        const response = await fetch(url, { method: 'delete' });
+        fetch(url, { method: 'delete' });
 
         dispatch({ type: deleteAddressFinish, id });
     },
@@ -31,7 +31,7 @@ export const actionCreators = {
 
         idSet.forEach(async function (id) {
             const url = `api/AddressSets/${id}`;
-            const response = await fetch(url, { method: 'delete' });
+            fetch(url, { method: 'delete' });
         });
 
         dispatch({ type: deleteAddressesFinish, idSet });

@@ -1,6 +1,4 @@
-﻿import { resetWarningCache } from "prop-types";
-
-const getAppraisersStart = 'GET_APPRAISERS_START';
+﻿const getAppraisersStart = 'GET_APPRAISERS_START';
 const getAppraisersFinish = 'GET_APPRAISERS_FINISH';
 const deleteAppraiserStart = 'DELETE_APPRAISER_START';
 const deleteAppraiserFinish = 'DELETE_APPRAISER_FINISH';
@@ -29,7 +27,7 @@ export const actionCreators = {
         dispatch({ type: deleteAppraiserStart });
 
         const url = `api/AppraiserSets/${id}`;
-        const response = await fetch(url, { method: 'delete' });
+        fetch(url, { method: 'delete' });
 
         dispatch({ type: deleteAppraiserFinish, id });
     },
@@ -38,7 +36,7 @@ export const actionCreators = {
 
         idSet.forEach(async function (id) {
             const url = `api/AppraiserSets/${id}`;
-            const response = await fetch(url, { method: 'delete' });
+            fetch(url, { method: 'delete' });
         });
 
         dispatch({ type: deleteAppraisersFinish, idSet });

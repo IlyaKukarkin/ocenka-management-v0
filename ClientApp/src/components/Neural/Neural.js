@@ -1,4 +1,4 @@
-﻿import React, { Component } from 'react';
+﻿import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import MaskedInput from 'react-text-mask';
@@ -168,6 +168,9 @@ class Neural extends React.Component {
                     walls = '010000';
                     break;
                 case 'Кирпич':
+                    walls = '100000';
+                    break;
+                default:
                     walls = '100000';
                     break;
             }
@@ -374,6 +377,8 @@ class Neural extends React.Component {
             case 'Заозерье':
             case 'Новые ляды':
             case 'Чусовской водозабор':
+                return '0000001';
+            default:
                 return '0000001';
         }
     }

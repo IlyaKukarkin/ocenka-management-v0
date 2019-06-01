@@ -1,11 +1,24 @@
 ﻿import React from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { withStyles } from '@material-ui/core/styles';
+import { actionCreators } from '../store/LoginReducer';
 import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField
+    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, Typography
 } from '@material-ui/core';
 
 function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
+
+const styles = theme => ({
+    error: {
+        marginBottom: '4px',
+    },
+    errorText: {
+        color: '#f44336',
+    },
+});
 
 class LoginDialog extends React.Component {
     constructor(props) {
@@ -30,125 +43,56 @@ class LoginDialog extends React.Component {
         // as a prop by the parent (App)
 
         if (!this.validateForm()) {
-            const resultObject = { city: this.state.login, district: this.state.password, street: this.state.patronymic, house: this.state.birthday, numberOfFlat: this.state.worksSince }
-
-
-            this.props.onAddAction(resultObject);
+            const resultObject = { login: this.state.login, password: this.state.password }
 
             this.setState({
-                login: '',
-                password: '',
                 loginError: false,
                 passwordError: false,
                 loginLabel: "Логин",
                 passwordLabel: "Пароль",
             });
+
+            let test = this.props.Login(resultObject);
+
+            test.then((res) => {
+                if (res.role !== 0) {
+                    this.setState({
+                        login: '',
+                        password: ''
+                    });
+
+                    this.props.onCancelAction();
+                }
+            });
         }
     }
 
     validateForm() {
-        let city = false, district = false, street = false, house = false, numberOfFlat = false;
+        let login = false, password = false;
 
-        return true;
-
-        if (this.state.login !== "") {
-            if (this.state.login.length > 30) {
-                this.setState({ surnameLabel: "Город до 30 символов" });
-                this.setState({ surnameError: true });
-                city = true;
-            }
-        } else {
-            this.setState({ surnameLabel: "Введите фамилию"});
-            this.setState({ surnameError: true });
-            city = true;
+        if (this.state.login === "") {
+            this.setState({ loginLabel: "Введите логин"});
+            this.setState({ loginError: true });
+            login = true;
         }
 
-        if (this.state.password !== "") {
-            if (this.state.password.length > 30) {
-                this.setState({ nameLabel: "Район до 30 символов" });
-                this.setState({ nameError: true });
-                district = true;
-            }
-        } else {
-            this.setState({ nameLabel: "Введите имя" });
-            this.setState({ nameError: true });
-            district = true;
+        if (this.state.password === "") {
+            this.setState({ passwordLabel: "Введите пароль" });
+            this.setState({ passwordError: true });
+            password = true;
         }
 
-        if (this.state.patronymic !== "") {
-            if (this.state.patronymic.length > 30) {
-                this.setState({ patronymicLabel: "Улица до 30 символов" });
-                this.setState({ patronymicError: true });
-                street = true;
-            }
-        } else {
-            this.setState({ patronymicLabel: "Введите отчество" });
-            this.setState({ patronymicError: true });
-            street = true;
-        }
-
-        if (this.state.birthday !== "") {
-            if (this.state.birthday > 250 || this.state.birthday < 1 || !Number.isInteger(+this.state.birthday)) {
-                this.setState({ birthdayLabel: "Номер дома - целое число от 1 до 250" });
-                this.setState({ birthdayError: true });
-                house = true;
-            }
-        } else {
-            this.setState({ birthdayLabel: "Введите дату рождения" });
-            this.setState({ birthdayError: true });
-            house = true;
-        }
-
-        if (this.state.worksSince !== "") {
-            if (this.state.worksSince > 1000 || this.state.worksSince < 1 || !Number.isInteger(+this.state.worksSince)) {
-                this.setState({ worksSinceLabel: "Номер квартиры - целое число от 1 до 1000" });
-                this.setState({ worksSinceError: true });
-                numberOfFlat = true;
-            }
-        } else {
-            this.setState({ worksSinceLabel: "Введите дату начала работы" });
-            this.setState({ worksSinceError: true });
-            numberOfFlat = true;
-        }
-
-        if (this.state.position !== "") {
-            if (this.state.position.length > 30) {
-                this.setState({ positionLabel: "Улица до 30 символов" });
-                this.setState({ positionError: true });
-                street = true;
-            }
-        } else {
-            this.setState({ positionLabel: "Введите должность" });
-            this.setState({ positionError: true });
-            street = true;
-        }
-
-        if (!city) {
+        if (!login) {
             this.setState({ cityLabel: "Город" });
             this.setState({ cityError: false });
         }
 
-        if (!district) {
+        if (!password) {
             this.setState({ districtLabel: "Район" });
             this.setState({ districtError: false });
         }
 
-        if (!street) {
-            this.setState({ streetLabel: "Улица" });
-            this.setState({ streetError: false });
-        }
-
-        if (!house) {
-            this.setState({ houseLabel: "Номер дома" });
-            this.setState({ houseError: false });
-        }
-
-        if (!numberOfFlat) {
-            this.setState({ numberOfFlatLabel: "Номер квартиры" });
-            this.setState({ numberOfFlatError: false });
-        }
-
-        return (city || district || street || house || numberOfFlat);
+        return (login || password);
     }
 
     handleChange(event) {
@@ -171,7 +115,7 @@ class LoginDialog extends React.Component {
     }
 
     render() {
-        const { showDialog } = this.props;
+        const { showDialog, error, classes } = this.props;
 
         return (
             <Dialog
@@ -211,6 +155,9 @@ class LoginDialog extends React.Component {
                     </form>
                 </DialogContent>
                 <DialogActions>
+                    <div hidden={error} className={classes.error}>
+                        <Typography className={classes.errorText}>Неверный логин или пароль</Typography>
+                    </div>
                     <Button onClick={this.myHandleClose} color="primary">
                         Отмена
                     </Button>
@@ -223,4 +170,7 @@ class LoginDialog extends React.Component {
     }
 }
 
-export default LoginDialog;
+export default withStyles(styles)(connect(
+    state => state.login,
+    dispatch => bindActionCreators(actionCreators, dispatch)
+)(LoginDialog));

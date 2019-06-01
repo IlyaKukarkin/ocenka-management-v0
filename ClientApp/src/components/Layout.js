@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 import {
     AppBar, Toolbar, IconButton, Typography, Hidden,
@@ -61,6 +62,7 @@ class Layout extends Component {
         this.handleLoginClick = this.handleLoginClick.bind(this);
         this.showLoginDialog = this.showLoginDialog.bind(this);
         this.closeLoginDialog = this.closeLoginDialog.bind(this);
+        this.exitClick = this.exitClick.bind(this);
     }
 
     state = {
@@ -74,6 +76,10 @@ class Layout extends Component {
 
     showLoginDialog = () => {
         this.setState({ showLoginDialog: true });
+    }
+
+    exitClick = () => {
+        this.props.history.push('/');
     }
 
     closeLoginDialog = () => {
@@ -94,10 +100,73 @@ class Layout extends Component {
     }
 
     render() {
-        const { classes, location: { pathname }, children } = this.props;
+        const { classes, location: { pathname }, children, role } = this.props;
         const { mobileOpen } = this.state;
 
-        const drawer = (
+        const baseDrawer = (
+            <div>
+                <Hidden smDown>
+                    <div className={classes.toolbar} />
+                </Hidden>
+                <MenuList>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/" selected={'/' === pathname}>
+                        <MenuText textIndex={0} />
+                    </MenuItem>
+                </MenuList>
+            </div>
+        );
+
+        const appraiserDrawer = (
+            <div>
+                <Hidden smDown>
+                    <div className={classes.toolbar} />
+                </Hidden>
+                <MenuList>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/" selected={'/' === pathname}>
+                        <MenuText textIndex={0} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/users" selected={'/users' === pathname}>
+                        <MenuText textIndex={6} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/appraisers" selected={'/appraisers' === pathname}>
+                        <MenuText textIndex={4} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/address" selected={'/address' === pathname}>
+                        <MenuText textIndex={9} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/neural" selected={'/neural' === pathname}>
+                        <MenuText textIndex={5} />
+                    </MenuItem>
+                </MenuList>
+            </div>
+        );
+
+        const accauntantDrawer = (
+            <div>
+                <Hidden smDown>
+                    <div className={classes.toolbar} />
+                </Hidden>
+                <MenuList>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/" selected={'/' === pathname}>
+                        <MenuText textIndex={0} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/users" selected={'/users' === pathname}>
+                        <MenuText textIndex={6} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/appraisers" selected={'/appraisers' === pathname}>
+                        <MenuText textIndex={4} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/address" selected={'/address' === pathname}>
+                        <MenuText textIndex={9} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/neural" selected={'/neural' === pathname}>
+                        <MenuText textIndex={5} />
+                    </MenuItem>
+                </MenuList>
+            </div>
+        );
+
+        const directorDrawer = (
             <div>
                 <Hidden smDown>
                     <div className={classes.toolbar} />
@@ -141,8 +210,8 @@ class Layout extends Component {
                             Ocenka Management
                         </Typography>
                         <div className={classes.grow} />
-                        <div className={classes.login}>                            
-                            <LoginButton onButtonClick={this.showLoginDialog.bind(this)} />
+                        <div className={classes.login}>
+                            <LoginButton loginClick={this.showLoginDialog.bind(this)} exitClick={this.exitClick.bind(this)} />
                         </div>
                     </Toolbar>
                 </AppBar>
@@ -158,7 +227,7 @@ class Layout extends Component {
                             keepMounted: true, // Better open performance on mobile.
                         }}
                     >
-                        {drawer}
+                        {role === 0 ? baseDrawer : (role === 1 ? appraiserDrawer : (role === 2 ? accauntantDrawer : directorDrawer))}
                     </Drawer>
                 </Hidden>
                 <Hidden smDown implementation="css">
@@ -169,7 +238,7 @@ class Layout extends Component {
                             paper: classes.drawerPaper,
                         }}
                     >
-                        {drawer}
+                        {role === 0 ? baseDrawer : (role === 1 ? appraiserDrawer : (role === 2 ? accauntantDrawer : directorDrawer))}
                     </Drawer>
                 </Hidden>
                 <div className={classes.content}>
@@ -183,5 +252,6 @@ class Layout extends Component {
 
 export default compose(
     withRouter,
-    withStyles(styles)
+    withStyles(styles),
+    connect(state => state.login)
 )(Layout);

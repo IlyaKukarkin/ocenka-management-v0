@@ -2,7 +2,7 @@
 import MaskedInput from 'react-text-mask';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, MenuItem, IconButton, InputAdornment, FormControl, Input, InputLabel, Fade
+    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, MenuItem, IconButton, InputAdornment, FormControl, Input, InputLabel
 } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 
@@ -511,7 +511,7 @@ class AddUserDialog extends React.Component {
         const { showDialog } = this.props;
 
         const positions = [{ value: 'Оценщик', label: 'Оценщик' }, { value: 'Бухгалтер', label: 'Бухгалтер' }];
-        const categories = [{ value: '1-кат.', label: '1-кат.' }, { value: '2-кат.', label: '2-кат.' }, { value: 'Оценщик', label: 'Оценщик' }];
+        const categories = [{ value: '1-кат.', label: '1-кат.' }, { value: '2-кат.', label: '2-кат.' }, { value: 'Нет', label: 'Нет' }];
 
         return (
             <Dialog
