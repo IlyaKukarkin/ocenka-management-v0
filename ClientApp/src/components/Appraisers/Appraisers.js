@@ -57,7 +57,7 @@ class Appraisers extends Component {
         this.closeErrorFileDialog = this.closeErrorFileDialog.bind(this);
         this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
         this.handleExcelClick = this.handleExcelClick.bind(this);
-        this.handleSearchChange = this.handleSearchChange.bind(this)
+        this.handleSearchChange = this.handleSearchChange.bind(this);
     }
 
     state = {
@@ -68,6 +68,7 @@ class Appraisers extends Component {
         page: 0,
         rowsPerPage: 5,
         search: '',
+        emptyRows: 0,
         showDeleteDialog: false,
         showAddDialog: false,
         showErrorExportDialog: false,
@@ -78,8 +79,11 @@ class Appraisers extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.appraisers !== nextProps.appraisers)
+        if (this.props.appraisers !== nextProps.appraisers) {
             this.setState({ data: nextProps.appraisers });
+            const emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, nextProps.appraisers.length - this.state.page * this.state.rowsPerPage);
+            this.setState({ emptyRows: emptyRows });
+        }            
     }
 
     handleRequestSort = (event, property) => {
@@ -191,17 +195,18 @@ class Appraisers extends Component {
 
     handleSearchChange = (value) => {
         this.setState({ search: value });
+        const emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, this.state.data.length - this.state.page * this.state.rowsPerPage);
+        this.setState({ emptyRows: emptyRows });
     }
 
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
         const { classes, isLoading, fileSaved, fileError } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page, showErrorExportDialog, search } = this.state;
-        const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+        const { data, order, orderBy, selected, rowsPerPage, page, showErrorExportDialog, search, emptyRows } = this.state;
 
         return (
-            <TableCardLayout headerIndex={1} isLoading={isLoading} isPartial excelClick={this.handleExcelClick.bind(this)} onSearchChange={this.handleSearchChange.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+            <TableCardLayout id={"apr"} headerIndex={1} isLoading={isLoading} isPartial excelClick={this.handleExcelClick.bind(this)} onSearchChange={this.handleSearchChange.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
                 <DeleteDialog header={1} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
                 <AddAppraiserDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={this.state.showAddDialog} />
                 <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={0} />
@@ -223,8 +228,8 @@ class Appraisers extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search) || apr.birthday.includes(search) || apr.worksSince.includes(search) || apr.position.includes(search))
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
                                         return (
@@ -259,7 +264,7 @@ class Appraisers extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.length}
+                        count={data.filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search) || apr.birthday.includes(search) || apr.worksSince.includes(search) || apr.position.includes(search)).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{

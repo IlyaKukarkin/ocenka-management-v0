@@ -52,6 +52,7 @@ class Users extends Component {
         this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
         this.handleAddClick = this.handleAddClick.bind(this);
         this.closeAddDialog = this.closeAddDialog.bind(this);
+        this.handleSearchChange = this.handleSearchChange.bind(this);
     }
 
     state = {
@@ -60,6 +61,8 @@ class Users extends Component {
         selected: [],
         data: [],
         page: 0,
+        search: '',
+        emptyRows: 0,
         rowsPerPage: 5,
         showDeleteDialog: false,
         showAddDialog: false,
@@ -70,8 +73,11 @@ class Users extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.users !== nextProps.users)
+        if (this.props.users !== nextProps.users) {
             this.setState({ data: nextProps.users });
+            const emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, nextProps.users.length - this.state.page * this.state.rowsPerPage);
+            this.setState({ emptyRows: emptyRows });
+        }
     }
 
     handleRequestSort = (event, property) => {
@@ -160,15 +166,21 @@ class Users extends Component {
         console.dir(id);
     }
 
+    handleSearchChange = (value) => {
+        this.setState({ search: value });
+        const emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, this.state.data.length - this.state.page * this.state.rowsPerPage);
+        this.setState({ emptyRows: emptyRows });
+    }
+
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
         const { classes, isLoading } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog } = this.state;
+        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search } = this.state;
         const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
         return (
-            <TableCardLayout headerIndex={2} isLoading={isLoading} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+            <TableCardLayout id={"usr"} headerIndex={2} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
                 <DeleteDialog header={1} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
                 <AddUserDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} />
                 <div style={{ width: "100%" }}>
@@ -185,7 +197,8 @@ class Users extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search) || apr.birthday.includes(search) || apr.worksSince.includes(search) || apr.login.includes(search))
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
                                         return (
@@ -222,7 +235,7 @@ class Users extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.length}
+                        count={data.filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search) || apr.birthday.includes(search) || apr.worksSince.includes(search) || apr.login.includes(search)).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{
