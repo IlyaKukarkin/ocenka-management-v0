@@ -4,9 +4,21 @@ const deleteUserStart = 'DELETE_USER_START';
 const deleteUserFinish = 'DELETE_USER_FINISH';
 const addUserStart = 'ADD_USER_START';
 const addUserFinish = 'ADD_USER_FINISH';
+const editUserStart = 'EDIT_USER_START';
+const editUserFinish = 'EDIT_USER_FINISH';
 const deleteUsersStart = 'DELETE_USERS_START';
 const deleteUsersFinish = 'DELETE_USERS_FINISH';
-const initialState = { users: [], isLoading: false };
+const toExcelStart = 'TO_EXCEL_START';
+const toExcelFinish = 'TO_EXCEL_FINISH';
+const toExcelError = 'TO_EXCEL_ERROR';
+const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
+const toExcelClose = 'TO_EXCEL_CLOSE';
+const getEditUserStart = 'GET_EDIT_USER_START';
+const getEditApprFinish = 'GET_APPR_USER_FINISH';
+const getEditUserFinish = 'GET_EDIT_USER_FINISH';
+const getEditDirFinish = 'GET_EDIT_DIR_FINISH';
+const clearEditUser = 'CLEAR_EDIT_USER';
+const initialState = {    users: [], editUser: {}, isLoading: false, fileSaved: false, fileError: false };
 
 export const actionCreators = {
     GetUsersSet: () => async (dispatch) => {
@@ -17,6 +29,38 @@ export const actionCreators = {
         const users = await response.json();
 
         dispatch({ type: getUsersFinish, users });
+    },
+    GetEditUser: (data) => async (dispatch) => {
+        dispatch({ type: getEditUserStart, data });
+        let url, response, user;
+
+        if (data.roleId === 1) {
+            url = `api/AppraiserSets/${data.id}`;
+            return fetch(url)
+                .then(function (response) {
+                    return response.json();
+                }).then(function (user) {
+                    dispatch({ type: getEditApprFinish, user });
+                    return user;
+                });
+        } else {
+            if (data.roleId === 2) {
+                url = `api/AccountantSets/${data.id}`;
+                response = await fetch(url);
+                user = await response.json();
+                dispatch({ type: getEditUserFinish, user });
+                return user;
+            } else {
+                url = `api/DirectorSets/${data.id}`;
+                response = await fetch(url);
+                user = await response.json();
+                dispatch({ type: getEditDirFinish, user });
+                return user;
+            }
+        }
+    },
+    ClearEditUser: () => async (dispatch) => {
+        dispatch({ type: clearEditUser });        
     },
     DeleteUserSet: (id) => async (dispatch) => {
         dispatch({ type: deleteUserStart });
@@ -64,7 +108,83 @@ export const actionCreators = {
                     dispatch({ type: addUserFinish, newUser });
                 });
         }        
+    },
+    EditUserSet: (data) => async (dispatch) => {
+        dispatch({ type: editUserStart });
+
+        if (data.roleId === 1) {
+            const url = `api/UserSets/${data.id}`;
+            let myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            fetch(url, { method: 'put', body: JSON.stringify(data), headers: myHeaders })
+                .then(function (response) {
+                    const appr = { position: data.extra, id: data.id };
+                    fetch(`api/AppraiserSets/${data.id}`, { method: 'put', body: JSON.stringify(appr), headers: myHeaders });
+                    dispatch({ type: editUserFinish, data });
+                });
+        } else {
+            if (data.roleId === 2) {
+                const url = `api/UserSets/${data.id}`;
+                let myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+                fetch(url, { method: 'put', body: JSON.stringify(data), headers: myHeaders })
+                    .then(function (response) {
+                        const acc = { salary: data.extra, id: data.id };
+                        fetch(`api/AccountantSets/${data.id}`, { method: 'put', body: JSON.stringify(acc), headers: myHeaders });
+                        dispatch({ type: editUserFinish, data });
+                    });
+            } else {
+                const url = `api/UserSets/${data.id}`;
+                let myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+                fetch(url, { method: 'put', body: JSON.stringify(data), headers: myHeaders })
+                    .then(function (response) {
+                        const acc = { salary: data.extra, id: data.id };
+                        fetch(`api/DirectorSets/${data.id}`, { method: 'put', body: JSON.stringify(acc), headers: myHeaders });
+                        dispatch({ type: editUserFinish, data });
+                    });
+            }
+        }
+    },
+    ToExcel: (data) => async (dispatch) => {
+        dispatch({ type: toExcelStart });
+
+        const url = `api/UserSets/ToExcel`;
+        let myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
+            .then(function (response) {
+                if (response.ok) {
+                    dispatch({ type: toExcelFinish });
+                } else {
+                    dispatch({ type: toExcelError });
+                }
+            });
+    },
+    ToExcelClose: () => async (dispatch) => {
+        dispatch({ type: toExcelClose });
+    },
+    ToExcelErrorClose: () => async (dispatch) => {
+        dispatch({ type: toExcelErrorClose });
     }
+};
+
+const fixData = (user) => {
+    let res1, res2;
+    let y1, m1, d1, y2, m2, d2;
+
+    m1 = user.birthday.substring(0, 2);
+    d1 = user.birthday.substring(3, 5);
+    y1 = user.birthday.substring(6, 10);
+
+    m2 = user.worksSince.substring(0, 2);
+    d2 = user.worksSince.substring(3, 5);
+    y2 = user.worksSince.substring(6, 10);
+
+    user.birthday = y1 + '.' + m1 + '.' + d1;
+    user.worksSince = y2 + '.' + m2 + '.' + d2;
+
+    return user;
 };
 
 export const reducer = (state, action) => {
@@ -155,6 +275,106 @@ export const reducer = (state, action) => {
             ...state,
             users: users,
             isLoading: false
+        };
+    }
+
+    if (action.type === editUserStart) {
+        return {
+            ...state,
+            isLoading: true
+        };
+    }
+
+    if (action.type === editUserFinish) {
+
+        let users = state.users;
+        let newUser = action.data;
+
+        newUser = fixData(newUser);
+
+        const usrIndex = users.findIndex(u => u.id === newUser.id);
+
+        users[usrIndex] = newUser;
+
+        return {
+            ...state,
+            users: users,
+            isLoading: false
+        };
+    }
+
+    if (action.type === toExcelFinish) {
+        return {
+            ...state,
+            fileSaved: true
+        };
+    }
+
+    if (action.type === toExcelError) {
+        return {
+            ...state,
+            fileError: true
+        };
+    }
+
+    if (action.type === toExcelClose) {
+        return {
+            ...state,
+            fileSaved: false
+        };
+    }
+
+    if (action.type === toExcelErrorClose) {
+        return {
+            ...state,
+            fileError: false
+        };
+    }
+
+    if (action.type === getEditUserStart) {
+        return {
+            ...state,
+            editUser: action.data
+        };
+    }
+
+    if (action.type === getEditUserFinish) {
+        return {
+            ...state,
+            editUser: {
+                ...state.editUser,
+                salary: action.user.salary,
+                category: ""
+            }
+        };
+    }
+
+    if (action.type === getEditDirFinish) {
+        return {
+            ...state,
+            editUser: {
+                ...state.editUser,
+                salary: action.user.salary,
+                category: ""
+            }
+        };
+    }
+
+    if (action.type === getEditApprFinish) {
+        return {
+            ...state,
+            editUser: {
+                ...state.editUser,
+                category: action.user.position,
+                salary: ""
+            }
+        };
+    }
+
+    if (action.type === clearEditUser) {
+        return {
+            ...state,
+            editUser: {}
         };
     }
 

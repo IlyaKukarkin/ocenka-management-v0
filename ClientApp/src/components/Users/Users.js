@@ -6,6 +6,9 @@ import TableCardLayout from '../TableCardLayout';
 import MyTableHead from '../TableHead';
 import TableToolbar from '../TableToolbar';
 import DeleteDialog from '../DeleteDialog';
+import CreateFileDialog from '../CreateFileDialog';
+import ErrorFileDialog from '../ErrorFileDialog';
+import ErrorExportDialog from '../ErrorExportDialog';
 import AddUserDialog from './AddUserDialog';
 import RoleText from '../Home/RoleText';
 import { withStyles } from '@material-ui/core/styles';
@@ -52,7 +55,12 @@ class Users extends Component {
         this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
         this.handleAddClick = this.handleAddClick.bind(this);
         this.closeAddDialog = this.closeAddDialog.bind(this);
+        this.closeFileDialog = this.closeFileDialog.bind(this);
+        this.closeErrorFileDialog = this.closeErrorFileDialog.bind(this);
+        this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
+        this.handleExcelClick = this.handleExcelClick.bind(this);
         this.handleSearchChange = this.handleSearchChange.bind(this);
+        this.handleEditClick = this.handleEditClick.bind(this);
     }
 
     state = {
@@ -66,6 +74,20 @@ class Users extends Component {
         rowsPerPage: 5,
         showDeleteDialog: false,
         showAddDialog: false,
+        showErrorExportDialog: false,
+        editUser: {
+            id: '',
+            surname: '',
+            name: '',
+            patronymic: '',
+            login: '',
+            password: '',
+            birthday: '',
+            worksSince: '',
+            position: '',
+            category: '',
+            salary: '',
+        }
     };
 
     componentWillMount() {
@@ -133,15 +155,36 @@ class Users extends Component {
 
         this.setState({ showDeleteDialog: false });
         if (this.state.selected.length === 1) {
-            DeleteUserSet(this.state.selected[0]);
+            if (this.state.selected[0] !== 3003) {
+                DeleteUserSet(this.state.selected[0]);
+            }
         } else {
-            DeleteUsersSet(this.state.selected);
+            let arr = this.removeDirector(this.state.selected);
+            DeleteUsersSet(arr);
         }
         this.setState({ selected: [] });
     }
 
+    removeDirector = (arr) => {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] === 3003) {
+                arr.splice(i, 1);
+                return arr;
+            }
+        }
+        return arr;
+    }
+
     handleAddClick = (data) => {
         this.props.AddUserSet(data);
+
+        this.setState({ showAddDialog: false });
+    }
+
+    handleEditClick = (data) => {
+        this.props.ClearEditUser();
+
+        this.props.EditUserSet(data);
 
         this.setState({ showAddDialog: false });
     }
@@ -151,6 +194,8 @@ class Users extends Component {
     }
 
     showAddDialog = () => {
+        this.props.ClearEditUser();
+
         this.setState({ showAddDialog: true });
     }
 
@@ -159,11 +204,27 @@ class Users extends Component {
     }
 
     closeAddDialog = () => {
+        this.props.ClearEditUser();
+
         this.setState({ showAddDialog: false });
     }
 
-    handleEditClick = (event, id) => {
-        console.dir(id);
+    startEditClick = (event, id) => {
+        let user = this.findUser(id);
+
+        let getUser = this.props.GetEditUser(user);
+
+        getUser.then((user) => {
+            this.setState({ showAddDialog: true });
+        });
+    }
+
+    findUser = (id) => {
+        for (let i = 0; i < this.props.users.length; i++) {
+            if (this.props.users[i].id === id) {
+                return this.props.users[i];
+            }
+        }
     }
 
     handleSearchChange = (value) => {
@@ -172,17 +233,40 @@ class Users extends Component {
         this.setState({ emptyRows: emptyRows });
     }
 
+    handleExcelClick = () => {
+        if (this.state.selected.length !== 0) {
+            const res = { ids: this.state.selected };
+            this.props.ToExcel(res);
+        } else {
+            this.setState({ showErrorExportDialog: true });
+        }
+    }
+
+    closeErrorExportDialog = () => {
+        this.setState({ showErrorExportDialog: false });
+    }
+
+    closeFileDialog = () => {
+        this.props.ToExcelClose();
+    }
+
+    closeErrorFileDialog = () => {
+        this.props.ToExcelErrorClose();
+    }
+
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search } = this.state;
-        const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+        const { classes, isLoading, fileSaved, fileError, editUser } = this.props;
+        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search, showErrorExportDialog, emptyRows } = this.state;
 
         return (
-            <TableCardLayout id={"usr"} headerIndex={2} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
-                <DeleteDialog header={1} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
-                <AddUserDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} />
+            <TableCardLayout id={"usr"} headerIndex={2} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+                <DeleteDialog header={2} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
+                <AddUserDialog onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} editUser={editUser} />
+                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={1} />
+                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={1} />
+                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={1} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
                         <Table className={classes.table}>
@@ -218,7 +302,7 @@ class Users extends Component {
                                                 <TableCell align="center" className={classes.cell}>{getDate(n.birthday)}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getYear(n.worksSince)}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getRole(n.roleId)}</TableCell>
-                                                <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.handleEditClick(event, n.id)}>
+                                                <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.startEditClick(event, n.id)}>
                                                     <Edit fontSize="small" />
                                                 </IconButton>}</TableCell>
                                             </TableRow>

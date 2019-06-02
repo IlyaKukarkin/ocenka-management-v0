@@ -33,7 +33,7 @@ const styles = theme => ({
         marginUp: '180px'
     },
     buttons: {
-        minWidth: '237px'
+        minWidth: '224px'
     },
     search: {
         maxWidth: '130px',

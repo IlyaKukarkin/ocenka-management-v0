@@ -95,26 +95,98 @@ class AddUserDialog extends React.Component {
         };
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.editUser !== undefined && nextProps.editUser.surname !== undefined && (this.state.surname !== nextProps.editUser.surname || this.state.category !== nextProps.editUser.category || this.state.salary !== nextProps.editUser.salary)) {
+            let pos;
+            switch (nextProps.editUser.roleId) {
+                case 1:
+                    pos = 'Оценщик';
+                    break;
+                case 2:
+                    pos = 'Бухгалтер';
+                    break;
+                case 3:
+                    pos = 'Директор';
+                    break;
+            }
+            this.setState({
+                surname: nextProps.editUser.surname,
+                name: nextProps.editUser.name,
+                patronymic: nextProps.editUser.patronymic,
+                login: nextProps.editUser.login,
+                password: nextProps.editUser.password,
+                birthday: this.convertData(nextProps.editUser.birthday),
+                worksSince: this.convertData(nextProps.editUser.worksSince),
+                position: pos,
+                category: nextProps.editUser.category || '',
+                salary: nextProps.editUser.salary + ' ₽' || '',
+            });
+        }
+    }
+
+    convertData = (data) => {
+        let res = '';
+        let year, m, d;
+
+        year = data.substring(0, 4);
+        m = data.substring(5, 7);
+        d = data.substring(8, 10);
+
+        res = d + '/' + m + '/' + year;
+
+        return res;
+    }
+
+    replaceDayAndMonth = (data) => {
+        let res, day, mon, year;
+
+        day = data.substring(0, 2);
+        mon = data.substring(3, 5);
+        year = data.substring(6, 10);
+
+        res = mon + '/' + day + '/' + year;
+
+        return res;
+    }
+
     submitHandler(evt) {
         evt.preventDefault();
         // pass the input field value to the event handler passed
         // as a prop by the parent (App)
 
         if (!this.validateForm()) {
-            let role = 1, extra = this.state.category;
-            if (this.state.position === 'Бухгалтер') {
-                role = 2;
-                extra = this.clearSalary(this.state.salary);
+            if (this.props.editUser.id === undefined) {
+                let role = 1, extra = this.state.category;
+                if (this.state.position === 'Бухгалтер') {
+                    role = 2;
+                    extra = this.clearSalary(this.state.salary);
+                }
+
+                const resultObject = {
+                    surname: this.state.surname, name: this.state.name, patronymic: this.state.patronymic,
+                    login: this.state.login, password: this.state.password, birthday: this.replaceDayAndMonth(this.state.birthday),
+                    worksSince: this.replaceDayAndMonth(this.state.worksSince), roleId: role, extra: extra
+                }
+
+
+                this.props.onAddAction(resultObject);
+            } else {
+                let role2 = 1, extra2 = this.state.category;
+                if (this.state.position === 'Бухгалтер') {
+                    role2 = 2;
+                    extra2 = this.clearSalary(this.state.salary);
+                }
+
+                const resultObject2 = {
+                    id: this.props.editUser.id,
+                    surname: this.state.surname, name: this.state.name, patronymic: this.state.patronymic,
+                    login: this.state.login, password: this.state.password, birthday: this.replaceDayAndMonth(this.state.birthday),
+                    worksSince: this.replaceDayAndMonth(this.state.worksSince), roleId: role2, extra: extra2
+                }
+
+
+                this.props.onEditAction(resultObject2);
             }
-
-            const resultObject = {
-                surname: this.state.surname, name: this.state.name, patronymic: this.state.patronymic,
-                login: this.state.login, password: this.state.password, birthday: this.state.birthday,
-                worksSince: this.state.worksSince, roleId: role, extra: extra
-            }
-
-
-            this.props.onAddAction(resultObject);
 
             this.setState({
                 surname: '',
@@ -508,7 +580,7 @@ class AddUserDialog extends React.Component {
     }
 
     render() {
-        const { showDialog } = this.props;
+        const { showDialog, editUser } = this.props;
 
         const positions = [{ value: 'Оценщик', label: 'Оценщик' }, { value: 'Бухгалтер', label: 'Бухгалтер' }];
         const categories = [{ value: '1-кат.', label: '1-кат.' }, { value: '2-кат.', label: '2-кат.' }, { value: 'Нет', label: 'Нет' }];
@@ -523,7 +595,7 @@ class AddUserDialog extends React.Component {
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle id="alert-dialog-slide-title">
-                    Добавить пользователя
+                    {editUser.id !== undefined ? "Изменить пользователя" : "Добавить пользователя"}
                 </DialogTitle>
                 <DialogContent>
                     <form onSubmit={this.submitHandler}>
@@ -619,6 +691,7 @@ class AddUserDialog extends React.Component {
                             select
                             margin="dense"
                             id="position"
+                            disabled={this.state.position === 'Директор'}
                             label={this.state.positionLabel}
                             value={this.state.position}
                             onChange={this.handleChange}
@@ -671,7 +744,7 @@ class AddUserDialog extends React.Component {
                         Отмена
                     </Button>
                     <Button onClick={this.submitHandler} color="secondary">
-                        Сохранить
+                        {editUser.id !== undefined ? "Изменить" : "Сохранить" }
                     </Button>
                 </DialogActions>
             </Dialog>

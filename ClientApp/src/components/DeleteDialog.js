@@ -11,7 +11,7 @@ function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-const headers = ["выбранные адреса", "выбранных оценщиков"];
+const headers = ["выбранные адреса", "выбранных оценщиков", "выбранных пользователей"];
 
 class DeleteDialog extends React.Component {
     render() {

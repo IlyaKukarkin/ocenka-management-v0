@@ -10,10 +10,11 @@ import { lighten } from '@material-ui/core/styles/colorManipulator';
 
 const toolbarStyles = theme => ({
     root: {
-        paddingRight: theme.spacing.unit,
-        paddingLeft: theme.spacing.unit,
+        paddingRight: '0px',
+        paddingLeft: '0px',
         display: 'none',
         minHeight: '0',
+        maxWidth: '114px',
         borderRadius: '18px'
     },
     highlight:

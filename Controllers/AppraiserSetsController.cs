@@ -17,7 +17,6 @@ namespace ocenka_management.Controllers
     public class AppraiserSetsController : ControllerBase
     {
         private readonly OcenkaManagementContext _context;
-        private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         public AppraiserSetsController(OcenkaManagementContext context)
         {
