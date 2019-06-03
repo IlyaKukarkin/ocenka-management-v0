@@ -57,6 +57,7 @@ class Address extends Component {
         this.closeErrorFileDialog = this.closeErrorFileDialog.bind(this);
         this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
         this.handleExcelClick = this.handleExcelClick.bind(this);
+        this.handleEditClick = this.handleEditClick.bind(this);
     }
 
     state = {
@@ -71,6 +72,14 @@ class Address extends Component {
         showDeleteDialog: false,
         showAddDialog: false,
         showErrorExportDialog: false,
+        editAddress: {
+            id: '',
+            city: '',
+            district: '',
+            street: '',
+            house: '',
+            numberOfFlat: '',
+        }
     };
 
     componentWillMount() {
@@ -156,6 +165,8 @@ class Address extends Component {
     }
 
     showAddDialog = () => {
+        this.props.ClearEditAddress();
+
         this.setState({ showAddDialog: true });
     }
 
@@ -164,11 +175,35 @@ class Address extends Component {
     }
 
     closeAddDialog = () => {
+        this.props.ClearEditAddress();
+
         this.setState({ showAddDialog: false });
     }
 
-    handleEditClick = (event, id) => {
-        console.dir(id);
+    handleEditClick = (data) => {
+        this.props.ClearEditAddress();
+
+        this.props.EditAddressSet(data);
+
+        this.setState({ showAddDialog: false });
+    }
+
+    startEditClick = (event, id) => {
+        let address = this.findAddress(id);
+
+        let getAddress = this.props.StartEditAddress(address);
+
+        getAddress.then((user) => {
+            this.setState({ showAddDialog: true });
+        });
+    }
+
+    findAddress = (id) => {
+        for (let i = 0; i < this.props.addresses.length; i++) {
+            if (this.props.addresses[i].id === id) {
+                return this.props.addresses[i];
+            }
+        }
     }
 
     handleSearchChange = (value) => {
@@ -201,13 +236,13 @@ class Address extends Component {
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading, fileSaved, fileError } = this.props;
+        const { classes, isLoading, fileSaved, fileError, editAddress } = this.props;
         const { data, order, orderBy, selected, rowsPerPage, page, emptyRows, search, showAddDialog, showDeleteDialog, showErrorExportDialog } = this.state;
 
         return (
             <TableCardLayout headerIndex={0} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
                 <DeleteDialog header={0} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
-                <AddAddressDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} />
+                <AddAddressDialog onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} editAddress={editAddress} />
                 <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={2} />
                 <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={2} />
                 <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={2} />
@@ -247,7 +282,7 @@ class Address extends Component {
                                                 <TableCell align="center" className={classes.cell}>{n.street}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.house}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.numberOfFlat}</TableCell>
-                                                <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.handleEditClick(event, n.id)}>
+                                                <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.startEditClick(event, n.id)}>
                                                     <Edit fontSize="small" />
                                                 </IconButton>}</TableCell>
                                             </TableRow>

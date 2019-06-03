@@ -11,7 +11,10 @@ const toExcelFinish = 'TO_EXCEL_FINISH';
 const toExcelError = 'TO_EXCEL_ERROR';
 const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
 const toExcelClose = 'TO_EXCEL_CLOSE';
-const initialState = { addresses: [], isLoading: false, fileSaved: false, fileError: false };
+const editAddressStart = 'EDIT_ADDRESS_START';
+const editAddressFinish = 'EDIT_ADDRESS_FINISH';
+const clearEditAddress = 'CLEAR_EDIT_ADDRESS';
+const initialState = { addresses: [], editAddress: {}, isLoading: false, fileSaved: false, fileError: false };
 
 export const actionCreators = {
     GetAddressSet: () => async (dispatch) => {
@@ -74,7 +77,22 @@ export const actionCreators = {
     },
     ToExcelErrorClose: () => async (dispatch) => {
         dispatch({ type: toExcelErrorClose });
-    }
+    },
+    ClearEditAddress: () => async (dispatch) => {
+        dispatch({ type: clearEditAddress });
+    },
+    StartEditAddress: (data) => async (dispatch) => {
+        dispatch({ type: editAddressStart, data });
+    },
+    EditAddressSet: (data) => async (dispatch) => {
+        const url = `api/AddressSets/${data.id}`;
+        let myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        fetch(url, { method: 'put', body: JSON.stringify(data), headers: myHeaders })
+            .then(function (response) {
+                dispatch({ type: editAddressFinish, data });
+        });
+    },
 };
 
 export const reducer = (state, action) => {
@@ -193,6 +211,35 @@ export const reducer = (state, action) => {
         return {
             ...state,
             fileError: false
+        };
+    }
+
+    if (action.type === editAddressStart) {
+        return {
+            ...state,
+            editAddress: action.data
+        };
+    }
+
+    if (action.type === editAddressFinish) {
+        let addresses = state.addresses;
+        let newAddress = action.data;
+
+        const adrIndex = addresses.findIndex(u => u.id === newAddress.id);
+
+        addresses[adrIndex] = newAddress;
+
+        return {
+            ...state,
+            addressed: addresses,
+            isLoading: false
+        };
+    }
+
+    if (action.type === clearEditAddress) {
+        return {
+            ...state,
+            editAddress: {}
         };
     }
 

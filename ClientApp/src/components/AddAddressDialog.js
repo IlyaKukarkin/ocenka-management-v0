@@ -33,16 +33,33 @@ class AddAddressDialog extends React.Component {
         };
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.editAddress !== undefined && nextProps.editAddress.city !== undefined && (this.state.city !== nextProps.editAddress.city)) {
+            this.setState({
+                city: nextProps.editAddress.city,
+                district: nextProps.editAddress.district,
+                street: nextProps.editAddress.street,
+                house: nextProps.editAddress.house,
+                numberOfFlat: nextProps.editAddress.numberOfFlat
+            });
+        }
+    }
+
     submitHandler(evt) {
         evt.preventDefault();
         // pass the input field value to the event handler passed
         // as a prop by the parent (App)
 
         if (!this.validateForm()) {
-            const resultObject = { city: this.state.city, district: this.state.district, street: this.state.street, house: this.state.house, numberOfFlat: this.state.numberOfFlat }
+            if (this.props.editAddress.id === undefined) {
+                const resultObject = { city: this.state.city, district: this.state.district, street: this.state.street, house: this.state.house, numberOfFlat: this.state.numberOfFlat }
 
+                this.props.onAddAction(resultObject);
+            } else {
+                const resultObject2 = { id: this.props.editAddress.id, city: this.state.city, district: this.state.district, street: this.state.street, house: this.state.house, numberOfFlat: this.state.numberOfFlat }
 
-            this.props.onAddAction(resultObject);
+                this.props.onEditAction(resultObject2);
+            }
 
             this.setState({
                 city: '',
@@ -184,7 +201,7 @@ class AddAddressDialog extends React.Component {
     }
 
     render() {
-        const { showDialog } = this.props;
+        const { showDialog, editAddress } = this.props;
 
         return (
             <Dialog
@@ -196,7 +213,7 @@ class AddAddressDialog extends React.Component {
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle id="alert-dialog-slide-title">
-                    Добавить адрес
+                    {editAddress.id !== undefined ? "Изменить адрес" : "Добавить адрес"}
                 </DialogTitle>
                 <DialogContent>
                     <form onSubmit={this.submitHandler}>
@@ -261,7 +278,7 @@ class AddAddressDialog extends React.Component {
                         Отмена
                     </Button>
                     <Button onClick={this.submitHandler} color="secondary">
-                        Сохранить
+                        {editAddress.id !== undefined ? "Изменить" : "Сохранить"}
                     </Button>
                 </DialogActions>
             </Dialog>
