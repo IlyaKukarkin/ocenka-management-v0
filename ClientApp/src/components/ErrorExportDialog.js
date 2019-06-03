@@ -11,7 +11,7 @@ function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-const headers = ["оценщиков", "пользователей"];
+const headers = ["оценщиков", "пользователей", "адреса"];
 
 class ErrorExportDialog extends React.Component {
     render() {

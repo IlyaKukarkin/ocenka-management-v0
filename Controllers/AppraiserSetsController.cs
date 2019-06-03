@@ -216,6 +216,7 @@ namespace ocenka_management.Controllers
 
             // AutoFitColumns
             worksheet.Cells[1, 1, appraisers.Count() + 1, 6].AutoFitColumns();
+            worksheet.Cells[1, 1, appraisers.Count() + 1, 6].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
 
             return package;
         }

@@ -6,7 +6,12 @@ const addAddressStart = 'ADD_ADDRESS_START';
 const addAddressFinish = 'ADD_ADDRESS_FINISH';
 const deleteAddressesStart = 'DELETE_ADDRESSES_START';
 const deleteAddressesFinish = 'DELETE_ADDRESSES_FINISH';
-const initialState = { addresses: [], isLoading: false };
+const toExcelStart = 'TO_EXCEL_START';
+const toExcelFinish = 'TO_EXCEL_FINISH';
+const toExcelError = 'TO_EXCEL_ERROR';
+const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
+const toExcelClose = 'TO_EXCEL_CLOSE';
+const initialState = { addresses: [], isLoading: false, fileSaved: false, fileError: false };
 
 export const actionCreators = {
     GetAddressSet: () => async (dispatch) => {
@@ -48,6 +53,27 @@ export const actionCreators = {
             }).then(function (newAddress) {
                 dispatch({ type: addAddressFinish, newAddress });
             });
+    },
+    ToExcel: (data) => async (dispatch) => {
+        dispatch({ type: toExcelStart });
+
+        const url = `api/AddressSets/ToExcel`;
+        let myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
+            .then(function (response) {
+                if (response.ok) {
+                    dispatch({ type: toExcelFinish });
+                } else {
+                    dispatch({ type: toExcelError });
+                }
+            });
+    },
+    ToExcelClose: () => async (dispatch) => {
+        dispatch({ type: toExcelClose });
+    },
+    ToExcelErrorClose: () => async (dispatch) => {
+        dispatch({ type: toExcelErrorClose });
     }
 };
 
@@ -139,6 +165,34 @@ export const reducer = (state, action) => {
             ...state,
             addresses: addresses,
             isLoading: false
+        };
+    }
+
+    if (action.type === toExcelFinish) {
+        return {
+            ...state,
+            fileSaved: true
+        };
+    }
+
+    if (action.type === toExcelError) {
+        return {
+            ...state,
+            fileError: true
+        };
+    }
+
+    if (action.type === toExcelClose) {
+        return {
+            ...state,
+            fileSaved: false
+        };
+    }
+
+    if (action.type === toExcelErrorClose) {
+        return {
+            ...state,
+            fileError: false
         };
     }
 

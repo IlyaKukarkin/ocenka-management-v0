@@ -170,7 +170,6 @@ export const actionCreators = {
 };
 
 const fixData = (user) => {
-    let res1, res2;
     let y1, m1, d1, y2, m2, d2;
 
     m1 = user.birthday.substring(0, 2);

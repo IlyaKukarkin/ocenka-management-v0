@@ -11,7 +11,7 @@ function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-const headers = ["оценщиками", "пользователями"];
+const headers = ["оценщиками", "пользователями", "адресами"];
 
 class ErrorFileDialog extends React.Component {
     render() {

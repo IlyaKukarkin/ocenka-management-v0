@@ -7,6 +7,9 @@ import MyTableHead from './TableHead';
 import TableToolbar from './TableToolbar';
 import DeleteDialog from './DeleteDialog';
 import AddAddressDialog from './AddAddressDialog';
+import CreateFileDialog from './CreateFileDialog';
+import ErrorFileDialog from './ErrorFileDialog';
+import ErrorExportDialog from './ErrorExportDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
     Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
@@ -50,6 +53,10 @@ class Address extends Component {
         this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
         this.handleAddClick = this.handleAddClick.bind(this);
         this.closeAddDialog = this.closeAddDialog.bind(this);
+        this.closeFileDialog = this.closeFileDialog.bind(this);
+        this.closeErrorFileDialog = this.closeErrorFileDialog.bind(this);
+        this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
+        this.handleExcelClick = this.handleExcelClick.bind(this);
     }
 
     state = {
@@ -58,9 +65,12 @@ class Address extends Component {
         selected: [],
         data: this.props.addresses,
         page: 0,
+        search: '',
+        emptyRows: 0,
         rowsPerPage: 5,
         showDeleteDialog: false,
         showAddDialog: false,
+        showErrorExportDialog: false,
     };
 
     componentWillMount() {
@@ -68,8 +78,11 @@ class Address extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.addresses !== nextProps.addresses)
+        if (this.props.addresses !== nextProps.addresses) {
             this.setState({ data: nextProps.addresses });
+            const emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, nextProps.addresses.length - this.state.page * this.state.rowsPerPage);
+            this.setState({ emptyRows: emptyRows });
+        }
     }
 
     handleRequestSort = (event, property) => {
@@ -158,17 +171,46 @@ class Address extends Component {
         console.dir(id);
     }
 
+    handleSearchChange = (value) => {
+        this.setState({ search: value });
+        const emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, this.state.data.length - this.state.page * this.state.rowsPerPage);
+        this.setState({ emptyRows: emptyRows });
+    }
+
+    handleExcelClick = () => {
+        if (this.state.selected.length !== 0) {
+            const res = { ids: this.state.selected };
+            this.props.ToExcel(res);
+        } else {
+            this.setState({ showErrorExportDialog: true });
+        }
+    }
+
+    closeErrorExportDialog = () => {
+        this.setState({ showErrorExportDialog: false });
+    }
+
+    closeFileDialog = () => {
+        this.props.ToExcelClose();
+    }
+
+    closeErrorFileDialog = () => {
+        this.props.ToExcelErrorClose();
+    }
+
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
-        const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+        const { classes, isLoading, fileSaved, fileError } = this.props;
+        const { data, order, orderBy, selected, rowsPerPage, page, emptyRows, search, showAddDialog, showDeleteDialog, showErrorExportDialog } = this.state;
 
         return (
-            <TableCardLayout headerIndex={0} isLoading={isLoading} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
-                <DeleteDialog header={0} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
-                <AddAddressDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={this.state.showAddDialog} />
+            <TableCardLayout headerIndex={0} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+                <DeleteDialog header={0} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
+                <AddAddressDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} />
+                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={2} />
+                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={2} />
+                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={2} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
 
@@ -184,6 +226,7 @@ class Address extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
+                                    .filter(adr => adr.city.includes(search) || adr.district.includes(search) || adr.street.includes(search) || adr.house.toString().includes(search) || adr.numberOfFlat.toString().includes(search))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -221,7 +264,7 @@ class Address extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.length}
+                        count={data.filter(adr => adr.city.includes(search) || adr.district.includes(search) || adr.street.includes(search) || adr.house.toString().includes(search) || adr.numberOfFlat.toString().includes(search)).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{
