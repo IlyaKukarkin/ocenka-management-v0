@@ -4,6 +4,8 @@ const deleteClientStart = 'DELETE_CLIENT_START';
 const deleteClientFinish = 'DELETE_CLIENT_FINISH';
 const addClientStart = 'ADD_CLIENT_START';
 const addClientFinish = 'ADD_CLIENT_FINISH';
+const getEditClientStart = 'GET_EDIT_CLIENT_START';
+const getEditClientFinish = 'GET_EDIT_CLIENT_FINISH';
 const editClientStart = 'EDIT_CLIENT_START';
 const editClientFinish = 'EDIT_CLIENT_FINISH';
 const deleteClientsStart = 'DELETE_CLIENTS_START';
@@ -83,42 +85,32 @@ export const actionCreators = {
                     });
             });
     },
+    GetEditClient: (data) => async (dispatch) => {
+        dispatch({ type: getEditClientStart, data });
+    },
     EditClientSet: (data) => async (dispatch) => {
         dispatch({ type: editClientStart });
 
-        if (data.roleId === 1) {
-            const url = `api/UserSets/${data.id}`;
-            let myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-            fetch(url, { method: 'put', body: JSON.stringify(data), headers: myHeaders })
-                .then(function (response) {
-                    const appr = { position: data.extra, id: data.id };
-                    fetch(`api/AppraiserSets/${data.id}`, { method: 'put', body: JSON.stringify(appr), headers: myHeaders });
-                    dispatch({ type: editClientFinish, data });
-                });
-        } else {
-            if (data.roleId === 2) {
-                const url = `api/UserSets/${data.id}`;
-                let myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-                fetch(url, { method: 'put', body: JSON.stringify(data), headers: myHeaders })
-                    .then(function (response) {
-                        const acc = { salary: data.extra, id: data.id };
-                        fetch(`api/AccountantSets/${data.id}`, { method: 'put', body: JSON.stringify(acc), headers: myHeaders });
+        let address = {
+            id: data.addressId, city: data.city, district: data.district, street: data.street, house: data.house, numberOfFlat: data.numberOfFlat
+        };
+        let client = {
+            id: data.id,
+            surname: data.surname, name: data.name, patronymic: data.patronymic, series: data.series, number: data.number, dateOfBirth: data.dateOfBirth,
+            dateOfIssue: data.dateOfIssue, divisionCode: data.divisionCode, issuedBy: data.issuedBy, addressOfResidenceId: data.addressId
+        };
+
+        let url = `api/AddressSets/${data.addressId}`;
+        let myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        fetch(url, { method: 'put', body: JSON.stringify(address), headers: myHeaders })
+            .then(function () {
+                fetch(`api/IndividualSets/${data.id}`, { method: 'put', body: JSON.stringify(client), headers: myHeaders })
+                    .then(function (newClient2) {
                         dispatch({ type: editClientFinish, data });
                     });
-            } else {
-                const url = `api/UserSets/${data.id}`;
-                let myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-                fetch(url, { method: 'put', body: JSON.stringify(data), headers: myHeaders })
-                    .then(function (response) {
-                        const acc = { salary: data.extra, id: data.id };
-                        fetch(`api/DirectorSets/${data.id}`, { method: 'put', body: JSON.stringify(acc), headers: myHeaders });
-                        dispatch({ type: editClientFinish, data });
-                    });
-            }
-        }
+            });
     },
     ToExcel: (data) => async (dispatch) => {
         dispatch({ type: toExcelStart });
@@ -179,7 +171,7 @@ export const reducer = (state, action) => {
                 id: oldClients[i].id, surname: oldClients[i].surname, name: oldClients[i].name, patronymic: oldClients[i].patronymic, dateOfBirth: oldClients[i].dateOfBirth,
                 dateOfIssue: oldClients[i].dateOfIssue, divisionCode: oldClients[i].divisionCode, issuedBy: oldClients[i].issuedBy, series: oldClients[i].series, number: oldClients[i].number,
                 city: oldClients[i].addressOfResidence.city, district: oldClients[i].addressOfResidence.district, street: oldClients[i].addressOfResidence.street,
-                house: oldClients[i].addressOfResidence.house, numberOfFlat: oldClients[i].addressOfResidence.numberOfFlat
+                house: oldClients[i].addressOfResidence.house, numberOfFlat: oldClients[i].addressOfResidence.numberOfFlat, addressId: oldClients[i].addressOfResidence.id
             });
         }
 
@@ -249,12 +241,14 @@ export const reducer = (state, action) => {
     }
 
     if (action.type === addClientFinish) {
-
         let clients = state.clients;
+        let newClient = action.data;
 
-        const newСlient = fixData(action.data);
+        newClient = fixData(newClient);
 
-        clients.push(newСlient);
+        const clntIndex = clients.findIndex(u => u.id === newClient.id);
+
+        clients[clntIndex] = newClient;
 
         return {
             ...state,
@@ -266,7 +260,7 @@ export const reducer = (state, action) => {
     if (action.type === editClientStart) {
         return {
             ...state,
-            editClient: action.data
+            isLoading: true
         };
     }
 
@@ -313,6 +307,13 @@ export const reducer = (state, action) => {
         return {
             ...state,
             fileError: false
+        };
+    }
+
+    if (action.type === getEditClientStart) {
+        return {
+            ...state,
+            editClient: action.data
         };
     }
 

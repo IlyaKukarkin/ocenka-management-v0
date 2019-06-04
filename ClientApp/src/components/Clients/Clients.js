@@ -10,7 +10,6 @@ import CreateFileDialog from '../CreateFileDialog';
 import ErrorFileDialog from '../ErrorFileDialog';
 import ErrorExportDialog from '../ErrorExportDialog';
 import AddClientDialog from './AddClientDialog';
-import RoleText from '../Home/RoleText';
 import { withStyles } from '@material-ui/core/styles';
 import {
     Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox

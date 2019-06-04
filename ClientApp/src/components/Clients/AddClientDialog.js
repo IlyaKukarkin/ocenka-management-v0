@@ -1,10 +1,8 @@
 ﻿import React from 'react';
 import MaskedInput from 'react-text-mask';
-import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, MenuItem, IconButton, InputAdornment, FormControl, Input, InputLabel
+    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField
 } from '@material-ui/core';
-import { Visibility, VisibilityOff } from '@material-ui/icons';
 
 function Transition(props) {
     return <Slide direction="up" {...props} />;
@@ -118,6 +116,10 @@ function HouseMask(props) {
     );
 }
 
+function insertInString(str, index, value) {
+    return str.substr(0, index) + value + str.substr(index);
+}
+
 class AddClientDialog extends React.Component {
     constructor(props) {
         super(props);
@@ -177,11 +179,11 @@ class AddClientDialog extends React.Component {
                 surname: nextProps.editClient.surname,
                 name: nextProps.editClient.name,
                 patronymic: nextProps.editClient.patronymic,
-                series: nextProps.editClient.series,
-                number: nextProps.editeditClientUser.number,
+                series: insertInString(nextProps.editClient.series.toString(), 2, ' '),
+                number: insertInString(nextProps.editClient.number.toString(), 3, ' '),
                 dateOfBirth: this.convertData(nextProps.editClient.dateOfBirth),
                 dateOfIssue: this.convertData(nextProps.editClient.dateOfIssue),
-                divisionCode: nextProps.editClient.divisionCode,
+                divisionCode: insertInString(nextProps.editClient.divisionCode.toString(), 3, '-'),
                 issuedBy: nextProps.editClient.issuedBy,
                 city: nextProps.editClient.city,
                 district: nextProps.editClient.district,
@@ -240,7 +242,7 @@ class AddClientDialog extends React.Component {
                     series: this.state.series.replace(' ', ''), number: this.state.number.replace(' ', ''), dateOfBirth: this.replaceDayAndMonth(this.state.dateOfBirth),
                     dateOfIssue: this.replaceDayAndMonth(this.state.dateOfIssue), divisionCode: this.state.divisionCode.replace('-', ''), issuedBy: this.state.issuedBy,
                     city: this.state.city, district: this.state.district, street: this.state.street,
-                    house: this.state.house, numberOfFlat: this.state.numberOfFlat
+                    house: this.state.house, numberOfFlat: this.state.numberOfFlat, addressId: this.props.editClient.addressId
                 }
 
                 this.props.onEditAction(resultObject2);
