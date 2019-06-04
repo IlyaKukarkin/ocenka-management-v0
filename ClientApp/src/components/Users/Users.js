@@ -70,7 +70,6 @@ class Users extends Component {
         data: [],
         page: 0,
         search: '',
-        emptyRows: 0,
         rowsPerPage: 5,
         showDeleteDialog: false,
         showAddDialog: false,
@@ -97,8 +96,6 @@ class Users extends Component {
     componentWillReceiveProps(nextProps) {
         if (this.props.users !== nextProps.users) {
             this.setState({ data: nextProps.users });
-            const emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, nextProps.users.length - this.state.page * this.state.rowsPerPage);
-            this.setState({ emptyRows: emptyRows });
         }
     }
 
@@ -229,8 +226,6 @@ class Users extends Component {
 
     handleSearchChange = (value) => {
         this.setState({ search: value });
-        const emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, this.state.data.length - this.state.page * this.state.rowsPerPage);
-        this.setState({ emptyRows: emptyRows });
     }
 
     handleExcelClick = () => {
@@ -258,7 +253,7 @@ class Users extends Component {
 
     render() {
         const { classes, isLoading, fileSaved, fileError, editUser } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search, showErrorExportDialog, emptyRows } = this.state;
+        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search, showErrorExportDialog } = this.state;
 
         return (
             <TableCardLayout id={"usr"} headerIndex={2} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
@@ -308,11 +303,6 @@ class Users extends Component {
                                             </TableRow>
                                         );
                                     })}
-                                {emptyRows > 0 && (
-                                    <TableRow style={{ height: 52.8 * emptyRows }}>
-                                        <TableCell colSpan={8} />
-                                    </TableRow>
-                                )}
                             </TableBody>
                         </Table>
                     </div>

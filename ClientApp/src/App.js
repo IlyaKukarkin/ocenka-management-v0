@@ -6,6 +6,7 @@ import Addresses from './components/Addresses';
 import Appraisers from './components/Appraisers/Appraisers';
 import Users from './components/Users/Users';
 import Neural from './components/Neural/Neural';
+import Clients from './components/Clients/Clients';
 
 export default () => (
     <Layout>
@@ -15,6 +16,7 @@ export default () => (
             <Route path='/address' component={Addresses} />
             <Route path='/appraisers' component={Appraisers} />
             <Route path='/neural' component={Neural} />
+            <Route path='/clients' component={Clients} />
         </Switch>
     </Layout>
 );

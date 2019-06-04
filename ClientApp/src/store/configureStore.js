@@ -6,6 +6,7 @@ import * as AppraiserReducer from './AppraiserReducer';
 import * as UserReducer from './UserReducer';
 import * as NeuralReducer from './NeuralReducer';
 import * as LoginReducer from './LoginReducer';
+import * as ClientReducer from './ClientReducer';
 
 export default function configureStore(history, initialState) {
     const reducers = {
@@ -13,7 +14,8 @@ export default function configureStore(history, initialState) {
         appraisers: AppraiserReducer.reducer,
         users: UserReducer.reducer,
         neural: NeuralReducer.reducer,
-        login: LoginReducer.reducer
+        login: LoginReducer.reducer,
+        clients: ClientReducer.reducer,
     };
 
     const middleware = [

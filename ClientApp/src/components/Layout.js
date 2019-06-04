@@ -125,8 +125,8 @@ class Layout extends Component {
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/" selected={'/' === pathname}>
                         <MenuText textIndex={0} />
                     </MenuItem>
-                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/users" selected={'/users' === pathname}>
-                        <MenuText textIndex={6} />
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/clients" selected={'/clients' === pathname}>
+                        <MenuText textIndex={2} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/appraisers" selected={'/appraisers' === pathname}>
                         <MenuText textIndex={4} />

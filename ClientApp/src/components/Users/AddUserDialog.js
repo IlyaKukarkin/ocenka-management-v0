@@ -155,7 +155,7 @@ class AddUserDialog extends React.Component {
         // as a prop by the parent (App)
 
         if (!this.validateForm()) {
-            if (this.props.editUser.id === undefined) {
+            if (this.props.editUser === undefined || this.props.editUser.id === undefined) {
                 let role = 1, extra = this.state.category;
                 if (this.state.position === 'Бухгалтер') {
                     role = 2;
@@ -595,7 +595,7 @@ class AddUserDialog extends React.Component {
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle id="alert-dialog-slide-title">
-                    {editUser.id !== undefined ? "Изменить пользователя" : "Добавить пользователя"}
+                    {editUser !== undefined && editUser.id !== undefined ? "Изменить пользователя" : "Добавить пользователя"}
                 </DialogTitle>
                 <DialogContent>
                     <form onSubmit={this.submitHandler}>
@@ -744,7 +744,7 @@ class AddUserDialog extends React.Component {
                         Отмена
                     </Button>
                     <Button onClick={this.submitHandler} color="secondary">
-                        {editUser.id !== undefined ? "Изменить" : "Сохранить" }
+                        {editUser !== undefined && editUser.id !== undefined ? "Изменить" : "Сохранить" }
                     </Button>
                 </DialogActions>
             </Dialog>

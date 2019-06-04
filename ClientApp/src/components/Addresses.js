@@ -29,6 +29,7 @@ const styles = theme => ({
         width: '30px'
     },
     cell: {
+        padding: '0',
         maxWidth: '125px',
         whiteSpace: "normal",
         wordWrap: "break-word"

@@ -41,7 +41,7 @@ const styles = theme => ({
     }
 })
 
-const headers = ["Адреса", "Оценщики", "Пользователи"];
+const headers = ["Адреса", "Оценщики", "Пользователи", "Клиенты"];
 
 class TableCardLayout extends Component {
     constructor(props) {

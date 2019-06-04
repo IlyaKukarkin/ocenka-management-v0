@@ -24,7 +24,19 @@ namespace ocenka_management.Controllers
         [HttpGet]
         public IEnumerable<ClientSetIndividual> GetClientSetIndividual()
         {
-            return _context.ClientSetIndividual;
+            IEnumerable<AddressSet> addresses = _context.AddressSet;
+            IEnumerable<ClientSetIndividual> individuals = _context.ClientSetIndividual;
+            AddressSet adr = new AddressSet();
+            ClientSetIndividual ind = new ClientSetIndividual();
+
+            for (int i = 0; i < individuals.Count(); i++)
+            {
+                adr = addresses.First(u => u.Id == individuals.ElementAt(i).AddressOfResidenceId);
+                adr.ClientSetIndividual = null;
+                individuals.ElementAt(i).AddressOfResidence = adr;
+            }
+
+            return individuals;
         }
 
         // GET: api/IndividualSet/5

@@ -51,7 +51,7 @@ class AddAddressDialog extends React.Component {
         // as a prop by the parent (App)
 
         if (!this.validateForm()) {
-            if (this.props.editAddress.id === undefined) {
+            if (this.props.editAddress === undefined || this.props.editAddress.id === undefined) {
                 const resultObject = { city: this.state.city, district: this.state.district, street: this.state.street, house: this.state.house, numberOfFlat: this.state.numberOfFlat }
 
                 this.props.onAddAction(resultObject);
@@ -213,7 +213,7 @@ class AddAddressDialog extends React.Component {
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle id="alert-dialog-slide-title">
-                    {editAddress.id !== undefined ? "Изменить адрес" : "Добавить адрес"}
+                    {editAddress !== undefined && editAddress.id !== undefined ? "Изменить адрес" : "Добавить адрес"}
                 </DialogTitle>
                 <DialogContent>
                     <form onSubmit={this.submitHandler}>
@@ -278,7 +278,7 @@ class AddAddressDialog extends React.Component {
                         Отмена
                     </Button>
                     <Button onClick={this.submitHandler} color="secondary">
-                        {editAddress.id !== undefined ? "Изменить" : "Сохранить"}
+                        {editAddress !== undefined && editAddress.id !== undefined ? "Изменить" : "Сохранить"}
                     </Button>
                 </DialogActions>
             </Dialog>

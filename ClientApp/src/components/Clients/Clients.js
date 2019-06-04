@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { actionCreators } from '../../store/AppraiserReducer';
+import { actionCreators } from '../../store/ClientReducer';
 import TableCardLayout from '../TableCardLayout';
 import MyTableHead from '../TableHead';
 import TableToolbar from '../TableToolbar';
@@ -9,11 +9,13 @@ import DeleteDialog from '../DeleteDialog';
 import CreateFileDialog from '../CreateFileDialog';
 import ErrorFileDialog from '../ErrorFileDialog';
 import ErrorExportDialog from '../ErrorExportDialog';
-import AddAppraiserDialog from './AddAppraiserDialog';
+import AddClientDialog from './AddClientDialog';
+import RoleText from '../Home/RoleText';
 import { withStyles } from '@material-ui/core/styles';
 import {
-    Table, TableCell, TableRow, TableBody, TablePagination, Checkbox
+    Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
 } from '@material-ui/core';
+import { Edit } from '@material-ui/icons';
 
 const styles = theme => ({
     table: {
@@ -29,6 +31,7 @@ const styles = theme => ({
     },
     cell: {
         padding: '0',
+        maxWidth: '125px',
         whiteSpace: "normal",
         wordWrap: "break-word"
     }
@@ -37,13 +40,12 @@ const styles = theme => ({
 const rows = [
     { id: 'surname', numeric: false, label: '5' },
     { id: 'name', numeric: false, label: '6' },
-    { id: 'patronymic', numeric: false, label: '7' },
-    { id: 'birthday', numeric: false, label: '8' },
-    { id: 'worksSince', numeric: false, label: '9' },
-    { id: 'position', numeric: false, label: '10' }
+    { id: 'patrinymic', numeric: false, label: '7' },
+    { id: 'dateOfBirth', numeric: false, label: '8' },
+    { id: 'street', numeric: false, label: '2' },
 ];
 
-class Appraisers extends Component {
+class Clients extends Component {
     constructor(props) {
         super(props);
 
@@ -58,6 +60,7 @@ class Appraisers extends Component {
         this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
         this.handleExcelClick = this.handleExcelClick.bind(this);
         this.handleSearchChange = this.handleSearchChange.bind(this);
+        this.handleEditClick = this.handleEditClick.bind(this);
     }
 
     state = {
@@ -66,21 +69,38 @@ class Appraisers extends Component {
         selected: [],
         data: [],
         page: 0,
-        rowsPerPage: 5,
         search: '',
+        rowsPerPage: 5,
         showDeleteDialog: false,
         showAddDialog: false,
         showErrorExportDialog: false,
+        editClient: {
+            id: '',
+            surname: '',
+            name: '',
+            patronymic: '',
+            series: '',
+            number: '',
+            dateOfBirth: '',
+            dateOfIssue: '',
+            divisionCode: '',
+            issuedBy: '',
+            city: '',
+            district: '',
+            street: '',
+            house: '',
+            numberOfFlat: '',
+        }
     };
 
     componentWillMount() {
-        this.props.GetAppraisersSet();
+        this.props.GetClientsSet();
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.appraisers !== nextProps.appraisers) {
-            this.setState({ data: nextProps.appraisers });
-        }            
+        if (this.props.clients !== nextProps.clients) {
+            this.setState({ data: nextProps.clients });
+        }
     }
 
     handleRequestSort = (event, property) => {
@@ -132,19 +152,29 @@ class Appraisers extends Component {
     };
 
     handleDeleteClick = () => {
-        const { DeleteAddressSet, DeleteAddressesSet } = this.props;
+        const { DeleteClientSet, DeleteClientsSet } = this.props;
 
         this.setState({ showDeleteDialog: false });
         if (this.state.selected.length === 1) {
-            DeleteAddressSet(this.state.selected[0]);
+            if (this.state.selected[0] !== 3003) {
+                DeleteClientSet(this.state.selected[0]);
+            }
         } else {
-            DeleteAddressesSet(this.state.selected);
+            DeleteClientsSet(this.state.selected);
         }
         this.setState({ selected: [] });
     }
 
     handleAddClick = (data) => {
-        this.props.AddAddressSet(data);
+        this.props.AddClientSet(data);
+
+        this.setState({ showAddDialog: false });
+    }
+
+    handleEditClick = (data) => {
+        this.props.ClearEditClient();
+
+        this.props.EditClientSet(data);
 
         this.setState({ showAddDialog: false });
     }
@@ -154,6 +184,8 @@ class Appraisers extends Component {
     }
 
     showAddDialog = () => {
+        this.props.ClearEditClient();
+
         this.setState({ showAddDialog: true });
     }
 
@@ -161,25 +193,37 @@ class Appraisers extends Component {
         this.setState({ showDeleteDialog: false });
     }
 
-    closeFileDialog = () => {
-        this.props.ToExcelClose();
-    }
-
-    closeErrorFileDialog = () => {
-        this.props.ToExcelErrorClose();
-    }
-
     closeAddDialog = () => {
+        this.props.ClearEditClient();
+
         this.setState({ showAddDialog: false });
     }
 
-    handleEditClick = (event, id) => {
-        console.dir(id);
+    startEditClick = (event, id) => {
+        let client = this.findClient(id);
+
+        let getClient = this.props.GetEditClient(client);
+
+        getClient.then((client) => {
+            this.setState({ showAddDialog: true });
+        });
+    }
+
+    findClient = (id) => {
+        for (let i = 0; i < this.props.clients.length; i++) {
+            if (this.props.clients[i].id === id) {
+                return this.props.clients[i];
+            }
+        }
+    }
+
+    handleSearchChange = (value) => {
+        this.setState({ search: value });
     }
 
     handleExcelClick = () => {
         if (this.state.selected.length !== 0) {
-            const res = { ids: this.state.selected };            
+            const res = { ids: this.state.selected };
             this.props.ToExcel(res);
         } else {
             this.setState({ showErrorExportDialog: true });
@@ -190,29 +234,31 @@ class Appraisers extends Component {
         this.setState({ showErrorExportDialog: false });
     }
 
-    handleSearchChange = (value) => {
-        this.setState({ search: value });
+    closeFileDialog = () => {
+        this.props.ToExcelClose();
+    }
+
+    closeErrorFileDialog = () => {
+        this.props.ToExcelErrorClose();
     }
 
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading, fileSaved, fileError } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page, showErrorExportDialog, search } = this.state;
+        const { classes, isLoading, fileSaved, fileError, editClient } = this.props;
+        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search, showErrorExportDialog } = this.state;
 
         return (
-            <TableCardLayout id={"apr"} headerIndex={1} isLoading={isLoading} isPartial excelClick={this.handleExcelClick.bind(this)} onSearchChange={this.handleSearchChange.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
-                <DeleteDialog header={1} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={this.state.showDeleteDialog} />
-                <AddAppraiserDialog onAddAction={this.handleAddClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={this.state.showAddDialog} />
-                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={0} />
-                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={0} />
-                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={0} />
+            <TableCardLayout id={"clnt"} headerIndex={3} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+                <DeleteDialog header={3} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
+                <AddClientDialog onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} editClient={editClient} />
+                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={3} />
+                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={3} />
+                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={3} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
-
                         <Table className={classes.table}>
                             <MyTableHead
-                                isPartial
                                 numSelected={selected.length}
                                 order={order}
                                 orderBy={orderBy}
@@ -223,7 +269,7 @@ class Appraisers extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search) || apr.birthday.includes(search) || apr.worksSince.includes(search) || apr.position.includes(search))
+                                    .filter(clnt => clnt.surname.includes(search) || clnt.name.includes(search) || clnt.patronymic.includes(search) || clnt.dateOfBirth.includes(search) || clnt.street.includes(search) || clnt.house.toString().includes(search))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -242,9 +288,11 @@ class Appraisers extends Component {
                                                 <TableCell align="center" className={classes.cell}>{n.surname}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.name}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.patronymic}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{getDate(n.birthday)}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{getYear(n.worksSince)}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.position}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{getDate(n.dateOfBirth)}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{getAddress(n.street, n.house)}</TableCell>
+                                                <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.startEditClick(event, n.id)}>
+                                                    <Edit fontSize="small" />
+                                                </IconButton>}</TableCell>
                                             </TableRow>
                                         );
                                     })}
@@ -254,7 +302,7 @@ class Appraisers extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search) || apr.birthday.includes(search) || apr.worksSince.includes(search) || apr.position.includes(search)).length}
+                        count={data.filter(clnt => clnt.surname.includes(search) || clnt.name.includes(search) || clnt.patronymic.includes(search) || clnt.dateOfBirth.includes(search) || clnt.street.includes(search) || clnt.house.toString().includes(search)).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{
@@ -280,10 +328,10 @@ function getDate(date) {
     return result;
 }
 
-function getYear(date) {
+function getAddress(street, house) {
     let result = "";
 
-    result = date.substring(0, 4);
+    result = street + ", " + house;
 
     return result;
 }
@@ -313,6 +361,6 @@ function getSorting(order, orderBy) {
 }
 
 export default withStyles(styles)(connect(
-    state => state.appraisers,
+    state => state.clients,
     dispatch => bindActionCreators(actionCreators, dispatch)
-)(Appraisers));
+)(Clients));
