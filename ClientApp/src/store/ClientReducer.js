@@ -115,7 +115,7 @@ export const actionCreators = {
     ToExcel: (data) => async (dispatch) => {
         dispatch({ type: toExcelStart });
 
-        const url = `api/UserSets/ToExcel`;
+        const url = `api/IndividualSets/ToExcel`;
         let myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
