@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { actionCreators } from '../../store/ClientReducer';
+import { actionCreators } from '../../store/FlatReducer';
 import TableCardLayout from '../TableCardLayout';
 import MyTableHead from '../TableHead';
 import TableToolbar from '../TableToolbar';
@@ -9,7 +9,7 @@ import DeleteDialog from '../DeleteDialog';
 import CreateFileDialog from '../CreateFileDialog';
 import ErrorFileDialog from '../ErrorFileDialog';
 import ErrorExportDialog from '../ErrorExportDialog';
-import AddClientDialog from './AddClientDialog';
+import AddFlatDialog from './AddFlatDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
     Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
@@ -37,14 +37,15 @@ const styles = theme => ({
 });
 
 const rows = [
-    { id: 'surname', numeric: false, label: '5' },
-    { id: 'name', numeric: false, label: '6' },
-    { id: 'patrinymic', numeric: false, label: '7' },
-    { id: 'dateOfBirth', numeric: false, label: '8' },
-    { id: 'street', numeric: false, label: '2' },
+    { id: 'cadastralNumber', numeric: false, label: '16' },
+    { id: 'aimOfEvaluation', numeric: false, label: '17' },
+    { id: 'area', numeric: false, label: '18' },
+    { id: 'numberOfRooms', numeric: false, label: '19' },
+    { id: 'floor', numeric: false, label: '20' },
+    { id: 'street', numeric: false, label: '21' },
 ];
 
-class Clients extends Component {
+class Flats extends Component {
     constructor(props) {
         super(props);
 
@@ -64,7 +65,7 @@ class Clients extends Component {
 
     state = {
         order: 'asc',
-        orderBy: 'surname',
+        orderBy: 'cadastralNumber',
         selected: [],
         data: [],
         page: 0,
@@ -73,17 +74,13 @@ class Clients extends Component {
         showDeleteDialog: false,
         showAddDialog: false,
         showErrorExportDialog: false,
-        editClient: {
+        editFlat: {
             id: '',
-            surname: '',
-            name: '',
-            patronymic: '',
-            series: '',
-            number: '',
-            dateOfBirth: '',
-            dateOfIssue: '',
-            divisionCode: '',
-            issuedBy: '',
+            cadastralNumber: '',
+            aimOfEvaluation: '',
+            area: '',
+            numberOfRooms: '',
+            floor: '',
             city: '',
             district: '',
             street: '',
@@ -93,12 +90,12 @@ class Clients extends Component {
     };
 
     componentWillMount() {
-        this.props.GetClientsSet();
+        this.props.GetFlatsSet();
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.clients !== nextProps.clients) {
-            this.setState({ data: nextProps.clients });
+        if (this.props.flats !== nextProps.flats) {
+            this.setState({ data: nextProps.flats });
         }
     }
 
@@ -151,27 +148,27 @@ class Clients extends Component {
     };
 
     handleDeleteClick = () => {
-        const { DeleteClientSet, DeleteClientsSet } = this.props;
+        const { DeleteFlatSet, DeleteFlatsSet } = this.props;
 
         this.setState({ showDeleteDialog: false });
         if (this.state.selected.length === 1) {
-            DeleteClientSet(this.state.selected[0]);
+            DeleteFlatSet(this.state.selected[0]);
         } else {
-            DeleteClientsSet(this.state.selected);
+            DeleteFlatsSet(this.state.selected);
         }
         this.setState({ selected: [] });
     }
 
     handleAddClick = (data) => {
-        this.props.AddClientSet(data);
+        this.props.AddFlatSet(data);
 
         this.setState({ showAddDialog: false });
     }
 
     handleEditClick = (data) => {
-        this.props.ClearEditClient();
+        this.props.ClearEditFlat();
 
-        this.props.EditClientSet(data);
+        this.props.EditFlatSet(data);
 
         this.setState({ showAddDialog: false });
     }
@@ -181,7 +178,7 @@ class Clients extends Component {
     }
 
     showAddDialog = () => {
-        this.props.ClearEditClient();
+        this.props.ClearEditFlat();
 
         this.setState({ showAddDialog: true });
     }
@@ -191,25 +188,25 @@ class Clients extends Component {
     }
 
     closeAddDialog = () => {
-        this.props.ClearEditClient();
+        this.props.ClearEditFlat();
 
         this.setState({ showAddDialog: false });
     }
 
     startEditClick = (event, id) => {
-        let client = this.findClient(id);
+        let flat = this.findFlat(id);
 
-        let getClient = this.props.GetEditClient(client);
+        let getFlat = this.props.GetEditFlat(flat);
 
-        getClient.then((client) => {
+        getFlat.then((client) => {
             this.setState({ showAddDialog: true });
         });
     }
 
-    findClient = (id) => {
-        for (let i = 0; i < this.props.clients.length; i++) {
-            if (this.props.clients[i].id === id) {
-                return this.props.clients[i];
+    findFlat = (id) => {
+        for (let i = 0; i < this.props.flats.length; i++) {
+            if (this.props.flats[i].id === id) {
+                return this.props.flats[i];
             }
         }
     }
@@ -242,16 +239,16 @@ class Clients extends Component {
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading, fileSaved, fileError, editClient } = this.props;
+        const { classes, isLoading, fileSaved, fileError, editFlat } = this.props;
         const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search, showErrorExportDialog } = this.state;
 
         return (
-            <TableCardLayout id={"clnt"} headerIndex={3} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
-                <DeleteDialog header={3} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
-                <AddClientDialog onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} editClient={editClient} />
-                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={3} />
-                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={3} />
-                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={3} />
+            <TableCardLayout id={"clnt"} headerIndex={4} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+                <DeleteDialog header={4} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
+                <AddFlatDialog onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} editFlat={editFlat} />
+                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={4} />
+                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={4} />
+                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={4} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
                         <Table className={classes.table}>
@@ -266,7 +263,7 @@ class Clients extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(clnt => clnt.surname.includes(search) || clnt.name.includes(search) || clnt.patronymic.includes(search) || clnt.dateOfBirth.includes(search) || clnt.street.includes(search) || clnt.house.toString().includes(search))
+                                    .filter(flt => flt.cadastralNumber.toString().includes(search) || flt.aimOfEvaluation.includes(search) || flt.area.toString().includes(search) || flt.numberOfRooms.toString().includes(search) || flt.floor.toString().includes(search) || flt.street.includes(search) || flt.house.toString().includes(search))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -282,10 +279,11 @@ class Clients extends Component {
                                                 <TableCell padding="none" className={classes.narrowCell}>
                                                     <Checkbox onClick={event => this.handleClick(event, n.id)} checked={isSelected} color="primary"/>
                                                 </TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.surname}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.name}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.patronymic}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{getDate(n.dateOfBirth)}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{makeCadastral(n.cadastralNumber.toString())}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.aimOfEvaluation}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.area}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.numberOfRooms}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.floor}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getAddress(n.street, n.house)}</TableCell>
                                                 <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.startEditClick(event, n.id)}>
                                                     <Edit fontSize="small" />
@@ -299,7 +297,7 @@ class Clients extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.filter(clnt => clnt.surname.includes(search) || clnt.name.includes(search) || clnt.patronymic.includes(search) || clnt.dateOfBirth.includes(search) || clnt.street.includes(search) || clnt.house.toString().includes(search)).length}
+                        count={data.filter(flt => flt.cadastralNumber.toString().includes(search) || flt.aimOfEvaluation.includes(search) || flt.area.toString().includes(search) || flt.numberOfRooms.toString().includes(search) || flt.floor.toString().includes(search) || flt.street.includes(search) || flt.house.toString().includes(search)).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{
@@ -317,12 +315,8 @@ class Clients extends Component {
     }
 }
 
-function getDate(date) {
-    let result = "";
-
-    result = date.substring(8, 10) + "." + date.substring(5, 7) + "." + date.substring(0, 4);
-
-    return result;
+function makeCadastral(str) {
+    return str.substr(0, 2) + ":" + str.substr(2, 2) + ":" + str.substr(4, 7) + ":" + str.substr(11, 2);
 }
 
 function getAddress(street, house) {
@@ -358,6 +352,6 @@ function getSorting(order, orderBy) {
 }
 
 export default withStyles(styles)(connect(
-    state => state.clients,
+    state => state.flats,
     dispatch => bindActionCreators(actionCreators, dispatch)
-)(Clients));
+)(Flats));

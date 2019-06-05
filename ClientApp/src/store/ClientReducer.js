@@ -246,9 +246,7 @@ export const reducer = (state, action) => {
 
         newClient = fixData(newClient);
 
-        const clntIndex = clients.findIndex(u => u.id === newClient.id);
-
-        clients[clntIndex] = newClient;
+        clients.push(newClient);
 
         return {
             ...state,
