@@ -8,6 +8,7 @@ import * as NeuralReducer from './NeuralReducer';
 import * as LoginReducer from './LoginReducer';
 import * as ClientReducer from './ClientReducer';
 import * as FlatReducer from './FlatReducer';
+import * as ContractReducer from './ContractReducer';
 
 export default function configureStore(history, initialState) {
     const reducers = {
@@ -18,6 +19,7 @@ export default function configureStore(history, initialState) {
         login: LoginReducer.reducer,
         clients: ClientReducer.reducer,
         flats: FlatReducer.reducer,
+        contracts: ContractReducer.reducer,
     };
 
     const middleware = [

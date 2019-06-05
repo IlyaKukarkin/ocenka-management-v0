@@ -34,7 +34,7 @@ namespace ocenka_management.Controllers
 
             for (int i = 0; i < individuals.Count(); i++)
             {
-                adr = addresses.First(u => u.Id == individuals.ElementAt(i).AddressOfResidenceId);
+                adr = addresses.FirstOrDefault(u => u.Id == individuals.ElementAt(i).AddressOfResidenceId);
                 adr.ClientSetIndividual = null;
                 individuals.ElementAt(i).AddressOfResidence = adr;
             }
@@ -162,9 +162,9 @@ namespace ocenka_management.Controllers
 
             for (int i = 0; i < excel.Ids.Count(); i++)
             {
-                clnt = clients.First(u => u.Id == excel.Ids[i]);
+                clnt = clients.FirstOrDefault(u => u.Id == excel.Ids[i]);
 
-                adr = addresses.First(u => u.Id == clnt.AddressOfResidenceId);
+                adr = addresses.FirstOrDefault(u => u.Id == clnt.AddressOfResidenceId);
                 adr.ClientSetIndividual = null;
                 clnt.AddressOfResidence = adr;
 

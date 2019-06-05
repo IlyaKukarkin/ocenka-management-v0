@@ -138,7 +138,7 @@ namespace ocenka_management.Controllers
 
             for (int i = 0; i < excel.Ids.Count(); i++)
             {
-                usr = users.First(u => u.Id == excel.Ids[i]);
+                usr = users.FirstOrDefault(u => u.Id == excel.Ids[i]);
                 usersRes.Add(usr);
             }
 

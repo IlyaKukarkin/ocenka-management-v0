@@ -36,11 +36,11 @@ namespace ocenka_management.Controllers
 
             for (int i = 0; i < flats.Count(); i++)
             {
-                adr = adresses.First(u => u.Id == flats.ElementAt(i).AddressId);
+                adr = adresses.FirstOrDefault(u => u.Id == flats.ElementAt(i).AddressId);
                 adr.ObjectSetFlat = null;
                 flats.ElementAt(i).Address = adr;
 
-                obj = objects.First(u => u.Id == flats.ElementAt(i).Id);
+                obj = objects.FirstOrDefault(u => u.Id == flats.ElementAt(i).Id);
                 obj.ObjectSetFlat = null;
                 flats.ElementAt(i).IdNavigation = obj;
             }
@@ -170,13 +170,13 @@ namespace ocenka_management.Controllers
 
             for (int i = 0; i < excel.Ids.Count(); i++)
             {
-                flt = flats.First(u => u.Id == excel.Ids[i]);
+                flt = flats.FirstOrDefault(u => u.Id == excel.Ids[i]);
 
-                adr = addresses.First(u => u.Id == flt.AddressId);
+                adr = addresses.FirstOrDefault(u => u.Id == flt.AddressId);
                 adr.ObjectSetFlat = null;
                 flt.Address = adr;
 
-                obj = objects.First(u => u.Id == flt.Id);
+                obj = objects.FirstOrDefault(u => u.Id == flt.Id);
                 obj.ObjectSetFlat = null;
                 flt.IdNavigation = obj;
 

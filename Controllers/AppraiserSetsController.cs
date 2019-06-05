@@ -34,7 +34,7 @@ namespace ocenka_management.Controllers
 
             for (int i = 0; i < appraisers.Count(); i++)
             {
-                usr = users.First(u => u.Id == appraisers.ElementAt(i).Id);
+                usr = users.FirstOrDefault(u => u.Id == appraisers.ElementAt(i).Id);
                 usr.UserSetAppraiser = null;
                 appraisers.ElementAt(i).IdNavigation = usr;
             }
@@ -162,9 +162,9 @@ namespace ocenka_management.Controllers
 
             for (int i = 0; i < excel.Ids.Count(); i++)
             {
-                usr = users.First(u => u.Id == excel.Ids[i]);
+                usr = users.FirstOrDefault(u => u.Id == excel.Ids[i]);
                 usr.UserSetAppraiser = null;
-                apr = appraisers.First(u => u.Id == excel.Ids[i]);
+                apr = appraisers.FirstOrDefault(u => u.Id == excel.Ids[i]);
                 apr.IdNavigation = usr;
                 appraisersRes.Add(apr);
             }

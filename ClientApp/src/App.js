@@ -8,6 +8,7 @@ import Users from './components/Users/Users';
 import Neural from './components/Neural/Neural';
 import Clients from './components/Clients/Clients';
 import Flats from './components/Flats/Flats';
+import Contracts from './components/Contracts/Contracts';
 
 export default () => (
     <Layout>
@@ -19,6 +20,7 @@ export default () => (
             <Route path='/neural' component={Neural} />
             <Route path='/clients' component={Clients} />
             <Route path='/flats' component={Flats} />
+            <Route path='/contracts' component={Contracts} />
         </Switch>
     </Layout>
 );
