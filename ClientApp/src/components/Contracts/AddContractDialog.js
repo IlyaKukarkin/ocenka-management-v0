@@ -1,14 +1,35 @@
 ﻿import React from 'react';
 import MaskedInput from 'react-text-mask';
+import createNumberMask from 'text-mask-addons/dist/createNumberMask';
+import { compose } from 'recompose';
+import { withStyles } from '@material-ui/core/styles';
 import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, MenuItem
+    Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, TextField, MenuItem, CircularProgress, Grid
 } from '@material-ui/core';
+
+const styles = theme => ({
+    progress: {
+        margin: theme.spacing.unit * 2
+    },
+    loading: {
+        height: '400px',
+        marginUp: '180px',
+        minWidth: '550px'
+    }
+});
 
 function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-function CadastralNumber(props) {
+const numberMask = createNumberMask({
+    prefix: '',
+    suffix: ' ₽',
+    integerLimit: '10000000',
+    allowDecimal: true
+});
+
+function DateMask(props) {
     const { inputRef, ...other } = props;
 
     return (
@@ -17,7 +38,7 @@ function CadastralNumber(props) {
             ref={ref => {
                 inputRef(ref ? ref.inputElement : null);
             }}
-            mask={[/[0-9]/, /[0-9]/, ':', /[0-9]/, /[0-9]/, ':', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, ':', /[0-9]/, /[0-9]/]}
+            mask={[/[0-9]/, /[0-9]/, '/', /[0-9]/, /[0-9]/, '/', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
             placeholderChar={'\u2000'}
             keepCharPositions={true}
             guide={false}
@@ -26,7 +47,7 @@ function CadastralNumber(props) {
     );
 }
 
-function AreaMask(props) {
+function MoneyMask(props) {
     const { inputRef, ...other } = props;
 
     return (
@@ -35,79 +56,7 @@ function AreaMask(props) {
             ref={ref => {
                 inputRef(ref ? ref.inputElement : null);
             }}
-            mask={[/[0-9]/, /[0-9]/, /[0-9]/]}
-            placeholderChar={'\u2000'}
-            keepCharPositions={true}
-            guide={false}
-            showMask
-        />
-    );
-}
-
-function FloorMask(props) {
-    const { inputRef, ...other } = props;
-
-    return (
-        <MaskedInput
-            {...other}
-            ref={ref => {
-                inputRef(ref ? ref.inputElement : null);
-            }}
-            mask={[/[0-9]/, /[0-9]/]}
-            placeholderChar={'\u2000'}
-            keepCharPositions={true}
-            guide={false}
-            showMask
-        />
-    );
-}
-
-function RoomsMask(props) {
-    const { inputRef, ...other } = props;
-
-    return (
-        <MaskedInput
-            {...other}
-            ref={ref => {
-                inputRef(ref ? ref.inputElement : null);
-            }}
-            mask={[/[0-9]/]}
-            placeholderChar={'\u2000'}
-            keepCharPositions={true}
-            guide={false}
-            showMask
-        />
-    );
-}
-
-function FlatMask(props) {
-    const { inputRef, ...other } = props;
-
-    return (
-        <MaskedInput
-            {...other}
-            ref={ref => {
-                inputRef(ref ? ref.inputElement : null);
-            }}
-            mask={[/[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
-            placeholderChar={'\u2000'}
-            keepCharPositions={true}
-            guide={false}
-            showMask
-        />
-    );
-}
-
-function HouseMask(props) {
-    const { inputRef, ...other } = props;
-
-    return (
-        <MaskedInput
-            {...other}
-            ref={ref => {
-                inputRef(ref ? ref.inputElement : null);
-            }}
-            mask={[/[0-9]/, /[0-9]/, /[0-9]/]}
+            mask={numberMask}
             placeholderChar={'\u2000'}
             keepCharPositions={true}
             guide={false}
@@ -120,68 +69,62 @@ function insertInString(str, index, value) {
     return str.substr(0, index) + value + str.substr(index);
 }
 
-function makeCadastral(str) {
-    return str.substr(0, 2) + ":" + str.substr(2, 2) + ":" + str.substr(4, 7) + ":" + str.substr(11, 2);
-}
-
-function clearCadastral(str) {
-    return str.substr(0, 2) + str.substr(3, 2) + str.substr(6, 7) + str.substr(14, 2);
-}
-
 class AddContractDialog extends React.Component {
     constructor(props) {
         super(props);
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleAppraiserChange = this.handleAppraiserChange.bind(this);
+        this.handleClientTypeChange = this.handleClientTypeChange.bind(this);
+        this.handleClientChange = this.handleClientChange.bind(this);
+        this.handleObjectTypeChange = this.handleObjectTypeChange.bind(this);
+        this.handleObjectChange = this.handleObjectChange.bind(this);
         this.submitHandler = this.submitHandler.bind(this);
         this.myHandleClose = this.myHandleClose.bind(this);
         this.state = {
-            cadastralNumber: '',
-            aimOfEvaluation: '',
-            area: '',
-            numberOfRooms: '',
-            floor: '',
-            city: '',
-            district: '',
-            street: '',
-            house: '',
-            numberOfFlat: '',
-            cadastralNumberError: false,
-            aimOfEvaluationError: false,
-            areaError: false,
-            numberOfRoomsError: false,
-            floorError: false,
-            cityError: false,
-            districtError: false,
-            streetError: false,
-            houseError: false,
-            numberOfFlatError: false,
-            cadastralNumberLabel: "Кадастровый номер",
-            aimOfEvaluationLabel: "Цель оценки",
-            areaLabel: "Площадь",
-            numberOfRoomsLabel: "Кол-во комнат",
-            floorLabel: "Этаж",
-            cityLabel: "Город",
-            districtLabel: "Район",
-            streetLabel: "Улица",
-            houseLabel: "Номер дома",
-            numberOfFlatLabel: "Номер квартиры"
+            contractSumm: '',
+            prepaid: '',
+            startDate: '',
+            finishDate: '',
+            clientType: '',
+            objectType: '',
+            appraiserId: '',
+            clientId: '',
+            objectId: '',
+            contractSummError: false,
+            prepaidError: false,
+            startDateError: false,
+            finishDateError: false,
+            clientTypeError: false,
+            objectTypeError: false,
+            appraiserIdError: false,
+            clientIdError: false,
+            objectIdError: false,
+            contractSummLabel: "Сумма контракта",
+            prepaidLabel: "Аванс",
+            startDateLabel: "Дата начала",
+            finishDateLabel: "Дата окончания",
+            clientTypeLabel: "Тип клиента",
+            objectTypeLabel: "Тип объекта оценки",
+            appraiserIdLabel: "Оценщик",
+            clientIdLabel: "Клиент",
+            objectIdLabel: "Объект оценки",
         };
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.editFlat !== undefined && nextProps.editFlat.cadastralNumber !== undefined && (this.state.cadastralNumber !== nextProps.editFlat.cadastralNumber || this.state.city !== nextProps.editFlat.city || this.state.floor !== nextProps.editFlat.floor)) {
+        if (nextProps.editContract !== undefined && nextProps.editContract.contractSumm !== undefined && (this.state.contractSumm !== nextProps.editContract.contractSumm || this.state.objectType !== nextProps.editContract.objectType || this.state.clientType !== nextProps.editContract.clientType)) {
             this.setState({
-                cadastralNumber: makeCadastral(nextProps.editFlat.cadastralNumber.toString()),
-                aimOfEvaluation: nextProps.editFlat.aimOfEvaluation,
-                area: nextProps.editFlat.area,
-                numberOfRooms: nextProps.editFlat.numberOfRooms,
-                floor: nextProps.editFlat.floor,
-                city: nextProps.editFlat.city,
-                district: nextProps.editFlat.district,
-                street: nextProps.editFlat.street,
-                house: nextProps.editFlat.house,
-                numberOfFlat: nextProps.editFlat.numberOfFlat,
+                contractSumm: nextProps.editContract.contractSumm.toString(),
+                prepaid: nextProps.editContract.prepaid.toString(),
+                startDate: this.convertData(nextProps.editContract.startDate),
+                finishDate: this.convertData(nextProps.editContract.finishDate),
+                clientType: nextProps.editContract.clientType,
+                objectType: nextProps.editContract.objectType,
+                appraiserId: nextProps.editContract.appraiserId,
+                clientId: nextProps.editContract.clientId,
+                objectId: nextProps.editContract.objectId,
+                numberOfFlat: nextProps.editContract.numberOfFlat,
             });
         }
     }
@@ -194,7 +137,7 @@ class AddContractDialog extends React.Component {
         m = data.substring(5, 7);
         d = data.substring(8, 10);
 
-        res = d + '/' + m + '/' + year;
+        res = m + '/' + d + '/' + year;
 
         return res;
     }
@@ -217,66 +160,59 @@ class AddContractDialog extends React.Component {
         // as a prop by the parent (App)
 
         if (!this.validateForm()) {
-            if (this.props.editFlat === undefined || this.props.editFlat.id === undefined) {
+            if (this.props.editContract === undefined || this.props.editContract.id === undefined) {
                 const resultObject = {
-                    cadastralNumber: clearCadastral(this.state.cadastralNumber), aimOfEvaluation: this.state.aimOfEvaluation, area: this.state.area,
-                    numberOfRooms: this.state.numberOfRooms, floor: this.state.floor,
-                    city: this.state.city, district: this.state.district, street: this.state.street, house: this.state.house, numberOfFlat: this.state.numberOfFlat
+                    contractSumm: this.clearMoney(this.state.contractSumm), prepaid: this.clearMoney(this.state.prepaid), startDate: this.replaceDayAndMonth(this.state.startDate), finishDate: this.replaceDayAndMonth(this.state.finishDate),
+                    clientType: this.state.clientType, objectType: this.state.objectType, appraiserId: this.state.appraiserId, clientId: this.state.clientId, objectId: this.state.objectId,
+                    number: 1, stage: 'Создан'
                 }
 
                 this.props.onAddAction(resultObject);
             } else {
                 const resultObject2 = {
-                    id: this.props.editFlat.id,
-                    cadastralNumber: clearCadastral(this.state.cadastralNumber), aimOfEvaluation: this.state.aimOfEvaluation, area: this.state.area,
-                    numberOfRooms: this.state.numberOfRooms, floor: this.state.floor,
-                    city: this.state.city, district: this.state.district, street: this.state.street, house: this.state.house, numberOfFlat: this.state.numberOfFlat,
-                    addressId: this.props.editFlat.addressId
+                    id: this.props.editContract.id,
+                    contractSumm: this.clearMoney(this.state.contractSumm), prepaid: this.clearMoney(this.state.prepaid), startDate: this.replaceDayAndMonth(this.state.startDate), finishDate: this.replaceDayAndMonth(this.state.finishDate),
+                    clientType: this.state.clientType, objectType: this.state.objectType, appraiserId: this.state.appraiserId, clientId: this.state.clientId, objectId: this.state.objectId,
+                    number: 1, stage: 'Создан'
                 }
 
                 this.props.onEditAction(resultObject2);
             }
 
             this.setState({
-                cadastralNumber: '',
-                aimOfEvaluation: '',
-                area: '',
-                numberOfRooms: '',
-                floor: '',
-                city: '',
-                district: '',
-                street: '',
-                house: '',
-                numberOfFlat: '',
-                cadastralNumberError: false,
-                aimOfEvaluationError: false,
-                areaError: false,
-                numberOfRoomsError: false,
-                floorError: false,
-                cityError: false,
-                districtError: false,
-                streetError: false,
-                houseError: false,
-                numberOfFlatError: false,
-                cadastralNumberLabel: "Кадастровый номер",
-                aimOfEvaluationLabel: "Цель оценки",
-                areaLabel: "Площадь",
-                numberOfRoomsLabel: "Кол-во комнат",
-                floorLabel: "Этаж",
-                cityLabel: "Город",
-                districtLabel: "Район",
-                streetLabel: "Улица",
-                houseLabel: "Номер дома",
-                numberOfFlatLabel: "Номер квартиры"
+                contractSumm: '',
+                prepaid: '',
+                startDate: '',
+                finishDate: '',
+                clientType: '',
+                objectType: '',
+                appraiserId: '',
+                clientId: '',
+                objectId: '',
+                contractSummError: false,
+                prepaidError: false,
+                startDateError: false,
+                finishDateError: false,
+                clientTypeError: false,
+                objectTypeError: false,
+                appraiserIdError: false,
+                clientIdError: false,
+                objectIdError: false,
+                contractSummLabel: "Сумма контракта",
+                prepaidLabel: "Аванс",
+                startDateLabel: "Дата начала",
+                finishDateLabel: "Дата окончания",
+                clientTypeLabel: "Тип клиента",
+                objectTypeLabel: "Тип объекта оценки",
+                appraiserIdLabel: "Оценщик",
+                clientIdLabel: "Клиент",
+                objectIdLabel: "Объект оценки",
             });
         }
     }
 
     checkData(day, month, year) {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-
-        if ((day < 1) || (day > 31) || (month < 1) || (month > 12) || (year < 1945) || (year > yyyy)) {
+        if ((day < 1) || (day > 31) || (month < 1) || (month > 12)) {
             return true;
         } else {
             switch (month) {
@@ -300,6 +236,19 @@ class AddContractDialog extends React.Component {
                     if (day > 30) { return true; }
                     break;
             }
+        }
+
+        return false;
+    }
+
+    checkDataToday(day, month, year) {
+        const today = new Date();
+        const dd = today.getDate();
+        const mm = today.getMonth() + 1;
+        const yyyy = today.getFullYear();
+
+        if ((year < yyyy) && (month < mm) && (day < dd)) {
+            return true;
         }
 
         return false;
@@ -335,149 +284,224 @@ class AddContractDialog extends React.Component {
         return false;
     }
 
+    clearMoney(money) {
+        if (money.includes('₽')) {
+            return money.substring(0, money.length - 2).replace(/,/g, "");
+        }
+
+        return money;
+    }
+
     validateForm() {
-        let cadastralNumber = false, aimOfEvaluation = false, area = false, numberOfRooms = false, floor = false, city = false, district = false, street = false, house = false, numberOfFlat = false;
+        let contractSumm = false, prepaid = false, startDate = false, finishDate = false, clientType = false, objectType = false, appraiserId = false, clientId = false, objectId = false;
 
-        if (this.state.cadastralNumber !== "") {
-            if (this.state.cadastralNumber.length !== 16) {
-                this.setState({ cadastralNumberLabel: "Введите кадастровый номер полностью" });
-                this.setState({ cadastralNumberError: true });
-                cadastralNumber = true;
+        if (this.state.contractSumm !== "") {
+            let summNumber = this.clearMoney(this.state.contractSumm);
+
+            if (summNumber.includes('.')) {
+                if (summNumber.length > 8) {
+                    this.setState({ contractSummLabel: "Сумма слишком большая" });
+                    this.setState({ contractSummError: true });
+                    contractSumm = true;
+                }
+            } else {
+                if (summNumber.length > 5) {
+                    this.setState({ contractSummLabel: "Сумма слишком большая" });
+                    this.setState({ contractSummError: true });
+                    contractSumm = true;
+                }
             }
         } else {
-            this.setState({ cadastralNumberLabel: "Введите кадастровый номер"});
-            this.setState({ cadastralNumberError: true });
-            cadastralNumber = true;
+            this.setState({ contractSummLabel: "Введите сумму договора"});
+            this.setState({ contractSummError: true });
+            contractSumm = true;
         }
 
-        if (this.state.aimOfEvaluation === "") {
-            this.setState({ aimOfEvaluationLabel: "Выберете цель оценки" });
-            this.setState({ aimOfEvaluationError: true });
-            aimOfEvaluation = true;
-        }
+        if (this.state.prepaid !== "") {
+            let prepaidNumber = this.clearMoney(this.state.prepaid);
 
-        if (this.state.area === "") {
-            this.setState({ areaLabel: "Введите площадь" });
-            this.setState({ areaError: true });
-            area = true;
-        }
-
-        if (this.state.numberOfRooms === "") {
-            this.setState({ numberOfRoomsLabel: "Введите кол-во комнат" });
-            this.setState({ numberOfRoomsError: true });
-            numberOfRooms = true;
-        }
-
-        if (this.state.floor === "") {
-            this.setState({ floorLabel: "Введите этаж" });
-            this.setState({ floorError: true });
-            floor = true;
-        }
-
-        if (this.state.city !== "") {
-            if (this.state.city.length > 30) {
-                this.setState({ cityLabel: "Город до 30 символов" });
-                this.setState({ cityError: true });
-                city = true;
+            if (prepaidNumber.includes('.')) {
+                if (prepaidNumber.length > 8) {
+                    this.setState({ prepaidLabel: "Аванс слишком большой" });
+                    this.setState({ prepaidError: true });
+                    prepaid = true;
+                }
+            } else {
+                if (prepaidNumber.length > 5) {
+                    this.setState({ prepaidLabel: "Аванс слишком большой" });
+                    this.setState({ prepaidError: true });
+                    prepaid = true;
+                }
             }
         } else {
-            this.setState({ cityLabel: "Введите город" });
-            this.setState({ cityError: true });
-            city = true;
+            this.setState({ prepaidLabel: "Введите аванс" });
+            this.setState({ prepaidError: true });
+            prepaid = true;
         }
 
-        if (this.state.district !== "") {
-            if (this.state.city.district > 30) {
-                this.setState({ districtLabel: "Район до 30 символов" });
-                this.setState({ districtError: true });
-                district = true;
+        if (this.state.startDate !== "") {
+            if (this.state.startDate.length < 10) {
+                this.setState({ startDateLabel: "Введите дату начала полностью" });
+                this.setState({ startDateError: true });
+                startDate = true;
+            } else {
+                const day = +this.state.startDate.substring(0, 2);
+                const month = +this.state.startDate.substring(3, 5);
+                const year = +this.state.startDate.substring(6, 10);
+
+                if (this.checkData(day, month, year)) {
+                    this.setState({ startDateLabel: "Введите дату начала корректно" });
+                    this.setState({ startDateError: true });
+                    startDate = true;
+                } else {
+                    if (this.checkDataToday(day, month, year)) {
+                        this.setState({ startDateLabel: "Дата начала должна быть сегодня или в будущем" });
+                        this.setState({ startDateError: true });
+                        startDate = true;
+                    }
+                }
             }
         } else {
-            this.setState({ districtLabel: "Введите район" });
-            this.setState({ districtError: true });
-            district = true;
+            this.setState({ startDateLabel: "Введите дату начала" });
+            this.setState({ startDateError: true });
+            startDate = true;
         }
 
-        if (this.state.street !== "") {
-            if (this.state.street.length > 30) {
-                this.setState({ streetLabel: "Улица до 30 символов" });
-                this.setState({ streetError: true });
-                street = true;
+        if (this.state.finishDate !== "") {
+            if (this.state.finishDate.length < 10) {
+                this.setState({ startDafinishDateLabelteLabel: "Введите дату окончания полностью" });
+                this.setState({ finishDateError: true });
+                finishDate = true;
+            } else {
+                const day = +this.state.finishDate.substring(0, 2);
+                const month = +this.state.finishDate.substring(3, 5);
+                const year = +this.state.finishDate.substring(6, 10);
+
+                if (this.checkData(day, month, year)) {
+                    this.setState({ finishDateLabel: "Введите дату окончания корректно" });
+                    this.setState({ finishDateError: true });
+                    finishDate = true;
+                } else {
+                    if (this.checkDataToday(day, month, year)) {
+                        this.setState({ finishDateLabel: "Дата окончания должна быть сегодня или в будущем" });
+                        this.setState({ finishDateError: true });
+                        finishDate = true;
+                    }
+                }
             }
         } else {
-            this.setState({ streetLabel: "Введите улицу" });
-            this.setState({ streetError: true });
-            street = true;
+            this.setState({ finishDateLabel: "Введите дату окончания" });
+            this.setState({ finishDateError: true });
+            finishDate = true;
         }
 
-        if (this.state.house === "") {
-            this.setState({ houseLabel: "Введите номер дома" });
-            this.setState({ houseError: true });
-            house = true;
+        if (this.state.clientType === "") {
+            this.setState({ clientTypeLabel: "Выберите тип клиента" });
+            this.setState({ clientTypeError: true });
+            clientType = true;
         }
 
-        if (this.state.numberOfFlat === "") {
-            this.setState({ numberOfFlatLabel: "Введите номер квартиры" });
-            this.setState({ numberOfFlatError: true });
-            numberOfFlat = true;
+        if (this.state.objectType === "") {
+            this.setState({ objectTypeLabel: "Введите тип объекта оценки" });
+            this.setState({ objectTypeError: true });
+            objectType = true;
         }
 
-        if (!cadastralNumber) {
-            this.setState({ cadastralNumberLabel: "Кадастровый номер" });
-            this.setState({ cadastralNumberError: false });
+        if (this.state.appraiserId !== "") {
+            if (this.state.appraiserId === 'Empty') {
+                this.setState({ appraiserIdLabel: "Добавтье оценщика в базу данных" });
+                this.setState({ appraiserIdError: true });
+                appraiserId = true;
+            }
+        } else {
+            this.setState({ appraiserIdLabel: "Выберете оценщика" });
+            this.setState({ appraiserIdError: true });
+            appraiserId = true;
         }
 
-        if (!aimOfEvaluation) {
-            this.setState({ aimOfEvaluationLabel: "Цель оценки" });
-            this.setState({ aimOfEvaluationError: false });
+        if (this.state.clientId !== "") {
+            if (this.state.clientId === 'Empty') {
+                this.setState({ clientIdLabel: "Выберете другой тип клиента" });
+                this.setState({ clientIdError: true });
+                clientId = true;
+            }
+        } else {
+            this.setState({ clientIdLabel: "Выберете клиента" });
+            this.setState({ clientIdError: true });
+            clientId = true;
         }
 
-        if (!area) {
-            this.setState({ areaLabel: "Пдощадь" });
-            this.setState({ areaError: false });
+        if (this.state.objectId !== "") {
+            if (this.state.objectId === 'Empty') {
+                this.setState({ objectIdLabel: "Выберете другой объект оценки" });
+                this.setState({ objectIdError: true });
+                objectId = true;
+            }
+        } else {
+            this.setState({ objectIdLabel: "Выберете объект оценки" });
+            this.setState({ objectIdError: true });
+            objectId = true;
         }
 
-        if (!numberOfRooms) {
-            this.setState({ numberOfRoomsLabel: "Кол-во комнат" });
-            this.setState({ numberOfRoomsError: false });
+        if (!contractSumm) {
+            this.setState({ contractSummLabel: "Сумма контракта" });
+            this.setState({ contractSummError: false });
         }
 
-        if (!floor) {
-            this.setState({ floorLabel: "Этаж" });
-            this.setState({ floorError: false });
+        if (!prepaid) {
+            this.setState({ prepaidLabel: "Аванс" });
+            this.setState({ prepaidError: false });
         }
 
-        if (!city) {
-            this.setState({ cityLabel: "Город" });
-            this.setState({ cityError: false });
+        if (!startDate) {
+            this.setState({ startDateLabel: "Дата начала" });
+            this.setState({ startDateError: false });
         }
 
-        if (!district) {
-            this.setState({ districtLabel: "Район" });
-            this.setState({ districtError: false });
+        if (!finishDate) {
+            this.setState({ finishDateLabel: "Дата окончания" });
+            this.setState({ finishDateError: false });
         }
 
-        if (!street) {
-            this.setState({ streetLabel: "Улица" });
-            this.setState({ streetError: false });
+        if (!clientType) {
+            this.setState({ clientTypeLabel: "Тип клиента" });
+            this.setState({ clientTypeError: false });
         }
 
-        if (!house) {
-            this.setState({ houseLabel: "Номер дома" });
-            this.setState({ houseError: false });
+        if (!objectType) {
+            this.setState({ objectTypeLabel: "Тип объекта оценки" });
+            this.setState({ objectTypeError: false });
         }
 
-        if (!numberOfFlat) {
-            this.setState({ numberOfFlatLabel: "Номер квартиры" });
-            this.setState({ numberOfFlatError: false });
+        if (!appraiserId) {
+            this.setState({ appraiserIdLabel: "Оценщик" });
+            this.setState({ appraiserIdError: false });
         }
 
-        return (cadastralNumber || aimOfEvaluation || area || numberOfRooms || floor || city || district || street || house || numberOfFlat);
+        if (!clientId) {
+            this.setState({ clientIdLabel: "Клиент" });
+            this.setState({ clientIdError: false });
+        }
+
+        if (!objectId) {
+            this.setState({ objectIdLabel: "Объект оценки" });
+            this.setState({ objectIdError: false });
+        }
+
+        if (!startDate && !finishDate) {
+            if (!this.dateLess(this.state.startDate, this.state.finishDate)) {
+                this.setState({ finishDateLabel: "Дата окончания работы раньше или равна дате начала" });
+                this.setState({ finishDateError: true });
+                finishDate = true;
+            }
+        }
+
+        return (contractSumm || prepaid || startDate || finishDate || clientType || objectType || appraiserId || clientId || objectId);
     }
 
     handleChange(event) {
         if (event.target.id === undefined) {
-            this.setState({ aimOfEvaluation: event.target.value });
+            this.setState({ prepaid: event.target.value });
         } else {
             this.setState({
                 [event.target.id]: event.target.value
@@ -485,47 +509,66 @@ class AddContractDialog extends React.Component {
         }
     }
 
+    handleAppraiserChange(event) {
+        this.setState({ appraiserId: event.target.value });
+    }
+
+    handleClientTypeChange(event) {
+        this.setState({ clientType: event.target.value, clientId: '' });
+    }
+
+    handleClientChange(event) {
+        this.setState({ clientId: event.target.value });
+    }
+
+    handleObjectTypeChange(event) {
+        this.setState({ objectType: event.target.value, objectId: '' });
+    }
+
+    handleObjectChange(event) {
+        this.setState({ objectId: event.target.value });
+    }
+
     myHandleClose() {
         this.setState({
-            cadastralNumber: '',
-            aimOfEvaluation: '',
-            area: '',
-            numberOfRooms: '',
-            floor: '',
-            city: '',
-            district: '',
-            street: '',
-            house: '',
-            numberOfFlat: '',
-            cadastralNumberError: false,
-            aimOfEvaluationError: false,
-            areaError: false,
-            numberOfRoomsError: false,
-            floorError: false,
-            cityError: false,
-            districtError: false,
-            streetError: false,
-            houseError: false,
-            numberOfFlatError: false,
-            cadastralNumberLabel: "Кадастровый номер",
-            aimOfEvaluationLabel: "Цель оценки",
-            areaLabel: "Площадь",
-            numberOfRoomsLabel: "Кол-во комнат",
-            floorLabel: "Этаж",
-            cityLabel: "Город",
-            districtLabel: "Район",
-            streetLabel: "Улица",
-            houseLabel: "Номер дома",
-            numberOfFlatLabel: "Номер квартиры"
+            contractSumm: '',
+            prepaid: '',
+            startDate: '',
+            finishDate: '',
+            clientType: '',
+            objectType: '',
+            appraiserId: '',
+            clientId: '',
+            objectId: '',
+            contractSummError: false,
+            prepaidError: false,
+            startDateError: false,
+            finishDateError: false,
+            clientTypeError: false,
+            objectTypeError: false,
+            appraiserIdError: false,
+            clientIdError: false,
+            objectIdError: false,
+            contractSummLabel: "Сумма контракта",
+            prepaidLabel: "Аванс",
+            startDateLabel: "Дата начала",
+            finishDateLabel: "Дата окончания",
+            clientTypeLabel: "Тип клиента",
+            objectTypeLabel: "Тип объекта оценки",
+            appraiserIdLabel: "Оценщик",
+            clientIdLabel: "Клиент",
+            objectIdLabel: "Объект оценки",
         });
 
         this.props.onCancelAction();
     }
 
     render() {
-        const { showDialog, editFlat } = this.props;
+        const { classes, showDialog, editContract, isLoading, indivList, entList, flatList, carList, parcelList, apprList } = this.props;
+        const { clientType, objectType } = this.state;
 
-        const aims = [{ value: 'Банк', label: 'Банк' }, { value: 'Наследство', label: 'Наследство' }, { value: 'Суд', label: 'Суд' }];
+        const client = [{ value: 'Indiv', label: 'Физ. Лицо' }, { value: 'Ent', label: 'Юр. Лицо' }];
+        const object = [{ value: 'Flat', label: 'Квартира' }, { value: 'Parcel', label: 'Участок' }, { value: 'Car', label: 'Автомобиль' }];
 
         return (
             <Dialog
@@ -537,143 +580,240 @@ class AddContractDialog extends React.Component {
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle id="alert-dialog-slide-title">
-                    {editFlat !== undefined && editFlat.id !== undefined ? "Изменить квартиру" : "Добавить квартиру"}
+                    {editContract !== undefined && editContract.id !== undefined ? "Изменить контракт" : "Добавить контракт"}
                 </DialogTitle>
                 <DialogContent>
-                    <form onSubmit={this.submitHandler}>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="cadastralNumber"
-                            label={this.state.cadastralNumberLabel}
-                            value={this.state.cadastralNumber}
-                            onChange={this.handleChange}
-                            error={this.state.cadastralNumberError}
-                            InputProps={{
-                                inputComponent: CadastralNumber
-                            }}
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            select
-                            margin="dense"
-                            id="aimOfEvaluation"
-                            label={this.state.aimOfEvaluationLabel}
-                            value={this.state.aimOfEvaluation}
-                            onChange={this.handleChange}
-                            error={this.state.aimOfEvaluationError}
-                            fullWidth
-                        >
-                            {aims.map(option => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="area"
-                            label={this.state.areaLabel}
-                            value={this.state.area}
-                            onChange={this.handleChange}
-                            error={this.state.areaError}
-                            InputProps={{
-                                inputComponent: AreaMask
-                            }}
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="numberOfRooms"
-                            label={this.state.numberOfRoomsLabel}
-                            value={this.state.numberOfRooms}
-                            onChange={this.handleChange}
-                            error={this.state.numberOfRoomsError}
-                            InputProps={{
-                                inputComponent: RoomsMask
-                            }}
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="floor"
-                            label={this.state.floorLabel}
-                            value={this.state.floor}
-                            onChange={this.handleChange}
-                            error={this.state.floorError}
-                            InputProps={{
-                                inputComponent: FloorMask
-                            }}
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="city"
-                            label={this.state.cityLabel}
-                            value={this.state.city}
-                            onChange={this.handleChange}
-                            error={this.state.cityError}
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="district"
-                            label={this.state.districtLabel}
-                            value={this.state.district}
-                            onChange={this.handleChange}
-                            error={this.state.districtError}
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="street"
-                            label={this.state.streetLabel}
-                            value={this.state.street}
-                            onChange={this.handleChange}
-                            error={this.state.streetError}
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="house"
-                            label={this.state.houseLabel}
-                            value={this.state.house}
-                            onChange={this.handleChange}
-                            error={this.state.houseError}
-                            InputProps={{
-                                inputComponent: HouseMask
-                            }}
-                            fullWidth
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="numberOfFlat"
-                            label={this.state.numberOfFlatLabel}
-                            value={this.state.numberOfFlat}
-                            onChange={this.handleChange}
-                            error={this.state.numberOfFlatError}
-                            InputProps={{
-                                inputComponent: FlatMask
-                            }}
-                            fullWidth
-                        />
-                    </form>
+                    {isLoading ? <Grid
+                        container
+                        direction="row"
+                        justify="center"
+                        alignItems="center"
+                        className={classes.loading}
+                    >
+                        <CircularProgress className={classes.progress} />
+                    </Grid> :
+                        <form onSubmit={this.submitHandler}>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="contractSumm"
+                                label={this.state.contractSummLabel}
+                                value={this.state.contractSumm}
+                                onChange={this.handleChange}
+                                error={this.state.contractSummError}
+                                InputProps={{
+                                    inputComponent: MoneyMask
+                                }}
+                                fullWidth
+                            />
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="prepaid"
+                                label={this.state.prepaidLabel}
+                                value={this.state.prepaid}
+                                onChange={this.handleChange}
+                                error={this.state.prepaidError}
+                                InputProps={{
+                                    inputComponent: MoneyMask
+                                }}
+                                fullWidth
+                            />
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="startDate"
+                                label={this.state.startDateLabel}
+                                value={this.state.startDate}
+                                onChange={this.handleChange}
+                                error={this.state.startDateError}
+                                InputProps={{
+                                    inputComponent: DateMask
+                                }}
+                                fullWidth
+                            />
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="finishDate"
+                                label={this.state.finishDateLabel}
+                                value={this.state.finishDate}
+                                onChange={this.handleChange}
+                                error={this.state.finishDateError}
+                                InputProps={{
+                                    inputComponent: DateMask
+                                }}
+                                fullWidth
+                            />
+                            <TextField
+                                autoFocus
+                                select
+                                margin="dense"
+                                id="clientType"
+                                label={this.state.clientTypeLabel}
+                                value={this.state.clientType}
+                                onChange={this.handleClientTypeChange}
+                                error={this.state.clientTypeError}
+                                fullWidth
+                            >
+                                {client.map(option => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                            {clientType === 'Indiv' ?
+                                <TextField
+                                    autoFocus
+                                    select
+                                    disabled={this.state.clientType === ''}
+                                    margin="dense"
+                                    id="clientId"
+                                    label={this.state.clientIdLabel}
+                                    value={this.state.clientId}
+                                    onChange={this.handleClientChange}
+                                    error={this.state.clientIdError}
+                                    fullWidth
+                                >
+                                    {indivList.length !== 0 ? indivList.map(option => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    )) : <MenuItem key={'Empty'} value={'Empty'}>
+                                            Нет в базе
+                                        </MenuItem>}
+                                </TextField> :
+                                <TextField
+                                    autoFocus
+                                    select
+                                    disabled={this.state.clientType === ''}
+                                    margin="dense"
+                                    id="clientId2"
+                                    label={this.state.clientIdLabel}
+                                    value={this.state.clientId}
+                                    onChange={this.handleClientChange}
+                                    error={this.state.clientIdError}
+                                    fullWidth
+                                >
+                                    {entList.length !== 0 ? entList.map(option => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    )) : <MenuItem key={'Empty'} value={'Empty'}>
+                                            Нет в базе
+                                        </MenuItem>
+                                    }
+                                </TextField>
+                            }
+                            <TextField
+                                autoFocus
+                                select
+                                margin="dense"
+                                id="objectType"
+                                label={this.state.objectTypeLabel}
+                                value={this.state.objectType}
+                                onChange={this.handleObjectTypeChange}
+                                error={this.state.objectTypeError}
+                                fullWidth
+                            >
+                                {object.map(option => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                            {objectType === 'Flat' ?
+                                <TextField
+                                    autoFocus
+                                    select
+                                    disabled={this.state.objectType === ''}
+                                    margin="dense"
+                                    id="objectId"
+                                    label={this.state.objectIdLabel}
+                                    value={this.state.objectId}
+                                    onChange={this.handleObjectChange}
+                                    error={this.state.objectIdError}
+                                    fullWidth
+                                >
+                                    {flatList.length !== 0 ? flatList.map(option => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    )) : <MenuItem key={'Empty'} value={'Empty'}>
+                                            Нет в базе
+                                        </MenuItem>}
+                                </TextField> :
+                                objectType === 'Car' ?
+                                    <TextField
+                                        autoFocus
+                                        select
+                                        disabled={this.state.objectType === ''}
+                                        margin="dense"
+                                        id="objectId2"
+                                        label={this.state.objectIdLabel}
+                                        value={this.state.objectId}
+                                        onChange={this.handleObjectChange}
+                                        error={this.state.objectIdError}
+                                        fullWidth
+                                    >
+                                        {carList.length !== 0 ? carList.map(option => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </MenuItem>
+                                        )) : <MenuItem key={'Empty'} value={'Empty'}>
+                                                Нет в базе
+                                        </MenuItem>}
+                                    </TextField> :
+                                    <TextField
+                                        autoFocus
+                                        select
+                                        disabled={this.state.objectType === ''}
+                                        margin="dense"
+                                        id="objectId3"
+                                        label={this.state.objectIdLabel}
+                                        value={this.state.objectId}
+                                        onChange={this.handleObjectChange}
+                                        error={this.state.objectIdError}
+                                        fullWidth
+                                    >
+                                        {parcelList.length !== 0 ? parcelList.map(option => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </MenuItem>
+                                        )) : <MenuItem key={'Empty'} value={'Empty'}>
+                                                Нет в базе
+                                        </MenuItem>
+                                        }
+                                    </TextField>
+                            }
+                            <TextField
+                                autoFocus
+                                select
+                                margin="dense"
+                                id="appraiserId"
+                                label={this.state.appraiserIdLabel}
+                                value={this.state.appraiserId}
+                                onChange={this.handleAppraiserChange}
+                                error={this.state.appraiserIdError}
+                                fullWidth
+                            >
+                                {apprList.length !== 0 ? apprList.map(option => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                )) : <MenuItem key={'Empty'} value={'Empty'}>
+                                        Нет в базе
+                                        </MenuItem>}
+                            </TextField>
+                        </form>
+                    }
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.myHandleClose} color="primary">
                         Отмена
                     </Button>
-                    <Button onClick={this.submitHandler} color="secondary">
-                        {editFlat !== undefined && editFlat.id !== undefined ? "Изменить" : "Сохранить"}
+                    <Button disabled={isLoading} onClick={this.submitHandler} color="secondary">
+                        {editContract !== undefined && editContract.id !== undefined ? "Изменить" : "Сохранить"}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -681,4 +821,6 @@ class AddContractDialog extends React.Component {
     }
 }
 
-export default AddContractDialog;
+export default compose(
+    withStyles(styles)
+)(AddContractDialog);

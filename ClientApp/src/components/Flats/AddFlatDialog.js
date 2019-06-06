@@ -433,7 +433,7 @@ class AddFlatDialog extends React.Component {
         }
 
         if (!area) {
-            this.setState({ areaLabel: "Пдощадь" });
+            this.setState({ areaLabel: "Площадь" });
             this.setState({ areaError: false });
         }
 

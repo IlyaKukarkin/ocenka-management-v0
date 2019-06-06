@@ -175,9 +175,13 @@ class Contracts extends Component {
     handleEditClick = (data) => {
         this.props.ClearEditContract();
 
-        this.props.EditContractSet(data);
+        let editContract = this.props.EditContractSet(data);
 
-        this.setState({ showAddDialog: false });
+        editContract.then(con => {
+            this.props.GetContractsSet();
+
+            this.setState({ showAddDialog: false });
+        });
     }
 
     showDeleteDialog = () => {
@@ -186,6 +190,7 @@ class Contracts extends Component {
 
     showAddDialog = () => {
         this.props.ClearEditContract();
+        this.props.GetListsSet();
 
         this.setState({ showAddDialog: true });
     }
@@ -201,7 +206,7 @@ class Contracts extends Component {
     }
 
     closeMoreDialog = () => {
-        this.props.ClearEditContract();
+        this.props.ClearMoreContract();
         
         this.setState({ showMoreDialog: false });
     }
@@ -213,13 +218,14 @@ class Contracts extends Component {
 
         getContract.then((client) => {
             this.setState({ showAddDialog: true });
+            this.props.GetListsSet();
         });
     }
 
     startMoreClick = (event, id) => {
         let contract = this.findContract(id);
 
-        let getContract = this.props.GetEditContract(contract);
+        let getContract = this.props.GetMoreContract(contract);
 
         getContract.then((client) => {
             this.setState({ showMoreDialog: true });
@@ -262,14 +268,17 @@ class Contracts extends Component {
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading, fileSaved, fileError, editContract } = this.props;
+        const { classes, isLoading, fileSaved, fileError, editContract, moreContract, addIsLoading, indivList, entList, flatList, carList, parcelList, apprList } = this.props;
         const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showMoreDialog, showDeleteDialog, search, showErrorExportDialog } = this.state;
 
         return (
             <TableCardLayout id={"clnt"} headerIndex={5} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
                 <DeleteDialog header={5} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
-                <AddContractDialog onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} editContract={editContract} />
-                <ShowContractDialog onCancelAction={this.closeMoreDialog.bind(this)} showDialog={showMoreDialog} Contract={editContract} />
+                <AddContractDialog
+                    isLoading={addIsLoading} indivList={indivList} entList={entList} flatList={flatList} carList={carList} parcelList={parcelList} apprList={apprList}
+                    onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)}
+                    showDialog={showAddDialog} editContract={editContract} />
+                <ShowContractDialog onCancelAction={this.closeMoreDialog.bind(this)} showDialog={showMoreDialog} Contract={moreContract} />
                 <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={5} />
                 <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={5} />
                 <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={5} />
@@ -307,7 +316,7 @@ class Contracts extends Component {
                                                 <TableCell align="center" className={classes.cell}>{n.prepaid}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getDate(n.startDate)}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getDate(n.finishDate)}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.clientType === 'Indv' ? getFio(n.client.surname, n.client.name, n.client.patronymic) : n.client.companyName}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.clientType === 'Indiv' ? getFio(n.client.surname, n.client.name, n.client.patronymic) : n.client.companyName}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getFio(n.appraiser.surname, n.appraiser.name, n.appraiser.patronymic)}</TableCell>
                                                 <TableCell align="center" className={classes.doubleNarrowCell}>{
                                                     <div>

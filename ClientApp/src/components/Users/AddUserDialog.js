@@ -288,7 +288,7 @@ class AddUserDialog extends React.Component {
     }
 
     clearSalary(salary) {
-        return salary.substring(0, this.state.salary.length - 2).replace(/,/g, "");
+        return salary.substring(0, salary.length - 2).replace(/,/g, "");
     }
 
     validateForm() {

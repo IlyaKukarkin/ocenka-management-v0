@@ -5,7 +5,10 @@ const deleteContractFinish = 'DELETE_CONTRACT_FINISH';
 const addContractStart = 'ADD_CONTRACT_START';
 const addContractFinish = 'ADD_CONTRACT_FINISH';
 const getEditContractStart = 'GET_EDIT_CONTRACT_START';
-const getEditContractFinish = 'GET_EDIT_CONTRACT_FINISH';
+const getMoreContractStart = 'GET_MORE_CONTRACT_START';
+const clearMoreContract = 'CLEAR_MORE_CONTRACT';
+const getListsStart = 'GET_LISTS_START';
+const getListsFinish = 'GET_LISTS_FINISH';
 const editContractStart = 'EDIT_CONTRACT_START';
 const editContractFinish = 'EDIT_CONTRACT_FINISH';
 const deleteContractsStart = 'DELETE_CONTRACTS_START';
@@ -16,7 +19,10 @@ const toExcelError = 'TO_EXCEL_ERROR';
 const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
 const toExcelClose = 'TO_EXCEL_CLOSE';
 const clearEditContract = 'CLEAR_EDIT_CONTRACT';
-const initialState = {    contracts: [], editContract: {}, isLoading: false, fileSaved: false, fileError: false };
+const initialState = {
+    contracts: [], editContract: {}, moreContract: {}, isLoading: false, fileSaved: false, fileError: false, addIsLoading: false,
+    indivList: [], entList: [], flatList: [], carList: [], parcelList: [], apprList: []
+};
 
 export const actionCreators = {
     GetContractsSet: () => async (dispatch) => {
@@ -28,8 +34,40 @@ export const actionCreators = {
 
         dispatch({ type: getContractsFinish, contracts });
     },
+    GetListsSet: () => async (dispatch) => {
+        dispatch({ type: getListsStart });
+
+        let url = `api/IndividualSets`;
+        let response = await fetch(url);
+        const indivList = await response.json();
+
+        url = `api/EntitySets`;
+        response = await fetch(url);
+        const entList = await response.json();
+
+        url = `api/FlatSets`;
+        response = await fetch(url);
+        const flatList = await response.json();
+
+        url = `api/CarSets`;
+        response = await fetch(url);
+        const carList = await response.json();
+
+        url = `api/ParcelSets`;
+        response = await fetch(url);
+        const parcelList = await response.json();
+
+        url = `api/AppraiserSets`;
+        response = await fetch(url);
+        const apprList = await response.json();
+
+        dispatch({ type: getListsFinish, indivList, entList, flatList, carList, parcelList, apprList });
+    },
     ClearEditContract: () => async (dispatch) => {
         dispatch({ type: clearEditContract });        
+    },
+    ClearMoreContract: () => async (dispatch) => {
+        dispatch({ type: clearMoreContract });
     },
     DeleteContractSet: (id) => async (dispatch) => {
         dispatch({ type: deleteContractStart });
@@ -58,63 +96,44 @@ export const actionCreators = {
     AddContractSet: (data) => async (dispatch) => {
         dispatch({ type: addContractStart });
 
-        let objectId, addressId;
+        let appraiserId = data.appraiserId, aprContr;
 
-        let url = `api/ObjectSets`;
+        let url = `api/ContractSets`;
         let myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
             .then(function (response) {
                 return response.json();
-            }).then(function (newObject) {
-                objectId = newObject.id;
-                url = `api/AddressSets`;
-                fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
+            }).then(function (newContract) {
+                aprContr = { contractId: newContract.id, appraiserId: appraiserId };
+                fetch('api/AppraiserContracts', { method: 'post', body: JSON.stringify(aprContr), headers: myHeaders })
                     .then(function (response) {
                         return response.json();
-                    }).then(function (newAddress) {
-                        addressId = newAddress.id;
-                        data['id'] = objectId;
-                        data['AddressId'] = addressId;
-                        fetch('api/ContractSets', { method: 'post', body: JSON.stringify(data), headers: myHeaders })
-                            .then(function (response) {
-                                return response.json();
-                            }).then(function (newClient2) {
-                                dispatch({ type: addContractFinish, data });
-                            });
+                    }).then(function (newContract2) {
+                        dispatch({ type: addContractFinish, data });
                     });
             });
     },
     GetEditContract: (data) => async (dispatch) => {
         dispatch({ type: getEditContractStart, data });
     },
+    GetMoreContract: (data) => async (dispatch) => {
+        dispatch({ type: getMoreContractStart, data });
+    },
     EditContractSet: (data) => async (dispatch) => {
         dispatch({ type: editContractStart });
 
-        let address = {
-            id: data.addressId, city: data.city, district: data.district, street: data.street, house: data.house, numberOfContract: data.numberOfContract
-        };
-        let flat = {
-            id: data.id,
-            area: data.area, numberOfRooms: data.numberOfRooms, floor: data.floor, addressId: data.addressId
-        };
-        let object = {
-            id: data.id,
-            cadastralNumber: data.cadastralNumber, aimOfEvaluation: data.aimOfEvaluation
-        };
+        let appraiserId = data.appraiserId, aprContr;
 
-        let url = `api/AddressSets/${data.addressId}`;
+        let url = `api/ContractSets/${data.id}`;
         let myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-
-        fetch(url, { method: 'put', body: JSON.stringify(address), headers: myHeaders })
-            .then(function () {
-                fetch(`api/ObjectSets/${data.id}`, { method: 'put', body: JSON.stringify(object), headers: myHeaders })
-                    .then(function () {
-                        fetch(`api/ContractSets/${data.id}`, { method: 'put', body: JSON.stringify(flat), headers: myHeaders })
-                            .then(function () {
-                                dispatch({ type: editContractFinish, data });
-                            });
+        fetch(url, { method: 'put', body: JSON.stringify(data), headers: myHeaders })
+            .then(function (newContract) {
+                aprContr = { contractId: data.id, appraiserId: appraiserId };
+                fetch(`api/AppraiserContracts/${data.id}`, { method: 'put', body: JSON.stringify(aprContr), headers: myHeaders })
+                    .then(function (newContract2) {
+                        dispatch({ type: editContractFinish, data });
                     });
             });
     },
@@ -141,21 +160,21 @@ export const actionCreators = {
     }
 };
 
-const fixData = (client) => {
+const fixData = (contract) => {
     let y1, m1, d1, y2, m2, d2;
 
-    m1 = client.dateOfIssue.substring(0, 2);
-    d1 = client.dateOfIssue.substring(3, 5);
-    y1 = client.dateOfIssue.substring(6, 10);
+    m1 = contract.startDate.substring(0, 2);
+    d1 = contract.startDate.substring(3, 5);
+    y1 = contract.startDate.substring(6, 10);
 
-    m2 = client.dateOfBirth.substring(0, 2);
-    d2 = client.dateOfBirth.substring(3, 5);
-    y2 = client.dateOfBirth.substring(6, 10);
+    m2 = contract.finishDate.substring(0, 2);
+    d2 = contract.finishDate.substring(3, 5);
+    y2 = contract.finishDate.substring(6, 10);
 
-    client.dateOfIssue = y1 + '.' + m1 + '.' + d1;
-    client.dateOfBirth = y2 + '.' + m2 + '.' + d2;
+    contract.startDate = y1 + '.' + m1 + '.' + d1;
+    contract.finishDate = y2 + '.' + m2 + '.' + d2;
 
-    return client;
+    return contract;
 };
 
 const getObjectType = (object) => {
@@ -180,7 +199,7 @@ const getObjectType = (object) => {
 };
 
 const getClientType = (client) => {
-    let resType = 'Indv';
+    let resType = 'Indiv';
 
     if (client.clientSetIndividual !== null) {
         return resType;
@@ -235,9 +254,8 @@ export const reducer = (state, action) => {
 
                     object = {
                         id: oldContracts[i].object.id, cadastralNumber: oldContracts[i].object.cadastralNumber, aimOfEvaluation: oldContracts[i].object.aimOfEvaluation,
-                        area: oldContracts[i].object.objectSetFlat.area, numberOfRooms: oldContracts[i].object.objectSetFlat.numberOfRooms, floor: oldContracts[i].object.objectSetFlat.floor,
-                        city: oldContracts[i].object.objectSetFlat.address.city, district: oldContracts[i].object.objectSetFlat.address.district, street: oldContracts[i].object.objectSetFlat.address.street,
-                        house: oldContracts[i].object.objectSetFlat.address.house, numberOfFlat: oldContracts[i].object.objectSetFlat.address.numberOfFlat, addressId: oldContracts[i].object.objectSetFlat.address.id
+                        mark: oldContracts[i].object.objectSetCar.mark, model: oldContracts[i].object.objectSetCar.model, licenseNumber: oldContracts[i].object.objectSetCar.licenseNumber,
+                        year: oldContracts[i].object.objectSetCar.year
                     };
 
                     contract['object'] = object;
@@ -247,9 +265,7 @@ export const reducer = (state, action) => {
 
                     object = {
                         id: oldContracts[i].object.id, cadastralNumber: oldContracts[i].object.cadastralNumber, aimOfEvaluation: oldContracts[i].object.aimOfEvaluation,
-                        area: oldContracts[i].object.objectSetFlat.area, numberOfRooms: oldContracts[i].object.objectSetFlat.numberOfRooms, floor: oldContracts[i].object.objectSetFlat.floor,
-                        city: oldContracts[i].object.objectSetFlat.address.city, district: oldContracts[i].object.objectSetFlat.address.district, street: oldContracts[i].object.objectSetFlat.address.street,
-                        house: oldContracts[i].object.objectSetFlat.address.house, numberOfFlat: oldContracts[i].object.objectSetFlat.address.numberOfFlat, addressId: oldContracts[i].object.objectSetFlat.address.id
+                        area: oldContracts[i].object.objectSetParcel.area, usageType: oldContracts[i].object.objectSetParcel.usageType
                     };
 
                     contract['object'] = object;
@@ -260,8 +276,8 @@ export const reducer = (state, action) => {
             }
 
             switch (getClientType(oldContracts[i].client)) {
-                case 'Indv':
-                    contract['clientType'] = 'Indv';
+                case 'Indiv':
+                    contract['clientType'] = 'Indiv';
 
                     client = {
                         id: oldContracts[i].client.clientSetIndividual.id,
@@ -277,17 +293,17 @@ export const reducer = (state, action) => {
                     contract['clientType'] = 'Ent';
 
                     client = {
-                        id: oldContracts[i].client.clientSetIndividual.id,
-                        surname: oldContracts[i].client.clientSetIndividual.surname, name: oldContracts[i].client.clientSetIndividual.name, patronymic: oldContracts[i].client.clientSetIndividual.patronymic, dateOfBirth: oldContracts[i].client.clientSetIndividual.dateOfBirth,
-                        dateOfIssue: oldContracts[i].client.clientSetIndividual.dateOfIssue, divisionCode: oldContracts[i].client.clientSetIndividual.divisionCode, issuedBy: oldContracts[i].client.clientSetIndividual.issuedBy, series: oldContracts[i].client.clientSetIndividual.series, number: oldContracts[i].client.clientSetIndividual.number,
-                        city: oldContracts[i].client.clientSetIndividual.addressOfResidence.city, district: oldContracts[i].client.clientSetIndividual.addressOfResidence.district, street: oldContracts[i].client.clientSetIndividual.addressOfResidence.street,
-                        house: oldContracts[i].client.clientSetIndividual.addressOfResidence.house, numberOfFlat: oldContracts[i].client.clientSetIndividual.addressOfResidence.numberOfFlat, addressId: oldContracts[i].client.clientSetIndividual.addressOfResidence.id
+                        id: oldContracts[i].client.clientSetEntity.id,
+                        companyName: oldContracts[i].client.clientSetEntity.companyName, bin: oldContracts[i].client.clientSetEntity.bin, inn: oldContracts[i].client.clientSetEntity.inn,
+                        mailAddress: oldContracts[i].client.clientSetEntity.mailAddress, paymentAccount: oldContracts[i].client.clientSetEntity.paymentAccount,
+                        city: oldContracts[i].client.clientSetEntity.legalAddress.city, district: oldContracts[i].client.clientSetEntity.legalAddress.district, street: oldContracts[i].client.clientSetEntity.legalAddress.street,
+                        house: oldContracts[i].client.clientSetEntity.legalAddress.house, numberOfFlat: oldContracts[i].client.clientSetEntity.legalAddress.numberOfFlat, addressId: oldContracts[i].client.clientSetEntity.legalAddress.id
                     };
 
                     contract['client'] = client;
                     break;
                 default:
-                    contract['clientType'] = 'Indv';
+                    contract['clientType'] = 'Indiv';
                     break;
             }            
 
@@ -305,6 +321,82 @@ export const reducer = (state, action) => {
             ...state,
             contracts: newContracts,
             isLoading: false
+        };
+    }
+
+    if (action.type === getListsStart) {
+        return {
+            ...state,
+            addIsLoading: true
+        };
+    }
+
+    if (action.type === getListsFinish) {
+        const indiv = action.indivList;
+        const ent = action.entList;
+        const flt = action.flatList;
+        const car = action.carList;
+        const prcl = action.parcelList;
+        const appr = action.apprList;
+        let newIndiv = [];
+        let newEnt = [];
+        let newFlt = [];
+        let newCar = [];
+        let newPrcl = [];
+        let newAppr = [];
+        let listEntry = {};
+
+        for (let i = 0; i < indiv.length; i++) {
+
+            listEntry = { value: indiv[i].id, label: indiv[i].surname + ' ' + indiv[i].name + ' ' + indiv[i].patronymic };
+
+            newIndiv.push(listEntry);
+        }
+
+        for (let i = 0; i < ent.length; i++) {
+
+            listEntry = { value: ent[i].id, label: ent[i].companyName };
+
+            newEnt.push(listEntry);
+        }
+
+        for (let i = 0; i < flt.length; i++) {
+
+            listEntry = { value: flt[i].id, label: flt[i].address.street + ', ' + flt[i].address.house };
+
+            newFlt.push(listEntry);
+        }
+
+        for (let i = 0; i < car.length; i++) {
+
+            listEntry = { value: car[i].id, label: car[i].mark + ' ' + car[i].model + ' (' + car[i].licenseNumber + ')' };
+
+            newCar.push(listEntry);
+        }
+
+        for (let i = 0; i < prcl.length; i++) {
+
+            listEntry = { value: prcl[i].id, label: prcl[i].area + ' ' + prcl[i].usageType };
+
+            newPrcl.push(listEntry);
+        }
+
+        for (let i = 0; i < appr.length; i++) {
+
+            listEntry = { value: appr[i].id, label: appr[i].idNavigation.surname + ' ' + appr[i].idNavigation.name + ' ' + appr[i].idNavigation.patronymic };
+
+            newAppr.push(listEntry);
+        }
+
+        return {
+            ...state,
+            indivList: newIndiv,
+            entList: newEnt,
+            flatList: newFlt,
+            carList: newCar,
+            parcelList: newPrcl,
+            apprList: newAppr,
+            addIsLoading: false
         };
     }
 
@@ -370,6 +462,8 @@ export const reducer = (state, action) => {
         let contracts = state.contracts;
         let newContract = action.data;
 
+        newContract = fixData(newContract);
+
         contracts.push(newContract);
 
         return {
@@ -388,17 +482,8 @@ export const reducer = (state, action) => {
 
     if (action.type === editContractFinish) {
 
-        let contracts = state.contracts;
-        let newContract = action.data;
-
-        const fltIndex = contracts.findIndex(u => u.id === newContract.id);
-
-        contracts[fltIndex] = newContract;
-
         return {
-            ...state,
-            contracts: contracts,
-            isLoading: false
+            ...state
         };
     }
 
@@ -437,10 +522,24 @@ export const reducer = (state, action) => {
         };
     }
 
+    if (action.type === getMoreContractStart) {
+        return {
+            ...state,
+            moreContract: action.data
+        };
+    }
+
     if (action.type === clearEditContract) {
         return {
             ...state,
             editContract: {}
+        };
+    }
+
+    if (action.type === clearEditContract) {
+        return {
+            ...state,
+            moreContract: {}
         };
     }
 

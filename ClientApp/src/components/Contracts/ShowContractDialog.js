@@ -49,7 +49,7 @@ class ShowContractDialog extends React.Component {
                         </Typography>
                         <Typography component={'span'} variant="body1">
                             Клиент
-                        {Contract.clientType === 'Indv' ?
+                        {Contract.clientType === 'Indiv' ?
                                 <ul>
                                     <li>{Contract.client.surname}</li>
                                     <li>{Contract.client.name}</li>
