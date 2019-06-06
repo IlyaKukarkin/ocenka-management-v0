@@ -128,7 +128,7 @@ function clearCadastral(str) {
     return str.substr(0, 2) + str.substr(3, 2) + str.substr(6, 7) + str.substr(14, 2);
 }
 
-class AddFlatDialog extends React.Component {
+class AddContractDialog extends React.Component {
     constructor(props) {
         super(props);
 
@@ -681,4 +681,4 @@ class AddFlatDialog extends React.Component {
     }
 }
 
-export default AddFlatDialog;
+export default AddContractDialog;

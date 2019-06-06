@@ -92,7 +92,10 @@ export const reducer = (state, action) => {
         let newAppraisers = [];
 
         for (let i = 0; i < oldAppraisers.length; i++) {
-            newAppraisers.push({ id: oldAppraisers[i].id, surname: oldAppraisers[i].idNavigation.surname, name: oldAppraisers[i].idNavigation.name, patronymic: oldAppraisers[i].idNavigation.patronymic, birthday: oldAppraisers[i].idNavigation.birthday, worksSince: oldAppraisers[i].idNavigation.worksSince, position: oldAppraisers[i].position });
+            newAppraisers.push({
+                id: oldAppraisers[i].id, surname: oldAppraisers[i].idNavigation.surname, name: oldAppraisers[i].idNavigation.name, patronymic: oldAppraisers[i].idNavigation.patronymic,
+                birthday: oldAppraisers[i].idNavigation.birthday, worksSince: oldAppraisers[i].idNavigation.worksSince, position: oldAppraisers[i].position
+            });
         }
 
         return {

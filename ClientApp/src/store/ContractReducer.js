@@ -141,6 +141,59 @@ export const actionCreators = {
     }
 };
 
+const fixData = (client) => {
+    let y1, m1, d1, y2, m2, d2;
+
+    m1 = client.dateOfIssue.substring(0, 2);
+    d1 = client.dateOfIssue.substring(3, 5);
+    y1 = client.dateOfIssue.substring(6, 10);
+
+    m2 = client.dateOfBirth.substring(0, 2);
+    d2 = client.dateOfBirth.substring(3, 5);
+    y2 = client.dateOfBirth.substring(6, 10);
+
+    client.dateOfIssue = y1 + '.' + m1 + '.' + d1;
+    client.dateOfBirth = y2 + '.' + m2 + '.' + d2;
+
+    return client;
+};
+
+const getObjectType = (object) => {
+    let resType = 'Flat';
+
+    if (object.objectSetCar !== null) {
+        resType = 'Car';
+        return resType;
+    }
+
+    if (object.objectSetFlat !== null) {
+        resType = 'Flat';
+        return resType;
+    }
+
+    if (object.objectSetParcel !== null) {
+        resType = 'Parcel';
+        return resType;
+    }
+
+    return resType;
+};
+
+const getClientType = (client) => {
+    let resType = 'Indv';
+
+    if (client.clientSetIndividual !== null) {
+        return resType;
+    }
+
+    if (client.clientSetEntity !== null) {
+        resType = 'Ent';
+        return resType;
+    }
+
+    return resType;
+};
+
 export const reducer = (state, action) => {
     state = state || initialState;
 
@@ -156,12 +209,96 @@ export const reducer = (state, action) => {
         let newContracts = [];
 
         for (let i = 0; i < oldContracts.length; i++) {
-            newContracts.push({
-                id: oldContracts[i].id, area: oldContracts[i].area, numberOfRooms: oldContracts[i].numberOfRooms, floor: oldContracts[i].floor,
-                cadastralNumber: oldContracts[i].idNavigation.cadastralNumber, aimOfEvaluation: oldContracts[i].idNavigation.aimOfEvaluation,
-                city: oldContracts[i].address.city, district: oldContracts[i].address.district, street: oldContracts[i].address.street,
-                house: oldContracts[i].address.house, numberOfContract: oldContracts[i].address.numberOfContract, addressId: oldContracts[i].address.id
-            });
+
+            let contract, object, client, appraiser;
+
+            contract = {
+                id: oldContracts[i].id, contractSumm: oldContracts[i].contractSumm, prepaid: oldContracts[i].prepaid, startDate: oldContracts[i].startDate, finishDate: oldContracts[i].finishDate,
+                clientId: oldContracts[i].clientId, objectId: oldContracts[i].objectId, appraiserId: oldContracts[i].appraiserContract[0].appraiserId
+            };
+
+            switch (getObjectType(oldContracts[i].object)) {
+                case 'Flat':
+                    contract['objectType'] = 'Flat';
+
+                    object = {
+                        id: oldContracts[i].object.id, cadastralNumber: oldContracts[i].object.cadastralNumber, aimOfEvaluation: oldContracts[i].object.aimOfEvaluation,
+                        area: oldContracts[i].object.objectSetFlat.area, numberOfRooms: oldContracts[i].object.objectSetFlat.numberOfRooms, floor: oldContracts[i].object.objectSetFlat.floor,
+                        city: oldContracts[i].object.objectSetFlat.address.city, district: oldContracts[i].object.objectSetFlat.address.district, street: oldContracts[i].object.objectSetFlat.address.street,
+                        house: oldContracts[i].object.objectSetFlat.address.house, numberOfFlat: oldContracts[i].object.objectSetFlat.address.numberOfFlat, addressId: oldContracts[i].object.objectSetFlat.address.id
+                    };
+
+                    contract['object'] = object;
+                    break;
+                case 'Car':
+                    contract['objectType'] = 'Car';
+
+                    object = {
+                        id: oldContracts[i].object.id, cadastralNumber: oldContracts[i].object.cadastralNumber, aimOfEvaluation: oldContracts[i].object.aimOfEvaluation,
+                        area: oldContracts[i].object.objectSetFlat.area, numberOfRooms: oldContracts[i].object.objectSetFlat.numberOfRooms, floor: oldContracts[i].object.objectSetFlat.floor,
+                        city: oldContracts[i].object.objectSetFlat.address.city, district: oldContracts[i].object.objectSetFlat.address.district, street: oldContracts[i].object.objectSetFlat.address.street,
+                        house: oldContracts[i].object.objectSetFlat.address.house, numberOfFlat: oldContracts[i].object.objectSetFlat.address.numberOfFlat, addressId: oldContracts[i].object.objectSetFlat.address.id
+                    };
+
+                    contract['object'] = object;
+                    break;
+                case 'Parcel':
+                    contract['objectType'] = 'Parcel';
+
+                    object = {
+                        id: oldContracts[i].object.id, cadastralNumber: oldContracts[i].object.cadastralNumber, aimOfEvaluation: oldContracts[i].object.aimOfEvaluation,
+                        area: oldContracts[i].object.objectSetFlat.area, numberOfRooms: oldContracts[i].object.objectSetFlat.numberOfRooms, floor: oldContracts[i].object.objectSetFlat.floor,
+                        city: oldContracts[i].object.objectSetFlat.address.city, district: oldContracts[i].object.objectSetFlat.address.district, street: oldContracts[i].object.objectSetFlat.address.street,
+                        house: oldContracts[i].object.objectSetFlat.address.house, numberOfFlat: oldContracts[i].object.objectSetFlat.address.numberOfFlat, addressId: oldContracts[i].object.objectSetFlat.address.id
+                    };
+
+                    contract['object'] = object;
+                    break;
+                default:
+                    contract['objectType'] = 'Flat';
+                    break;
+            }
+
+            switch (getClientType(oldContracts[i].client)) {
+                case 'Indv':
+                    contract['clientType'] = 'Indv';
+
+                    client = {
+                        id: oldContracts[i].client.clientSetIndividual.id,
+                        surname: oldContracts[i].client.clientSetIndividual.surname, name: oldContracts[i].client.clientSetIndividual.name, patronymic: oldContracts[i].client.clientSetIndividual.patronymic, dateOfBirth: oldContracts[i].client.clientSetIndividual.dateOfBirth,
+                        dateOfIssue: oldContracts[i].client.clientSetIndividual.dateOfIssue, divisionCode: oldContracts[i].client.clientSetIndividual.divisionCode, issuedBy: oldContracts[i].client.clientSetIndividual.issuedBy, series: oldContracts[i].client.clientSetIndividual.series, number: oldContracts[i].client.clientSetIndividual.number,
+                        city: oldContracts[i].client.clientSetIndividual.addressOfResidence.city, district: oldContracts[i].client.clientSetIndividual.addressOfResidence.district, street: oldContracts[i].client.clientSetIndividual.addressOfResidence.street,
+                        house: oldContracts[i].client.clientSetIndividual.addressOfResidence.house, numberOfFlat: oldContracts[i].client.clientSetIndividual.addressOfResidence.numberOfFlat, addressId: oldContracts[i].client.clientSetIndividual.addressOfResidence.id
+                    };
+
+                    contract['client'] = client;
+                    break;
+                case 'Ent':
+                    contract['clientType'] = 'Ent';
+
+                    client = {
+                        id: oldContracts[i].client.clientSetIndividual.id,
+                        surname: oldContracts[i].client.clientSetIndividual.surname, name: oldContracts[i].client.clientSetIndividual.name, patronymic: oldContracts[i].client.clientSetIndividual.patronymic, dateOfBirth: oldContracts[i].client.clientSetIndividual.dateOfBirth,
+                        dateOfIssue: oldContracts[i].client.clientSetIndividual.dateOfIssue, divisionCode: oldContracts[i].client.clientSetIndividual.divisionCode, issuedBy: oldContracts[i].client.clientSetIndividual.issuedBy, series: oldContracts[i].client.clientSetIndividual.series, number: oldContracts[i].client.clientSetIndividual.number,
+                        city: oldContracts[i].client.clientSetIndividual.addressOfResidence.city, district: oldContracts[i].client.clientSetIndividual.addressOfResidence.district, street: oldContracts[i].client.clientSetIndividual.addressOfResidence.street,
+                        house: oldContracts[i].client.clientSetIndividual.addressOfResidence.house, numberOfFlat: oldContracts[i].client.clientSetIndividual.addressOfResidence.numberOfFlat, addressId: oldContracts[i].client.clientSetIndividual.addressOfResidence.id
+                    };
+
+                    contract['client'] = client;
+                    break;
+                default:
+                    contract['clientType'] = 'Indv';
+                    break;
+            }            
+
+            appraiser = {
+                id: oldContracts[i].appraiserContract[0].appraiser.id, surname: oldContracts[i].appraiserContract[0].appraiser.idNavigation.surname, name: oldContracts[i].appraiserContract[0].appraiser.idNavigation.name, patronymic: oldContracts[i].appraiserContract[0].appraiser.idNavigation.patronymic,
+                birthday: oldContracts[i].appraiserContract[0].appraiser.idNavigation.birthday, worksSince: oldContracts[i].appraiserContract[0].appraiser.idNavigation.worksSince, position: oldContracts[i].appraiserContract[0].appraiser.position
+            };
+
+            contract['appraiser'] = appraiser;
+
+            newContracts.push(contract);
         }
 
         return {

@@ -10,11 +10,12 @@ import CreateFileDialog from '../CreateFileDialog';
 import ErrorFileDialog from '../ErrorFileDialog';
 import ErrorExportDialog from '../ErrorExportDialog';
 import AddContractDialog from './AddContractDialog';
+import ShowContractDialog from './ShowContractDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
     Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
 } from '@material-ui/core';
-import { Edit } from '@material-ui/icons';
+import { Edit, Info } from '@material-ui/icons';
 
 const styles = theme => ({
     table: {
@@ -27,6 +28,9 @@ const styles = theme => ({
     },
     narrowCell: {
         width: '30px'
+    },
+    doubleNarrowCell: {
+        minWidth: '136px'
     },
     cell: {
         padding: '0',
@@ -42,7 +46,7 @@ const rows = [
     { id: 'startDate', numeric: false, label: '24' },
     { id: 'finishDate', numeric: false, label: '25' },
     { id: 'surname', numeric: false, label: '26' },
-    { id: 'object', numeric: false, label: '27' },
+    { id: 'appraiser', numeric: false, label: '27' },
 ];
 
 class Contracts extends Component {
@@ -55,6 +59,7 @@ class Contracts extends Component {
         this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
         this.handleAddClick = this.handleAddClick.bind(this);
         this.closeAddDialog = this.closeAddDialog.bind(this);
+        this.closeMoreDialog = this.closeMoreDialog.bind(this);
         this.closeFileDialog = this.closeFileDialog.bind(this);
         this.closeErrorFileDialog = this.closeErrorFileDialog.bind(this);
         this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
@@ -73,6 +78,7 @@ class Contracts extends Component {
         rowsPerPage: 5,
         showDeleteDialog: false,
         showAddDialog: false,
+        showMoreDialog: false,
         showErrorExportDialog: false,
         editContract: {
             id: '',
@@ -82,9 +88,11 @@ class Contracts extends Component {
             finishDate: '',
             clientId: '',
             objectId: '',
+            appraiserId: '',
             client: {},
             objectType: '',
             object: {},
+            appraiser: {},
         }
     };
 
@@ -192,6 +200,12 @@ class Contracts extends Component {
         this.setState({ showAddDialog: false });
     }
 
+    closeMoreDialog = () => {
+        this.props.ClearEditContract();
+        
+        this.setState({ showMoreDialog: false });
+    }
+
     startEditClick = (event, id) => {
         let contract = this.findContract(id);
 
@@ -199,6 +213,16 @@ class Contracts extends Component {
 
         getContract.then((client) => {
             this.setState({ showAddDialog: true });
+        });
+    }
+
+    startMoreClick = (event, id) => {
+        let contract = this.findContract(id);
+
+        let getContract = this.props.GetEditContract(contract);
+
+        getContract.then((client) => {
+            this.setState({ showMoreDialog: true });
         });
     }
 
@@ -239,15 +263,16 @@ class Contracts extends Component {
 
     render() {
         const { classes, isLoading, fileSaved, fileError, editContract } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search, showErrorExportDialog } = this.state;
+        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showMoreDialog, showDeleteDialog, search, showErrorExportDialog } = this.state;
 
         return (
-            <TableCardLayout id={"clnt"} headerIndex={4} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
-                <DeleteDialog header={4} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
+            <TableCardLayout id={"clnt"} headerIndex={5} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
+                <DeleteDialog header={5} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
                 <AddContractDialog onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} editContract={editContract} />
-                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={4} />
-                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={4} />
-                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={4} />
+                <ShowContractDialog onCancelAction={this.closeMoreDialog.bind(this)} showDialog={showMoreDialog} Contract={editContract} />
+                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={5} />
+                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={5} />
+                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={5} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
                         <Table className={classes.table}>
@@ -262,7 +287,7 @@ class Contracts extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(cntr => cntr.contractSumm.toString().includes(search) || cntr.prepaid.toString().includes(search) || cntr.startDate.includes(search) || cntr.finishDate.includes(search) || cntr.client.surname.includes(search) || cntr.objectType.includes(search))
+                                    .filter(cntr => cntr.contractSumm.toString().includes(search) || cntr.prepaid.toString().includes(search) || cntr.startDate.includes(search) || cntr.finishDate.includes(search) || (cntr.client.surname && cntr.client.surname.includes(search)) || (cntr.client.companyName && cntr.client.companyName.includes(search)) || cntr.appraiser.surname.includes(search))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -282,11 +307,18 @@ class Contracts extends Component {
                                                 <TableCell align="center" className={classes.cell}>{n.prepaid}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getDate(n.startDate)}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getDate(n.finishDate)}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{getFio(n.client.surname, n.client.name, n.client.patronymic)}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.objectType}</TableCell>
-                                                <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.startEditClick(event, n.id)}>
-                                                    <Edit fontSize="small" />
-                                                </IconButton>}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.clientType === 'Indv' ? getFio(n.client.surname, n.client.name, n.client.patronymic) : n.client.companyName}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{getFio(n.appraiser.surname, n.appraiser.name, n.appraiser.patronymic)}</TableCell>
+                                                <TableCell align="center" className={classes.doubleNarrowCell}>{
+                                                    <div>
+                                                        <IconButton onClick={event => this.startMoreClick(event, n.id)}>
+                                                            <Info fontSize="small" />
+                                                        </IconButton>
+                                                        <IconButton onClick={event => this.startEditClick(event, n.id)}>
+                                                            <Edit fontSize="small" />
+                                                        </IconButton>
+                                                    </div>
+                                                }</TableCell>
                                             </TableRow>
                                         );
                                     })}
@@ -296,7 +328,7 @@ class Contracts extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.filter(cntr => cntr.contractSumm.toString().includes(search) || cntr.prepaid.toString().includes(search) || cntr.startDate.includes(search) || cntr.finishDate.includes(search) || cntr.client.surname.includes(search) || cntr.objectType.includes(search)).length}
+                        count={data.filter(cntr => cntr.contractSumm.toString().includes(search) || cntr.prepaid.toString().includes(search) || cntr.startDate.includes(search) || cntr.finishDate.includes(search) || (cntr.client.surname && cntr.client.surname.includes(search)) || (cntr.client.companyName && cntr.client.companyName.includes(search)) || cntr.appraiser.surname.includes(search)).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{
@@ -363,6 +395,6 @@ function getSorting(order, orderBy) {
 }
 
 export default withStyles(styles)(connect(
-    state => state.ontracts,
+    state => state.contracts,
     dispatch => bindActionCreators(actionCreators, dispatch)
 )(Contracts));
