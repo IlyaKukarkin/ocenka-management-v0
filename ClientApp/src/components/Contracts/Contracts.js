@@ -167,9 +167,13 @@ class Contracts extends Component {
     }
 
     handleAddClick = (data) => {
-        this.props.AddContractSet(data);
+        let addContract = this.props.AddContractSet(data);
 
-        this.setState({ showAddDialog: false });
+        addContract.then(con => {
+            this.props.GetContractsSet();
+
+            this.setState({ showAddDialog: false });
+        });
     }
 
     handleEditClick = (data) => {

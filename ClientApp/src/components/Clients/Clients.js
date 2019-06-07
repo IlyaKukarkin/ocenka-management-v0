@@ -9,6 +9,7 @@ import DeleteDialog from '../DeleteDialog';
 import CreateFileDialog from '../CreateFileDialog';
 import ErrorFileDialog from '../ErrorFileDialog';
 import ErrorExportDialog from '../ErrorExportDialog';
+import DeleteErrorDialog from '../DeleteErrorDialog';
 import AddClientDialog from './AddClientDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
@@ -60,6 +61,7 @@ class Clients extends Component {
         this.handleExcelClick = this.handleExcelClick.bind(this);
         this.handleSearchChange = this.handleSearchChange.bind(this);
         this.handleEditClick = this.handleEditClick.bind(this);
+        this.closeDeleteErrorDialog = this.closeDeleteErrorDialog.bind(this);
     }
 
     state = {
@@ -239,10 +241,14 @@ class Clients extends Component {
         this.props.ToExcelErrorClose();
     }
 
+    closeDeleteErrorDialog = () => {
+        this.props.DeleteErrorClose();
+    }
+
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading, fileSaved, fileError, editClient } = this.props;
+        const { classes, isLoading, fileSaved, fileError, editClient, deleteError } = this.props;
         const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search, showErrorExportDialog } = this.state;
 
         return (
@@ -252,6 +258,7 @@ class Clients extends Component {
                 <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={3} />
                 <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={3} />
                 <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={3} />
+                <DeleteErrorDialog onCancelAction={this.closeDeleteErrorDialog.bind(this)} showDialog={deleteError} header={3} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
                         <Table className={classes.table}>

@@ -15,8 +15,10 @@ const toExcelFinish = 'TO_EXCEL_FINISH';
 const toExcelError = 'TO_EXCEL_ERROR';
 const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
 const toExcelClose = 'TO_EXCEL_CLOSE';
+const deleteError = 'DELETE_ERROR';
+const deleteErrorClose = 'DELETE_ERROR_CLOSE';
 const clearEditFlat = 'CLEAR_EDIT_FLAT';
-const initialState = {    flats: [], editFlat: {}, isLoading: false, fileSaved: false, fileError: false };
+const initialState = { flats: [], editFlat: {}, isLoading: false, fileSaved: false, fileError: false, deleteError: false };
 
 export const actionCreators = {
     GetFlatsSet: () => async (dispatch) => {
@@ -34,26 +36,30 @@ export const actionCreators = {
     DeleteFlatSet: (id) => async (dispatch) => {
         dispatch({ type: deleteFlatStart });
 
-        const url = `api/FlatSets/${id}`;
-        fetch(url, { method: 'delete' });
-
         const url2 = `api/ObjectSets/${id}`;
-        fetch(url2, { method: 'delete' });
-
-        dispatch({ type: deleteFlatFinish, id });
+        fetch(url2, { method: 'delete' })
+            .then(function (response) {
+                if (response.status === 500) {
+                    dispatch({ type: deleteError });
+                } else {
+                    dispatch({ type: deleteFlatFinish, id });
+                }
+            });
     },
     DeleteFlatsSet: (idSet) => async (dispatch) => {
         dispatch({ type: deleteFlatsStart });
 
         idSet.forEach(async function (id) {
-            const url = `api/FlatSets/${id}`;
-            fetch(url, { method: 'delete' });
-
             const url2 = `api/ObjectSets/${id}`;
-            fetch(url2, { method: 'delete' });
+            fetch(url2, { method: 'delete' })
+                .then(function (response) {
+                    if (response.status === 500) {
+                        dispatch({ type: deleteError });
+                    } else {
+                        dispatch({ type: deleteFlatFinish, id });
+                    }
+                });
         });
-
-        dispatch({ type: deleteFlatsFinish, idSet });
     },
     AddFlatSet: (data) => async (dispatch) => {
         dispatch({ type: addFlatStart });
@@ -138,6 +144,9 @@ export const actionCreators = {
     },
     ToExcelErrorClose: () => async (dispatch) => {
         dispatch({ type: toExcelErrorClose });
+    },
+    DeleteErrorClose: () => async (dispatch) => {
+        dispatch({ type: deleteErrorClose });
     }
 };
 
@@ -304,6 +313,21 @@ export const reducer = (state, action) => {
         return {
             ...state,
             editFlat: {}
+        };
+    }
+
+    if (action.type === deleteError) {
+        return {
+            ...state,
+            isLoading: false,
+            deleteError: true
+        };
+    }
+
+    if (action.type === deleteErrorClose) {
+        return {
+            ...state,
+            deleteError: false
         };
     }
 

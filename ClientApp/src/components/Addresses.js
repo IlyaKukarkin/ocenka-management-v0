@@ -10,6 +10,7 @@ import AddAddressDialog from './AddAddressDialog';
 import CreateFileDialog from './CreateFileDialog';
 import ErrorFileDialog from './ErrorFileDialog';
 import ErrorExportDialog from './ErrorExportDialog';
+import DeleteErrorDialog from './DeleteErrorDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
     Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
@@ -59,6 +60,7 @@ class Address extends Component {
         this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
         this.handleExcelClick = this.handleExcelClick.bind(this);
         this.handleEditClick = this.handleEditClick.bind(this);
+        this.closeDeleteErrorDialog = this.closeDeleteErrorDialog.bind(this);
     }
 
     state = {
@@ -226,6 +228,10 @@ class Address extends Component {
         this.setState({ showErrorExportDialog: false });
     }
 
+    closeDeleteErrorDialog = () => {
+        this.props.DeleteErrorClose();
+    }
+
     closeFileDialog = () => {
         this.props.ToExcelClose();
     }
@@ -237,7 +243,7 @@ class Address extends Component {
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading, fileSaved, fileError, editAddress } = this.props;
+        const { classes, isLoading, fileSaved, fileError, editAddress, deleteError } = this.props;
         const { data, order, orderBy, selected, rowsPerPage, page, emptyRows, search, showAddDialog, showDeleteDialog, showErrorExportDialog } = this.state;
 
         return (
@@ -247,6 +253,7 @@ class Address extends Component {
                 <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={2} />
                 <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={2} />
                 <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={2} />
+                <DeleteErrorDialog onCancelAction={this.closeDeleteErrorDialog.bind(this)} showDialog={deleteError} header={2} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
 

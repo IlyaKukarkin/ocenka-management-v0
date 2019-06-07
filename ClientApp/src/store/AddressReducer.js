@@ -13,8 +13,10 @@ const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
 const toExcelClose = 'TO_EXCEL_CLOSE';
 const editAddressStart = 'EDIT_ADDRESS_START';
 const editAddressFinish = 'EDIT_ADDRESS_FINISH';
+const deleteError = 'DELETE_ERROR';
+const deleteErrorClose = 'DELETE_ERROR_CLOSE';
 const clearEditAddress = 'CLEAR_EDIT_ADDRESS';
-const initialState = { addresses: [], editAddress: {}, isLoading: false, fileSaved: false, fileError: false };
+const initialState = { addresses: [], editAddress: {}, isLoading: false, fileSaved: false, fileError: false, deleteError: false };
 
 export const actionCreators = {
     GetAddressSet: () => async (dispatch) => {
@@ -30,19 +32,31 @@ export const actionCreators = {
         dispatch({ type: deleteAddressStart });
 
         const url = `api/AddressSets/${id}`;
-        fetch(url, { method: 'delete' });
-
-        dispatch({ type: deleteAddressFinish, id });
+        fetch(url, { method: 'delete' })
+            .then(
+            function (response) {
+                if (response.status === 500) {
+                    dispatch({ type: deleteError });
+                } else {
+                    dispatch({ type: deleteAddressFinish, id });
+                }
+            });
     },
     DeleteAddressesSet: (idSet) => async (dispatch) => {
         dispatch({ type: deleteAddressesStart });
 
         idSet.forEach(async function (id) {
             const url = `api/AddressSets/${id}`;
-            fetch(url, { method: 'delete' });
+            fetch(url, { method: 'delete' })
+                .then(
+                    function (response) {
+                        if (response.status === 500) {
+                            dispatch({ type: deleteError });
+                        } else {
+                            dispatch({ type: deleteAddressFinish, id });
+                        }
+                    });
         });
-
-        dispatch({ type: deleteAddressesFinish, idSet });
     },
     AddAddressSet: (data) => async (dispatch) => {
         dispatch({ type: addAddressStart });
@@ -93,6 +107,9 @@ export const actionCreators = {
                 dispatch({ type: editAddressFinish, data });
         });
     },
+    DeleteErrorClose: () => async (dispatch) => {
+        dispatch({ type: deleteErrorClose });
+    }
 };
 
 export const reducer = (state, action) => {
@@ -240,6 +257,21 @@ export const reducer = (state, action) => {
         return {
             ...state,
             editAddress: {}
+        };
+    }
+
+    if (action.type === deleteError) {
+        return {
+            ...state,
+            isLoading: false,
+            deleteError: true
+        };
+    }
+
+    if (action.type === deleteErrorClose) {
+        return {
+            ...state,
+            deleteError: false
         };
     }
 

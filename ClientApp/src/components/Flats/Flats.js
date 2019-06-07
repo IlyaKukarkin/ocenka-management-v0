@@ -9,6 +9,7 @@ import DeleteDialog from '../DeleteDialog';
 import CreateFileDialog from '../CreateFileDialog';
 import ErrorFileDialog from '../ErrorFileDialog';
 import ErrorExportDialog from '../ErrorExportDialog';
+import DeleteErrorDialog from '../DeleteErrorDialog';
 import AddFlatDialog from './AddFlatDialog';
 import { withStyles } from '@material-ui/core/styles';
 import {
@@ -61,6 +62,7 @@ class Flats extends Component {
         this.handleExcelClick = this.handleExcelClick.bind(this);
         this.handleSearchChange = this.handleSearchChange.bind(this);
         this.handleEditClick = this.handleEditClick.bind(this);
+        this.closeDeleteErrorDialog = this.closeDeleteErrorDialog.bind(this);
     }
 
     state = {
@@ -156,6 +158,7 @@ class Flats extends Component {
         } else {
             DeleteFlatsSet(this.state.selected);
         }
+
         this.setState({ selected: [] });
     }
 
@@ -228,6 +231,10 @@ class Flats extends Component {
         this.setState({ showErrorExportDialog: false });
     }
 
+    closeDeleteErrorDialog = () => {
+        this.props.DeleteErrorClose();
+    }
+
     closeFileDialog = () => {
         this.props.ToExcelClose();
     }
@@ -239,7 +246,7 @@ class Flats extends Component {
     isSelected = id => this.state.selected.indexOf(id) !== -1;
 
     render() {
-        const { classes, isLoading, fileSaved, fileError, editFlat } = this.props;
+        const { classes, isLoading, fileSaved, fileError, editFlat, deleteError } = this.props;
         const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search, showErrorExportDialog } = this.state;
 
         return (
@@ -249,6 +256,7 @@ class Flats extends Component {
                 <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={4} />
                 <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={4} />
                 <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={4} />
+                <DeleteErrorDialog onCancelAction={this.closeDeleteErrorDialog.bind(this)} showDialog={deleteError} header={4} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
                         <Table className={classes.table}>

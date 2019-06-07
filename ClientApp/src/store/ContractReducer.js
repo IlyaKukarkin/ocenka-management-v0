@@ -75,7 +75,7 @@ export const actionCreators = {
         const url = `api/ContractSets/${id}`;
         fetch(url, { method: 'delete' });
 
-        const url2 = `api/ObjectSets/${id}`;
+        const url2 = `api/AppraiserContracts/${id}`;
         fetch(url2, { method: 'delete' });
 
         dispatch({ type: deleteContractFinish, id });
@@ -87,7 +87,7 @@ export const actionCreators = {
             const url = `api/ContractSets/${id}`;
             fetch(url, { method: 'delete' });
 
-            const url2 = `api/ObjectSets/${id}`;
+            const url2 = `api/AppraiserContracts/${id}`;
             fetch(url2, { method: 'delete' });
         });
 
@@ -459,17 +459,9 @@ export const reducer = (state, action) => {
     }
 
     if (action.type === addContractFinish) {
-        let contracts = state.contracts;
-        let newContract = action.data;
-
-        newContract = fixData(newContract);
-
-        contracts.push(newContract);
 
         return {
-            ...state,
-            contracts: contracts,
-            isLoading: false
+            ...state
         };
     }
 

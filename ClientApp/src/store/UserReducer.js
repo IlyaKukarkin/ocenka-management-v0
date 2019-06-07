@@ -17,8 +17,10 @@ const getEditUserStart = 'GET_EDIT_USER_START';
 const getEditApprFinish = 'GET_APPR_USER_FINISH';
 const getEditUserFinish = 'GET_EDIT_USER_FINISH';
 const getEditDirFinish = 'GET_EDIT_DIR_FINISH';
+const deleteError = 'DELETE_ERROR';
+const deleteErrorClose = 'DELETE_ERROR_CLOSE';
 const clearEditUser = 'CLEAR_EDIT_USER';
-const initialState = {    users: [], editUser: {}, isLoading: false, fileSaved: false, fileError: false };
+const initialState = { users: [], editUser: {}, isLoading: false, fileSaved: false, fileError: false, deleteError: false };
 
 export const actionCreators = {
     GetUsersSet: () => async (dispatch) => {
@@ -66,19 +68,29 @@ export const actionCreators = {
         dispatch({ type: deleteUserStart });
 
         const url = `api/UserSets/${id}`;
-        fetch(url, { method: 'delete' });
-
-        dispatch({ type: deleteUserFinish, id });
+        fetch(url, { method: 'delete' })
+            .then(function (response) {
+                if (response.status === 500) {
+                    dispatch({ type: deleteError });
+                } else {
+                    dispatch({ type: deleteUserFinish, id });
+                }
+            });
     },
     DeleteUsersSet: (idSet) => async (dispatch) => {
         dispatch({ type: deleteUsersStart });
 
         idSet.forEach(async function (id) {
             const url = `api/UserSets/${id}`;
-            fetch(url, { method: 'delete' });
+            fetch(url, { method: 'delete' })
+                .then(function (response) {
+                    if (response.status === 500) {
+                        dispatch({ type: deleteError });
+                    } else {
+                        dispatch({ type: deleteUserFinish, id });
+                    }
+                });
         });
-
-        dispatch({ type: deleteUsersFinish, idSet });
     },
     AddUserSet: (data) => async (dispatch) => {
         dispatch({ type: addUserStart });
@@ -166,6 +178,9 @@ export const actionCreators = {
     },
     ToExcelErrorClose: () => async (dispatch) => {
         dispatch({ type: toExcelErrorClose });
+    },
+    DeleteErrorClose: () => async (dispatch) => {
+        dispatch({ type: deleteErrorClose });
     }
 };
 
@@ -374,6 +389,21 @@ export const reducer = (state, action) => {
         return {
             ...state,
             editUser: {}
+        };
+    }
+
+    if (action.type === deleteError) {
+        return {
+            ...state,
+            isLoading: false,
+            deleteError: true
+        };
+    }
+
+    if (action.type === deleteErrorClose) {
+        return {
+            ...state,
+            deleteError: false
         };
     }
 

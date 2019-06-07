@@ -15,8 +15,10 @@ const toExcelFinish = 'TO_EXCEL_FINISH';
 const toExcelError = 'TO_EXCEL_ERROR';
 const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
 const toExcelClose = 'TO_EXCEL_CLOSE';
+const deleteError = 'DELETE_ERROR';
+const deleteErrorClose = 'DELETE_ERROR_CLOSE';
 const clearEditClient = 'CLEAR_EDIT_CLIENT';
-const initialState = {    clients: [], editClient: {}, isLoading: false, fileSaved: false, fileError: false };
+const initialState = { clients: [], editClient: {}, isLoading: false, fileSaved: false, fileError: false, deleteError: false };
 
 export const actionCreators = {
     GetClientsSet: () => async (dispatch) => {
@@ -34,26 +36,32 @@ export const actionCreators = {
     DeleteClientSet: (id) => async (dispatch) => {
         dispatch({ type: deleteClientStart });
 
-        const url = `api/IndividualSets/${id}`;
-        fetch(url, { method: 'delete' });
-
         const url2 = `api/ClientSets/${id}`;
         fetch(url2, { method: 'delete' });
 
-        dispatch({ type: deleteClientFinish, id });
+        fetch(url2, { method: 'delete' })
+            .then(function (response) {
+                if (response.status === 500) {
+                    dispatch({ type: deleteError });
+                } else {
+                    dispatch({ type: deleteClientFinish, id });
+                }
+            });
     },
     DeleteClientsSet: (idSet) => async (dispatch) => {
         dispatch({ type: deleteClientsStart });
 
         idSet.forEach(async function (id) {
-            const url = `api/IndividualSets/${id}`;
-            fetch(url, { method: 'delete' });
-
             const url2 = `api/ClientSets/${id}`;
-            fetch(url2, { method: 'delete' });
+            fetch(url2, { method: 'delete' })
+                .then(function (response) {
+                    if (response.status === 500) {
+                        dispatch({ type: deleteError });
+                    } else {
+                        dispatch({ type: deleteClientFinish, id });
+                    }
+                });
         });
-
-        dispatch({ type: deleteClientsFinish, idSet });
     },
     AddClientSet: (data) => async (dispatch) => {
         dispatch({ type: addClientStart });
@@ -132,6 +140,9 @@ export const actionCreators = {
     },
     ToExcelErrorClose: () => async (dispatch) => {
         dispatch({ type: toExcelErrorClose });
+    },
+    DeleteErrorClose: () => async (dispatch) => {
+        dispatch({ type: deleteErrorClose });
     }
 };
 
@@ -319,6 +330,21 @@ export const reducer = (state, action) => {
         return {
             ...state,
             editClient: {}
+        };
+    }
+
+    if (action.type === deleteError) {
+        return {
+            ...state,
+            isLoading: false,
+            deleteError: true
+        };
+    }
+
+    if (action.type === deleteErrorClose) {
+        return {
+            ...state,
+            deleteError: false
         };
     }
 

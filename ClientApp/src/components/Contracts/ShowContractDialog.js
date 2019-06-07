@@ -1,7 +1,18 @@
 ﻿import React from 'react';
+import { compose } from 'recompose';
+import { withStyles } from '@material-ui/core/styles';
 import {
     Button, Dialog, DialogActions, DialogContent, DialogTitle, Slide, Typography
 } from '@material-ui/core';
+
+const styles = theme => ({
+    progress: {
+        margin: theme.spacing.unit * 2
+    },
+    dialog: {
+        minWidth: '550px'
+    }
+});
 
 function Transition(props) {
     return <Slide direction="up" {...props} />;
@@ -18,8 +29,37 @@ class ShowContractDialog extends React.Component {
         this.props.onCancelAction();
     }
 
+    convertData = (data) => {
+        let res = '';
+        let year, m, d;
+
+        year = data.substring(0, 4);
+        m = data.substring(5, 7);
+        d = data.substring(8, 10);
+
+        res = d + '/' + m + '/' + year;
+
+        return res;
+    }
+
+    getAddress = (str, house, flat) => {
+        let res = '';
+
+        res = 'ул. ' + str + ', д. ' + house + ', кв. ' + flat;
+
+        return res;
+    }
+
+    makeCadastral = (number) => {
+        let res = '';
+
+        res = number.substring(0, 2) + ':' + number.substring(2, 4) + ':' + number.substring(4, 11) + ':' + number.substring(11, 13);
+
+        return res;
+    }
+
     render() {
-        const { showDialog, Contract } = this.props;
+        const { showDialog, Contract, classes } = this.props;
 
         if (Contract.client === undefined) {
             return (<div/>);
@@ -37,28 +77,28 @@ class ShowContractDialog extends React.Component {
                     <DialogTitle id="alert-dialog-slide-title">
                         Контракт - подробно
                 </DialogTitle>
-                    <DialogContent>
+                    <DialogContent className={classes.dialog}>
                         <Typography component={'span'} variant="body1">
                             Контракт
                         <ul>
-                                <li>{Contract.contractSumm}</li>
-                                <li>{Contract.prepaid}</li>
-                                <li>{Contract.startDate}</li>
-                                <li>{Contract.finishDate}</li>
+                                <li>Сумма контракта: {Contract.contractSumm} руб.</li>
+                                <li>Аванс: {Contract.prepaid} руб.</li>
+                                <li>Дата начала: {this.convertData(Contract.startDate)}</li>
+                                <li>Дата окончания: {this.convertData(Contract.finishDate)}</li>
                             </ul>
                         </Typography>
                         <Typography component={'span'} variant="body1">
                             Клиент
                         {Contract.clientType === 'Indiv' ?
                                 <ul>
-                                    <li>{Contract.client.surname}</li>
-                                    <li>{Contract.client.name}</li>
-                                    <li>{Contract.client.patronymic}</li>
+                                    <li>Фамилия: {Contract.client.surname}</li>
+                                    <li>Имя: {Contract.client.name}</li>
+                                    <li>Отчество: {Contract.client.patronymic}</li>
                                 </ul> :
                                 <ul>
-                                    <li>{Contract.client.companyName}</li>
-                                    <li>{Contract.client.mailAddress}</li>
-                                    <li>{Contract.client.paymentAccount}</li>
+                                    <li>Название компании: {Contract.client.companyName}</li>
+                                    <li>Эл. почта: {Contract.client.mailAddress}</li>
+                                    <li>Счёт для оплаты: {Contract.client.paymentAccount}</li>
                                 </ul>
                             }
                         </Typography>
@@ -66,31 +106,36 @@ class ShowContractDialog extends React.Component {
                             Объект оценки
                         {Contract.objectType === 'Flat' ?
                                 <ul>
-                                    <li>{Contract.object.area}</li>
-                                    <li>{Contract.object.numberOfRooms}</li>
-                                    <li>{Contract.object.floor}</li>
-                                    <li>{Contract.object.street}</li>
-                                    <li>{Contract.object.house}</li>
+                                    <li>Кадастровый номер: {this.makeCadastral(Contract.object.cadastralNumber.toString())}</li>
+                                    <li>Цель оценки: {Contract.object.aimOfEvaluation}</li>
+                                    <li>Площадь: {Contract.object.area}</li>
+                                    <li>Кол-во комнат: {Contract.object.numberOfRooms}</li>
+                                    <li>Этаж: {Contract.object.floor}</li>
+                                    <li>Адрес: {this.getAddress(Contract.object.street, Contract.object.house, Contract.object.numberOfFlat)}</li>
                                 </ul> :
                                 Contract.objectType === 'Car' ?
                                     <ul>
-                                        <li>{Contract.object.mark}</li>
-                                        <li>{Contract.object.model}</li>
-                                        <li>{Contract.object.licenseNumber}</li>
+                                        <li>Кадастровый номер: Нет</li>
+                                        <li>Цель оценки: {Contract.object.aimOfEvaluation}</li>
+                                        <li>Марка: {Contract.object.mark}</li>
+                                        <li>Модель: {Contract.object.model}</li>
+                                        <li>Номер: {Contract.object.licenseNumber}</li>
                                     </ul> :
                                     <ul>
-                                        <li>{Contract.object.area}</li>
-                                        <li>{Contract.object.usageType}</li>
+                                        <li>Кадастровый номер: {this.makeCadastral(Contract.object.cadastralNumber.toString())}</li>
+                                        <li>Цель оценки: {Contract.object.aimOfEvaluation}</li>
+                                        <li>Площадь: {Contract.object.area}</li>
+                                        <li>Тип использования: {Contract.object.usageType}</li>
                                     </ul>
                             }
                         </Typography>
                         <Typography component={'span'} variant="body1">
                             Оценщик
                         <ul>
-                                <li>{Contract.appraiser.surname}</li>
-                                <li>{Contract.appraiser.name}</li>
-                                <li>{Contract.appraiser.patronymic}</li>
-                                <li>{Contract.appraiser.position}</li>
+                                <li>Фамилия: {Contract.appraiser.surname}</li>
+                                <li>Имя: {Contract.appraiser.name}</li>
+                                <li>Отчество: {Contract.appraiser.patronymic}</li>
+                                <li>Категория: {Contract.appraiser.position}</li>
                             </ul>
                         </Typography>
                     </DialogContent>
@@ -105,4 +150,6 @@ class ShowContractDialog extends React.Component {
     }
 }
 
-export default ShowContractDialog;
+export default compose(
+    withStyles(styles)
+)(ShowContractDialog);
