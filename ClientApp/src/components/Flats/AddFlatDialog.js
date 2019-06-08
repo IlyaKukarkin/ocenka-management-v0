@@ -272,69 +272,6 @@ class AddFlatDialog extends React.Component {
         }
     }
 
-    checkData(day, month, year) {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-
-        if ((day < 1) || (day > 31) || (month < 1) || (month > 12) || (year < 1945) || (year > yyyy)) {
-            return true;
-        } else {
-            switch (month) {
-                case 2:
-                    if (year % 4 === 0) {
-                        if (day > 29) { return true; }
-                    } else {
-                        if (day > 28) { return true; }
-                    }
-                    break;
-                case 4:
-                    if (day > 30) { return true; }
-                    break;
-                case 6:
-                    if (day > 30) { return true; }
-                    break;
-                case 9:
-                    if (day > 30) { return true; }
-                    break;
-                case 11:
-                    if (day > 30) { return true; }
-                    break;
-            }
-        }
-
-        return false;
-    }
-
-    dateLess(firstDate, secondDate) {
-        const day1 = +firstDate.substring(0, 2);
-        const month1 = +firstDate.substring(3, 5);
-        const year1 = +firstDate.substring(6, 10);
-
-        const day2 = +secondDate.substring(0, 2);
-        const month2 = +secondDate.substring(3, 5);
-        const year2 = +secondDate.substring(6, 10);
-
-        if (year1 < year2) {
-            return true;
-        } else {
-            if (year1 === year2) {
-                if (month1 < month2) {
-                    return true;
-                } else {
-                    if (month1 === month2) {
-                        if (day1 < day2) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
     validateForm() {
         let cadastralNumber = false, aimOfEvaluation = false, area = false, numberOfRooms = false, floor = false, city = false, district = false, street = false, house = false, numberOfFlat = false;
 

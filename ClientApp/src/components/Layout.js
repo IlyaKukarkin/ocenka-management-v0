@@ -134,11 +134,11 @@ class Layout extends Component {
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/appraisers" selected={'/appraisers' === pathname}>
                         <MenuText textIndex={4} />
                     </MenuItem>
-                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/address" selected={'/address' === pathname}>
-                        <MenuText textIndex={9} />
-                    </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/flats" selected={'/flats' === pathname}>
-                        <MenuText textIndex={9} />
+                        <MenuText textIndex={10} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/parcels" selected={'/parcels' === pathname}>
+                        <MenuText textIndex={12} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/neural" selected={'/neural' === pathname}>
                         <MenuText textIndex={5} />
@@ -162,9 +162,6 @@ class Layout extends Component {
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/appraisers" selected={'/appraisers' === pathname}>
                         <MenuText textIndex={4} />
                     </MenuItem>
-                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/address" selected={'/address' === pathname}>
-                        <MenuText textIndex={9} />
-                    </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/salary" selected={'/salary' === pathname}>
                         <MenuText textIndex={7} />
                     </MenuItem>
@@ -181,8 +178,11 @@ class Layout extends Component {
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/" selected={'/' === pathname}>
                         <MenuText textIndex={0} />
                     </MenuItem>
-                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/users" selected={'/users' === pathname}>
-                        <MenuText textIndex={6} />
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/contracts" selected={'/contracts' === pathname}>
+                        <MenuText textIndex={1} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/clients" selected={'/clients' === pathname}>
+                        <MenuText textIndex={2} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/appraisers" selected={'/appraisers' === pathname}>
                         <MenuText textIndex={4} />
@@ -190,8 +190,17 @@ class Layout extends Component {
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/address" selected={'/address' === pathname}>
                         <MenuText textIndex={9} />
                     </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/flats" selected={'/flats' === pathname}>
+                        <MenuText textIndex={10} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/parcels" selected={'/parcels' === pathname}>
+                        <MenuText textIndex={12} />
+                    </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/neural" selected={'/neural' === pathname}>
                         <MenuText textIndex={5} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/salary" selected={'/salary' === pathname}>
+                        <MenuText textIndex={7} />
                     </MenuItem>
                 </MenuList>
             </div>

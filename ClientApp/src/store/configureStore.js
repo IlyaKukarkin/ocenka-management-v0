@@ -10,6 +10,7 @@ import * as ClientReducer from './ClientReducer';
 import * as FlatReducer from './FlatReducer';
 import * as ContractReducer from './ContractReducer';
 import * as SalaryReducer from './SalaryReducer';
+import * as ParcelReducer from './ParcelReducer';
 
 export default function configureStore(history, initialState) {
     const reducers = {
@@ -22,6 +23,7 @@ export default function configureStore(history, initialState) {
         flats: FlatReducer.reducer,
         contracts: ContractReducer.reducer,
         salary: SalaryReducer.reducer,
+        parcels: ParcelReducer.reducer,
     };
 
     const middleware = [

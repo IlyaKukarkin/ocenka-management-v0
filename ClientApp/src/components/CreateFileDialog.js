@@ -11,7 +11,7 @@ function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
 
-const headers = ["оценщиками", "пользователями", "адресами", "клиентами", "квартирами", "договорами", "зарплатами"];
+const headers = ["оценщиками", "пользователями", "адресами", "клиентами", "квартирами", "договорами", "зарплатами", "участками", "автомобилями"];
 
 class CreateFileDialog extends React.Component {
     render() {

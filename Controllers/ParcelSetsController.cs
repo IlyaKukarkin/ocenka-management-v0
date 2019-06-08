@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ocenka_management.Models;
+using System.IO;
+using OfficeOpenXml;
+using OfficeOpenXml.Table;
 
 namespace ocenka_management.Controllers
 {
@@ -146,6 +149,74 @@ namespace ocenka_management.Controllers
         private bool ObjectSetParcelExists(int id)
         {
             return _context.ObjectSetParcel.Any(e => e.Id == id);
+        }
+
+        [HttpPost("ToExcel")]
+        public async Task<IActionResult> ToExcel([FromBody] Excel excel)
+        {
+            IEnumerable<ObjectSetParcel> parcels = _context.ObjectSetParcel;
+            IEnumerable<ObjectSet> objects = _context.ObjectSet;
+            List<ObjectSetParcel> parcelsRes = new List<ObjectSetParcel>();
+            ObjectSetParcel prcl = new ObjectSetParcel();
+            ObjectSet obj = new ObjectSet();
+
+            for (int i = 0; i < excel.Ids.Count(); i++)
+            {
+                prcl = parcels.FirstOrDefault(u => u.Id == excel.Ids[i]);
+
+                obj = objects.FirstOrDefault(u => u.Id == prcl.Id);
+                obj.ObjectSetParcel = null;
+                prcl.IdNavigation = obj;
+
+                parcelsRes.Add(prcl);
+            }
+
+            var fileDownloadName = "Участки.xlsx";
+
+            using (var package = createExcelPackage(parcelsRes))
+            {
+                package.SaveAs(new FileInfo(Path.Combine(@"C:\Users\user\Downloads", fileDownloadName)));
+            }
+            return Ok();
+        }
+
+        private ExcelPackage createExcelPackage(IEnumerable<ObjectSetParcel> parcels)
+        {
+            var package = new ExcelPackage();
+            package.Workbook.Properties.Title = "Отчёт - участки";
+            package.Workbook.Properties.Author = "Ocenka Management";
+            package.Workbook.Properties.Subject = "Отчёт - участки";
+            package.Workbook.Properties.Keywords = "Ocenka Management";
+
+
+            var worksheet = package.Workbook.Worksheets.Add("Квартиры");
+
+            //First add the headers
+            worksheet.Cells[1, 1].Value = "Кадастровый номер";
+            worksheet.Cells[1, 2].Value = "Цель оценки";
+            worksheet.Cells[1, 3].Value = "Площадь";
+            worksheet.Cells[1, 4].Value = "Тип использования";
+
+            //Add values
+
+            for (int i = 0; i < parcels.Count(); i++)
+            {
+                worksheet.Cells[i + 2, 1].Value = parcels.ElementAt(i).IdNavigation.CadastralNumber.ToString("##:##:#######:##");
+                worksheet.Cells[i + 2, 2].Value = parcels.ElementAt(i).IdNavigation.AimOfEvaluation;
+                worksheet.Cells[i + 2, 3].Value = parcels.ElementAt(i).Area;
+                worksheet.Cells[i + 2, 4].Value = parcels.ElementAt(i).UsageType;
+            }
+
+            // Add to table / Add summary row
+            var tbl = worksheet.Tables.Add(new ExcelAddressBase(fromRow: 1, fromCol: 1, toRow: parcels.Count() + 1, toColumn: 4), "Data");
+            tbl.ShowHeader = true;
+            tbl.TableStyle = TableStyles.Dark9;
+
+            // AutoFitColumns
+            worksheet.Cells[1, 1, parcels.Count() + 1, 4].AutoFitColumns();
+            worksheet.Cells[1, 1, parcels.Count() + 1, 4].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+
+            return package;
         }
     }
 }
