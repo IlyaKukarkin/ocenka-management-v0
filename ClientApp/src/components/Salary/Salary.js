@@ -1,21 +1,19 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { actionCreators } from '../../store/FlatReducer';
+import { actionCreators } from '../../store/SalaryReducer';
 import TableCardLayout from '../TableCardLayout';
 import MyTableHead from '../TableHead';
 import TableToolbar from '../TableToolbar';
-import DeleteDialog from '../DeleteDialog';
 import CreateFileDialog from '../CreateFileDialog';
 import ErrorFileDialog from '../ErrorFileDialog';
-import ErrorExportDialog from '../ErrorExportDialog';
-import DeleteErrorDialog from '../DeleteErrorDialog';
-import AddFlatDialog from './AddFlatDialog';
+import ShowSalaryDialog from './ShowSalaryDialog';
+import MonthText from '../Home/MonthText';
 import { withStyles } from '@material-ui/core/styles';
 import {
-    Table, TableCell, TableRow, TableBody, TablePagination, IconButton, Checkbox
+    Table, TableCell, TableRow, TableBody, IconButton, Checkbox, Grid
 } from '@material-ui/core';
-import { Edit } from '@material-ui/icons';
+import { Info, NavigateNext, NavigateBefore } from '@material-ui/icons';
 
 const styles = theme => ({
     table: {
@@ -34,6 +32,10 @@ const styles = theme => ({
         maxWidth: '125px',
         whiteSpace: "normal",
         wordWrap: "break-word"
+    },
+    month: {
+        paddingRight: '20px',
+        paddingLeft: '20px'
     }
 });
 
@@ -41,37 +43,29 @@ const rows = [
     { id: 'surname', numeric: false, label: '27' },
     { id: 'contractsCount', numeric: false, label: '28' },
     { id: 'salary', numeric: false, label: '29' },
+]
 
 class Salary extends Component {
     constructor(props) {
         super(props);
 
-        this.handleDeleteClick = this.handleDeleteClick.bind(this);
-        this.showDeleteDialog = this.showDeleteDialog.bind(this);
-        this.showAddDialog = this.showAddDialog.bind(this);
-        this.closeDeleteDialog = this.closeDeleteDialog.bind(this);
-        this.handleAddClick = this.handleAddClick.bind(this);
-        this.closeAddDialog = this.closeAddDialog.bind(this);
         this.closeFileDialog = this.closeFileDialog.bind(this);
         this.closeErrorFileDialog = this.closeErrorFileDialog.bind(this);
-        this.closeErrorExportDialog = this.closeErrorExportDialog.bind(this);
         this.handleExcelClick = this.handleExcelClick.bind(this);
         this.handleSearchChange = this.handleSearchChange.bind(this);
         this.handleEditClick = this.handleEditClick.bind(this);
-        this.closeDeleteErrorDialog = this.closeDeleteErrorDialog.bind(this);
+        this.closeMoreDialog = this.closeMoreDialog.bind(this);
     }
 
     state = {
         order: 'asc',
-        orderBy: 'cadastralNumber',
-        selected: [],
+        orderBy: 'surname',
         data: [],
         page: 0,
+        currMonth: 0,
         search: '',
-        rowsPerPage: 5,
-        showDeleteDialog: false,
-        showAddDialog: false,
         showErrorExportDialog: false,
+        showMoreDialog: false,
         editSalary: {
             month: '',
             surname: '',
@@ -84,12 +78,14 @@ class Salary extends Component {
     };
 
     componentWillMount() {
-        this.props.GetFlatsSet();
+        this.props.GetSalary(0);
+
+        this.getCurrentMonth();
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.flats !== nextProps.flats) {
-            this.setState({ data: nextProps.flats });
+        if (this.props.salary !== nextProps.salary) {
+            this.setState({ data: nextProps.salary });
         }
     }
 
@@ -104,104 +100,47 @@ class Salary extends Component {
         this.setState({ order, orderBy });
     };
 
-    handleSelectAllClick = event => {
-        if (event.target.checked) {
-            this.setState(state => ({ selected: state.data.map(n => n.id) }));
-            return;
-        }
-        this.setState({ selected: [] });
-    };
-
-    handleClick = (event, id) => {
-        const { selected } = this.state;
-        const selectedIndex = selected.indexOf(id);
-        let newSelected = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(
-                selected.slice(0, selectedIndex),
-                selected.slice(selectedIndex + 1),
-            );
-        }
-
-        this.setState({ selected: newSelected });
-    };
-
     handleChangePage = (event, page) => {
         this.setState({ page });
     };
 
-    handleChangeRowsPerPage = event => {
-        this.setState({ rowsPerPage: event.target.value });
-    };
-
-    handleDeleteClick = () => {
-        const { DeleteFlatSet, DeleteFlatsSet } = this.props;
-
-        this.setState({ showDeleteDialog: false });
-        if (this.state.selected.length === 1) {
-            DeleteFlatSet(this.state.selected[0]);
-        } else {
-            DeleteFlatsSet(this.state.selected);
-        }
-
-        this.setState({ selected: [] });
-    }
-
-    handleAddClick = (data) => {
-        this.props.AddFlatSet(data);
-
-        this.setState({ showAddDialog: false });
-    }
-
     handleEditClick = (data) => {
-        this.props.ClearEditFlat();
+        this.props.ClearEditSalary();
 
-        this.props.EditFlatSet(data);
-
-        this.setState({ showAddDialog: false });
+        this.setState({ showMoreDialog: false });
     }
 
-    showDeleteDialog = () => {
-        this.setState({ showDeleteDialog: true });
-    }
-
-    showAddDialog = () => {
-        this.props.ClearEditFlat();
-
-        this.setState({ showAddDialog: true });
-    }
-
-    closeDeleteDialog = () => {
-        this.setState({ showDeleteDialog: false });
+    closeMoreDialog = () => {
+        this.setState({
+            showMoreDialog: false,
+            editSalary: {
+                month: '',
+                surname: '',
+                name: '',
+                patronymic: '',
+                contractsCount: '',
+                contracts: {},
+                salary: '',
+            }
+        });
     }
 
     closeAddDialog = () => {
         this.props.ClearEditFlat();
 
-        this.setState({ showAddDialog: false });
+        this.setState({ showMoreDialog: false });
     }
 
     startEditClick = (event, id) => {
-        let flat = this.findFlat(id);
+        let salary = this.findSalary(id);
 
-        let getFlat = this.props.GetEditFlat(flat);
-
-        getFlat.then((client) => {
-            this.setState({ showAddDialog: true });
-        });
+        this.setState({ showMoreDialog: true, editSalary: salary });
     }
 
-    findFlat = (id) => {
-        for (let i = 0; i < this.props.flats.length; i++) {
-            if (this.props.flats[i].id === id) {
-                return this.props.flats[i];
+    findSalary = (id) => {
+        for (let i = 0; i < this.props.salary.length; i++) {
+            if (this.props.salary[i].id === id) {
+                return this.props.salary[i];
             }
         }
     }
@@ -211,20 +150,7 @@ class Salary extends Component {
     }
 
     handleExcelClick = () => {
-        if (this.state.selected.length !== 0) {
-            const res = { ids: this.state.selected };
-            this.props.ToExcel(res);
-        } else {
-            this.setState({ showErrorExportDialog: true });
-        }
-    }
-
-    closeErrorExportDialog = () => {
-        this.setState({ showErrorExportDialog: false });
-    }
-
-    closeDeleteErrorDialog = () => {
-        this.props.DeleteErrorClose();
+        this.props.ToExcel(this.state.page);
     }
 
     closeFileDialog = () => {
@@ -235,58 +161,78 @@ class Salary extends Component {
         this.props.ToExcelErrorClose();
     }
 
-    isSelected = id => this.state.selected.indexOf(id) !== -1;
+    olderMonth = () => {
+        const pg = this.state.page;
+        const mt = this.state.currMonth;
+        this.props.GetSalary(pg + 1);
+        this.setState({ page: pg + 1 });
+
+        if (mt === 0) {
+            this.setState({ currMonth: 11 });
+        } else {
+            this.setState({ currMonth: mt - 1 });
+        }
+    }
+
+    newerMonth = () => {
+        const pg = this.state.page;
+        const mt = this.state.currMonth;
+        this.props.GetSalary(pg - 1);
+        this.setState({ page: pg - 1 });
+
+        if (mt === 11) {
+            this.setState({ currMonth: 0 });
+        } else {
+            this.setState({ currMonth: mt + 1 });
+        }
+    }
+
+    getCurrentMonth = () => {
+        let currDate = new Date();
+        this.setState({ currMonth: currDate.getMonth() });
+    }
 
     render() {
-        const { classes, isLoading, fileSaved, fileError, editSalary, deleteError } = this.props;
-        const { data, order, orderBy, selected, rowsPerPage, page, showAddDialog, showDeleteDialog, search, showErrorExportDialog } = this.state;
+        const { classes, isLoading, fileSaved, fileError } = this.props;
+        const { data, order, orderBy, page, currMonth, search, showMoreDialog, editSalary } = this.state;
 
         return (
-            <TableCardLayout id={"clnt"} headerIndex={4} isLoading={isLoading} onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} deleteToolbar={<TableToolbar numSelected={selected.length} deleteClick={this.showDeleteDialog.bind(this)} />} addClick={this.showAddDialog.bind(this)} >
-                <DeleteDialog header={4} onDeleteAction={this.handleDeleteClick.bind(this)} onCancelAction={this.closeDeleteDialog.bind(this)} showDialog={showDeleteDialog} />
-                <AddFlatDialog onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)} showDialog={showAddDialog} editSalary={editSalary} />
-                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={4} />
-                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={4} />
-                <ErrorExportDialog onCancelAction={this.closeErrorExportDialog.bind(this)} showDialog={showErrorExportDialog} header={4} />
-                <DeleteErrorDialog onCancelAction={this.closeDeleteErrorDialog.bind(this)} showDialog={deleteError} header={4} />
+            <TableCardLayout id={"sal"} headerIndex={6} isLoading={isLoading} isPartial onSearchChange={this.handleSearchChange.bind(this)} excelClick={this.handleExcelClick.bind(this)} excelDisable={data.length === 0} >
+                <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={6} />
+                <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={6} />
+                <ShowSalaryDialog onCancelAction={this.closeMoreDialog.bind(this)} showDialog={showMoreDialog} Salary={editSalary} header={4} />
                 <div style={{ width: "100%" }}>
                     <div className={classes.tableWrapper}>
                         <Table className={classes.table}>
                             <MyTableHead
-                                numSelected={selected.length}
+                                numSelected={0}
                                 order={order}
                                 orderBy={orderBy}
-                                onSelectAllClick={this.handleSelectAllClick}
                                 onRequestSort={this.handleRequestSort}
                                 rowCount={data.length}
                                 rows={rows}
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(flt => flt.cadastralNumber.toString().includes(search) || flt.aimOfEvaluation.includes(search) || flt.area.toString().includes(search) || flt.numberOfRooms.toString().includes(search) || flt.floor.toString().includes(search) || flt.street.includes(search) || flt.house.toString().includes(search))
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
+                                    .filter(sal => sal.salary.toString().includes(search) || sal.surname.includes(search) || sal.contractsCount.toString().includes(search))
                                     .map(n => {
-                                        const isSelected = this.isSelected(n.id);
                                         return (
                                             <TableRow
                                                 hover
                                                 role="checkbox"
-                                                aria-checked={isSelected}
+                                                aria-checked={false}
                                                 tabIndex={-1}
                                                 key={n.id}
-                                                selected={isSelected}
+                                                selected={false}
                                             >
                                                 <TableCell padding="none" className={classes.narrowCell}>
-                                                    <Checkbox onClick={event => this.handleClick(event, n.id)} checked={isSelected} color="primary"/>
+                                                    <Checkbox checked={false} color="primary"/>
                                                 </TableCell>
-                                                <TableCell align="center" className={classes.cell}>{makeCadastral(n.cadastralNumber.toString())}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.aimOfEvaluation}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.area}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.numberOfRooms}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.floor}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{getAddress(n.street, n.house)}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{getFio(n.surname, n.name, n.patronymic)}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.contractsCount}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{n.salary}</TableCell>
                                                 <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.startEditClick(event, n.id)}>
-                                                    <Edit fontSize="small" />
+                                                    <Info fontSize="small" />
                                                 </IconButton>}</TableCell>
                                             </TableRow>
                                         );
@@ -294,35 +240,25 @@ class Salary extends Component {
                             </TableBody>
                         </Table>
                     </div>
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
-                        component="div"
-                        count={data.filter(flt => flt.cadastralNumber.toString().includes(search) || flt.aimOfEvaluation.includes(search) || flt.area.toString().includes(search) || flt.numberOfRooms.toString().includes(search) || flt.floor.toString().includes(search) || flt.street.includes(search) || flt.house.toString().includes(search)).length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        backIconButtonProps={{
-                            'aria-label': 'Previous Page',
-                        }}
-                        nextIconButtonProps={{
-                            'aria-label': 'Next Page',
-                        }}
-                        onChangePage={this.handleChangePage}
-                        onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                    />
+                    <Grid container justify="flex-end" alignItems="center">
+                        <IconButton onClick={event => this.olderMonth()}>
+                            <NavigateBefore fontSize="small" />
+                        </IconButton>
+                        <MonthText textIndex={currMonth} />
+                        <IconButton disabled={page === 0} onClick={event => this.newerMonth()}>
+                            <NavigateNext fontSize="small" />
+                        </IconButton>
+                    </Grid>
                 </div>
             </TableCardLayout>
         );
     }
 }
 
-function makeCadastral(str) {
-    return str.substr(0, 2) + ":" + str.substr(2, 2) + ":" + str.substr(4, 7) + ":" + str.substr(11, 2);
-}
-
-function getAddress(street, house) {
+function getFio(surname, name, patronymic) {
     let result = "";
 
-    result = street + ", " + house;
+    result = surname + " " + name.substring(0, 1).toUpperCase() + ". " + patronymic.substring(0, 1).toUpperCase() + ".";
 
     return result;
 }
@@ -352,6 +288,6 @@ function getSorting(order, orderBy) {
 }
 
 export default withStyles(styles)(connect(
-    state => state.flats,
+    state => state.salary,
     dispatch => bindActionCreators(actionCreators, dispatch)
 )(Salary));

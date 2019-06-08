@@ -10,7 +10,7 @@ const addressLabel = ["Город", "Район", "Улица", "Дом", "Кв�
     "Фамилия", "Имя", "Отчество", "Дата рождения", "Год начала работы", "Категория",
     "ФИО", "Логин", "Дата рождения", "Год начала работы", "Должность",
     "Кад. номер", "Цель оценки", "Площадь", "Кол-во комнат", "Этаж", "Адрес",
-    "Цена", "Предоплата", "Дата начала", "Дата окончания", "Клиент", "Оценщик", "Договоров выполнил", "Зарплата"];
+    "Цена", "Предоплата", "Дата начала", "Дата окончания", "Клиент", "Оценщик", "Договоров выполнил(а)", "Оклад"];
 
 class MyTableHead extends React.Component {
     createSortHandler = property => event => {
@@ -67,7 +67,7 @@ class MyTableHead extends React.Component {
 MyTableHead.propTypes = {
     numSelected: PropTypes.number.isRequired,
     onRequestSort: PropTypes.func.isRequired,
-    onSelectAllClick: PropTypes.func.isRequired,
+    onSelectAllClick: PropTypes.func,
     order: PropTypes.string.isRequired,
     orderBy: PropTypes.string.isRequired,
     rowCount: PropTypes.number.isRequired,

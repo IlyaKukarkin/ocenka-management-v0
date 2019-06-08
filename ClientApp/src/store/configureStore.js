@@ -9,6 +9,7 @@ import * as LoginReducer from './LoginReducer';
 import * as ClientReducer from './ClientReducer';
 import * as FlatReducer from './FlatReducer';
 import * as ContractReducer from './ContractReducer';
+import * as SalaryReducer from './SalaryReducer';
 
 export default function configureStore(history, initialState) {
     const reducers = {
@@ -20,6 +21,7 @@ export default function configureStore(history, initialState) {
         clients: ClientReducer.reducer,
         flats: FlatReducer.reducer,
         contracts: ContractReducer.reducer,
+        salary: SalaryReducer.reducer,
     };
 
     const middleware = [

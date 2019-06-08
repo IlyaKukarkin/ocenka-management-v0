@@ -101,7 +101,7 @@ export const actionCreators = {
         let url = `api/ContractSets`;
         let myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-        fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
+        return fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
             .then(function (response) {
                 return response.json();
             }).then(function (newContract) {

@@ -41,7 +41,7 @@ const styles = theme => ({
     }
 })
 
-const headers = ["Адреса", "Оценщики", "Пользователи", "Клиенты", "Квартиры", "Договоры"];
+const headers = ["Адреса", "Оценщики", "Пользователи", "Клиенты", "Квартиры", "Договоры", "Зарплата"];
 
 class TableCardLayout extends Component {
     constructor(props) {
@@ -67,7 +67,7 @@ class TableCardLayout extends Component {
     };
 
     render() {
-        const { classes, children, headerIndex, isLoading, deleteToolbar, addClick, isPartial, excelClick } = this.props;
+        const { classes, children, headerIndex, isLoading, deleteToolbar, addClick, isPartial, excelClick, excelDisable } = this.props;
         const { showSearchbar } = this.state;
 
         return <Fragment>
@@ -103,7 +103,7 @@ class TableCardLayout extends Component {
                                         Добавить
                                     </Button>
                                 }
-                                <Button color="secondary" onClick={excelClick}>
+                                <Button color="secondary" onClick={excelClick} disabled={excelDisable}>
                                     <SaveAlt className={classes.leftIcon} />
                                     В Excel
                                 </Button>
