@@ -116,10 +116,6 @@ function HouseMask(props) {
     );
 }
 
-function insertInString(str, index, value) {
-    return str.substr(0, index) + value + str.substr(index);
-}
-
 function makeCadastral(str) {
     return str.substr(0, 2) + ":" + str.substr(2, 2) + ":" + str.substr(4, 7) + ":" + str.substr(11, 2);
 }
@@ -184,31 +180,6 @@ class AddFlatDialog extends React.Component {
                 numberOfFlat: nextProps.editFlat.numberOfFlat,
             });
         }
-    }
-
-    convertData = (data) => {
-        let res = '';
-        let year, m, d;
-
-        year = data.substring(0, 4);
-        m = data.substring(5, 7);
-        d = data.substring(8, 10);
-
-        res = d + '/' + m + '/' + year;
-
-        return res;
-    }
-
-    replaceDayAndMonth = (data) => {
-        let res, day, mon, year;
-
-        day = data.substring(0, 2);
-        mon = data.substring(3, 5);
-        year = data.substring(6, 10);
-
-        res = mon + '/' + day + '/' + year;
-
-        return res;
     }
 
     submitHandler(evt) {

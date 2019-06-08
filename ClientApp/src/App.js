@@ -11,6 +11,7 @@ import Flats from './components/Flats/Flats';
 import Contracts from './components/Contracts/Contracts';
 import Salary from './components/Salary/Salary';
 import Parcels from './components/Parcels/Parcels';
+import Cars from './components/Cars/Cars';
 
 export default () => (
     <Layout>
@@ -25,6 +26,7 @@ export default () => (
             <Route path='/contracts' component={Contracts} />
             <Route path='/salary' component={Salary} />
             <Route path='/parcels' component={Parcels} />
+            <Route path='/cars' component={Cars} />
         </Switch>
     </Layout>
 );

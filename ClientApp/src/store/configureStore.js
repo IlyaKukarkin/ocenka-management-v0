@@ -11,6 +11,7 @@ import * as FlatReducer from './FlatReducer';
 import * as ContractReducer from './ContractReducer';
 import * as SalaryReducer from './SalaryReducer';
 import * as ParcelReducer from './ParcelReducer';
+import * as CarReducer from './CarReducer';
 
 export default function configureStore(history, initialState) {
     const reducers = {
@@ -24,6 +25,7 @@ export default function configureStore(history, initialState) {
         contracts: ContractReducer.reducer,
         salary: SalaryReducer.reducer,
         parcels: ParcelReducer.reducer,
+        cars: CarReducer.reducer,
     };
 
     const middleware = [

@@ -1,15 +1,15 @@
-﻿const getParcelsStart = 'GET_PARCELS_START';
-const getParcelsFinish = 'GET_PARCELS_FINISH';
-const deleteParcelStart = 'DELETE_PARCEL_START';
-const deleteParcelFinish = 'DELETE_PARCEL_FINISH';
-const addParcelStart = 'ADD_PARCEL_START';
-const addParcelFinish = 'ADD_PARCEL_FINISH';
-const getEditParcelStart = 'GET_EDIT_PARCEL_START';
-const getEditParcelFinish = 'GET_EDIT_PARCEL_FINISH';
-const editParcelStart = 'EDIT_PARCEL_START';
-const editParcelFinish = 'EDIT_PARCEL_FINISH';
-const deleteParcelsStart = 'DELETE_PARCELS_START';
-const deleteParcelsFinish = 'DELETE_PARCELS_FINISH';
+﻿const getCarsStart = 'GET_CARS_START';
+const getCarsFinish = 'GET_CARS_FINISH';
+const deleteCarStart = 'DELETE_CAR_START';
+const deleteCarFinish = 'DELETE_CAR_FINISH';
+const addCarStart = 'ADD_CAR_START';
+const addCarFinish = 'ADD_CAR_FINISH';
+const getEditCarStart = 'GET_EDIT_CAR_START';
+const getEditCarFinish = 'GET_EDIT_CAR_FINISH';
+const editCarStart = 'EDIT_CAR_START';
+const editCarFinish = 'EDIT_CAR_FINISH';
+const deleteCarsStart = 'DELETE_CARS_START';
+const deleteCarsFinish = 'DELETE_CARS_FINISH';
 const toExcelStart = 'TO_EXCEL_START';
 const toExcelFinish = 'TO_EXCEL_FINISH';
 const toExcelError = 'TO_EXCEL_ERROR';
@@ -17,24 +17,24 @@ const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
 const toExcelClose = 'TO_EXCEL_CLOSE';
 const deleteError = 'DELETE_ERROR';
 const deleteErrorClose = 'DELETE_ERROR_CLOSE';
-const clearEditParcel = 'CLEAR_EDIT_PARCEL';
-const initialState = { parcels: [], editParcel: {}, isLoading: false, fileSaved: false, fileError: false, deleteError: false };
+const clearEditCar = 'CLEAR_EDIT_CAR';
+const initialState = { cars: [], editCar: {}, isLoading: false, fileSaved: false, fileError: false, deleteError: false };
 
 export const actionCreators = {
-    GetParcelsSet: () => async (dispatch) => {
-        dispatch({ type: getParcelsStart });
+    GetCarsSet: () => async (dispatch) => {
+        dispatch({ type: getCarsStart });
 
-        const url = `api/ParcelSets`;
+        const url = `api/CarSets`;
         const response = await fetch(url);
-        const parcels = await response.json();
+        const cars = await response.json();
 
-        dispatch({ type: getParcelsFinish, parcels });
+        dispatch({ type: getCarsFinish, cars });
     },
-    ClearEditParcel: () => async (dispatch) => {
-        dispatch({ type: clearEditParcel });        
+    ClearEditCar: () => async (dispatch) => {
+        dispatch({ type: clearEditCar });        
     },
-    DeleteParcelSet: (id) => async (dispatch) => {
-        dispatch({ type: deleteParcelStart });
+    DeleteCarSet: (id) => async (dispatch) => {
+        dispatch({ type: deleteCarStart });
 
         const url2 = `api/ObjectSets/${id}`;
         fetch(url2, { method: 'delete' })
@@ -42,12 +42,12 @@ export const actionCreators = {
                 if (response.status === 500) {
                     dispatch({ type: deleteError });
                 } else {
-                    dispatch({ type: deleteParcelFinish, id });
+                    dispatch({ type: deleteCarFinish, id });
                 }
             });
     },
-    DeleteParcelsSet: (idSet) => async (dispatch) => {
-        dispatch({ type: deleteParcelsStart });
+    DeleteCarsSet: (idSet) => async (dispatch) => {
+        dispatch({ type: deleteCarsStart });
 
         idSet.forEach(async function (id) {
             const url2 = `api/ObjectSets/${id}`;
@@ -56,13 +56,13 @@ export const actionCreators = {
                     if (response.status === 500) {
                         dispatch({ type: deleteError });
                     } else {
-                        dispatch({ type: deleteParcelFinish, id });
+                        dispatch({ type: deleteCarFinish, id });
                     }
                 });
         });
     },
-    AddParcelSet: (data) => async (dispatch) => {
-        dispatch({ type: addParcelStart });
+    AddCarSet: (data) => async (dispatch) => {
+        dispatch({ type: addCarStart });
 
         let url = `api/ObjectSets`;
         let myHeaders = new Headers();
@@ -70,46 +70,46 @@ export const actionCreators = {
         fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
             .then(function (response) {
                 return response.json();
-            }).then(function (newObject) {              
+            }).then(function (newObject) {
                 data['id'] = newObject.id;
-                fetch('api/ParcelSets', { method: 'post', body: JSON.stringify(data), headers: myHeaders })
+                fetch('api/CarSets', { method: 'post', body: JSON.stringify(data), headers: myHeaders })
                     .then(function (response) {
                         return response.json();
                     }).then(function (newClient2) {
-                        dispatch({ type: addParcelFinish, data });
+                        dispatch({ type: addCarFinish, data });
                     });
             });
     },
-    GetEditParcel: (data) => async (dispatch) => {
-        dispatch({ type: getEditParcelStart, data });
+    GetEditCar: (data) => async (dispatch) => {
+        dispatch({ type: getEditCarStart, data });
     },
-    EditParcelSet: (data) => async (dispatch) => {
-        dispatch({ type: editParcelStart });
+    EditCarSet: (data) => async (dispatch) => {
+        dispatch({ type: editCarStart });
 
-        let parcel = {
+        let car = {
             id: data.id,
-            area: data.area, usageType: data.usageType
+            mark: data.mark, model: data.model, year: data.year, licenseNumber: data.licenseNumber
         };
         let object = {
             id: data.id,
             cadastralNumber: data.cadastralNumber, aimOfEvaluation: data.aimOfEvaluation
         };
-        
+
         let myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
         fetch(`api/ObjectSets/${data.id}`, { method: 'put', body: JSON.stringify(object), headers: myHeaders })
             .then(function () {
-                fetch(`api/ParcelSets/${data.id}`, { method: 'put', body: JSON.stringify(parcel), headers: myHeaders })
+                fetch(`api/CarSets/${data.id}`, { method: 'put', body: JSON.stringify(car), headers: myHeaders })
                     .then(function () {
-                        dispatch({ type: editParcelFinish, data });
+                        dispatch({ type: editCarFinish, data });
                     });
             });
     },
     ToExcel: (data) => async (dispatch) => {
         dispatch({ type: toExcelStart });
 
-        const url = `api/ParcelSets/ToExcel`;
+        const url = `api/CarSets/ToExcel`;
         let myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         fetch(url, { method: 'post', body: JSON.stringify(data), headers: myHeaders })
@@ -135,70 +135,70 @@ export const actionCreators = {
 export const reducer = (state, action) => {
     state = state || initialState;
 
-    if (action.type === getParcelsStart) {
+    if (action.type === getCarsStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === getParcelsFinish) {
-        let oldParcels = action.parcels;
-        let newParcels = [];
+    if (action.type === getCarsFinish) {
+        let oldCars = action.cars;
+        let newCars = [];
 
-        for (let i = 0; i < oldParcels.length; i++) {
-            newParcels.push({
-                id: oldParcels[i].id, area: oldParcels[i].area, usageType: oldParcels[i].usageType,
-                cadastralNumber: oldParcels[i].idNavigation.cadastralNumber, aimOfEvaluation: oldParcels[i].idNavigation.aimOfEvaluation
+        for (let i = 0; i < oldCars.length; i++) {
+            newCars.push({
+                id: oldCars[i].id, mark: oldCars[i].mark, model: oldCars[i].model, year: oldCars[i].year, licenseNumber: oldCars[i].licenseNumber,
+                cadastralNumber: oldCars[i].idNavigation.cadastralNumber, aimOfEvaluation: oldCars[i].idNavigation.aimOfEvaluation
             });
         }
 
         return {
             ...state,
-            parcels: newParcels,
+            cars: newCars,
             isLoading: false
         };
     }
 
-    if (action.type === deleteParcelStart) {
+    if (action.type === deleteCarStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === deleteParcelFinish) {
+    if (action.type === deleteCarFinish) {
 
-        let newParcelss = state.parcels;
+        let newClients = state.cars;
 
-        for (var i = 0; i < newParcelss.length; i++) {
-            if (newParcelss[i].id === action.id) {
-                newParcelss.splice(i, 1);
+        for (var i = 0; i < newClients.length; i++) {
+            if (newClients[i].id === action.id) {
+                newClients.splice(i, 1);
             }
         }
 
         return {
             ...state,
-            parcels: newParcelss,
+            cars: newClients,
             isLoading: false
         };
     }
 
-    if (action.type === deleteParcelsStart) {
+    if (action.type === deleteCarsStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === deleteParcelsFinish) {
+    if (action.type === deleteCarsFinish) {
 
-        let newParcels = state.parcels;
+        let newCars = state.cars;
 
         for (var j = 0; j < action.idSet.length; j++) {
-            for (var k = 0; k < newParcels.length; k++) {
-                if (newParcels[k].id === action.idSet[j]) {
-                    newParcels.splice(k, 1);
+            for (var k = 0; k < newCars.length; k++) {
+                if (newCars[k].id === action.idSet[j]) {
+                    newCars.splice(k, 1);
                     break;
                 }
             }
@@ -206,50 +206,50 @@ export const reducer = (state, action) => {
 
         return {
             ...state,
-            parcels: newParcels,
+            cars: newCars,
             isLoading: false
         };
     }
 
-    if (action.type === addParcelStart) {
+    if (action.type === addCarStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === addParcelFinish) {
-        let parcels = state.parcels;
-        let newParcel = action.data;
+    if (action.type === addCarFinish) {
+        let cars = state.cars;
+        let newCar = action.data;
 
-        parcels.push(newParcel);
+        cars.push(newCar);
 
         return {
             ...state,
-            parcels: parcels,
+            cars: cars,
             isLoading: false
         };
     }
 
-    if (action.type === editParcelStart) {
+    if (action.type === editCarStart) {
         return {
             ...state,
             isLoading: true
         };
     }
 
-    if (action.type === editParcelFinish) {
+    if (action.type === editCarFinish) {
 
-        let parcels = state.parcels;
-        let newParcel = action.data;
+        let cars = state.cars;
+        let newCar = action.data;
 
-        const prcIndex = parcels.findIndex(u => u.id === newParcel.id);
+        const fltIndex = cars.findIndex(u => u.id === newCar.id);
 
-        parcels[prcIndex] = newParcel;
+        cars[fltIndex] = newCar;
 
         return {
             ...state,
-            parcels: parcels,
+            cars: cars,
             isLoading: false
         };
     }
@@ -282,17 +282,17 @@ export const reducer = (state, action) => {
         };
     }
 
-    if (action.type === getEditParcelStart) {
+    if (action.type === getEditCarStart) {
         return {
             ...state,
-            editParcel: action.data
+            editCar: action.data
         };
     }
 
-    if (action.type === clearEditParcel) {
+    if (action.type === clearEditCar) {
         return {
             ...state,
-            editParcel: {}
+            editCar: {}
         };
     }
 

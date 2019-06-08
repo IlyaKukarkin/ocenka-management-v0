@@ -189,7 +189,7 @@ namespace ocenka_management.Controllers
             package.Workbook.Properties.Keywords = "Ocenka Management";
 
 
-            var worksheet = package.Workbook.Worksheets.Add("Квартиры");
+            var worksheet = package.Workbook.Worksheets.Add("Участки");
 
             //First add the headers
             worksheet.Cells[1, 1].Value = "Кадастровый номер";
