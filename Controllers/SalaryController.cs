@@ -364,12 +364,12 @@ namespace ocenka_management.Controllers
                 itog = res - prepaid;
 
                 worksheet.Cells[i + 2, 1].Value = getFio(salary.ElementAt(i).Surname, salary.ElementAt(i).Name, salary.ElementAt(i).Patronymic);
-                worksheet.Cells[i + 2, 2].Value = salary.ElementAt(i).Salary.ToString("0.##");
-                worksheet.Cells[i + 2, 3].Value = koeff.ToString("0.##");
-                worksheet.Cells[i + 2, 4].Value = ndfl.ToString("0.##");
-                worksheet.Cells[i + 2, 5].Value = res.ToString("0.##");
-                worksheet.Cells[i + 2, 6].Value = prepaid.ToString("0.##");
-                worksheet.Cells[i + 2, 7].Value = itog.ToString("0.##");
+                worksheet.Cells[i + 2, 2].Value = Math.Round(salary.ElementAt(i).Salary, MidpointRounding.ToEven);
+                worksheet.Cells[i + 2, 3].Value = Math.Round(koeff, MidpointRounding.ToEven);
+                worksheet.Cells[i + 2, 4].Value = Math.Round(ndfl, MidpointRounding.ToEven);
+                worksheet.Cells[i + 2, 5].Value = Math.Round(res, MidpointRounding.ToEven);
+                worksheet.Cells[i + 2, 6].Value = Math.Round(prepaid, MidpointRounding.ToEven);
+                worksheet.Cells[i + 2, 7].Value = Math.Round(itog, MidpointRounding.ToEven);
             }
 
             // Add to table / Add summary row

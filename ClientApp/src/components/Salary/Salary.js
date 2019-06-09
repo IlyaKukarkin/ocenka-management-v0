@@ -214,7 +214,7 @@ class Salary extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(sal => sal.salary.toString().includes(search) || sal.surname.includes(search) || sal.contractsCount.toString().includes(search))
+                                    .filter(sal => sal.salary.toString().includes(search.toLowerCase()) || sal.surname.toLowerCase().includes(search.toLowerCase()) || sal.contractsCount.toString().includes(search.toLowerCase()))
                                     .map(n => {
                                         return (
                                             <TableRow

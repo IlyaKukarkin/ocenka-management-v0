@@ -283,7 +283,7 @@ class Users extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search) || apr.birthday.includes(search) || apr.worksSince.includes(search) || apr.login.includes(search))
+                                    .filter(apr => apr.surname.toLowerCase().includes(search.toLowerCase()) || apr.name.toLowerCase().includes(search.toLowerCase()) || apr.patronymic.toLowerCase().includes(search.toLowerCase()) || apr.birthday.includes(search.toLowerCase()) || apr.worksSince.includes(search.toLowerCase()) || apr.login.toLowerCase().includes(search.toLowerCase()))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -316,7 +316,7 @@ class Users extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.filter(apr => apr.surname.includes(search) || apr.name.includes(search) || apr.patronymic.includes(search) || apr.birthday.includes(search) || apr.worksSince.includes(search) || apr.login.includes(search)).length}
+                        count={data.filter(apr => apr.surname.toLowerCase().includes(search.toLowerCase()) || apr.name.toLowerCase().includes(search.toLowerCase()) || apr.patronymic.toLowerCase().includes(search.toLowerCase()) || apr.birthday.includes(search.toLowerCase()) || apr.worksSince.includes(search.toLowerCase()) || apr.login.toLowerCase().includes(search.toLowerCase())).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{

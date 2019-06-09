@@ -265,7 +265,7 @@ class Cars extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(cr => cr.aimOfEvaluation.includes(search) || cr.year.toString().includes(search) || cr.mark.includes(search) || cr.model.includes(search) || cr.licenseNumber.includes(search))
+                                    .filter(cr => cr.aimOfEvaluation.toLowerCase().includes(search.toLowerCase()) || cr.year.toString().includes(search.toLowerCase()) || cr.mark.toLowerCase().includes(search.toLowerCase()) || cr.model.toLowerCase().includes(search.toLowerCase()) || cr.licenseNumber.toLowerCase().includes(search.toLowerCase()))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -298,7 +298,7 @@ class Cars extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.filter(cr => cr.aimOfEvaluation.includes(search) || cr.year.toString().includes(search) || cr.mark.includes(search) || cr.model.includes(search) || cr.licenseNumber.includes(search)).length}
+                        count={data.filter(cr => cr.aimOfEvaluation.toLowerCase().includes(search.toLowerCase()) || cr.year.toString().includes(search.toLowerCase()) || cr.mark.toLowerCase().includes(search.toLowerCase()) || cr.model.toLowerCase().includes(search.toLowerCase()) || cr.licenseNumber.toLowerCase().includes(search.toLowerCase())).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{

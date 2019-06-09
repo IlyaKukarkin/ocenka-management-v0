@@ -271,7 +271,7 @@ class Flats extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(flt => flt.cadastralNumber.toString().includes(search) || flt.aimOfEvaluation.includes(search) || flt.area.toString().includes(search) || flt.numberOfRooms.toString().includes(search) || flt.floor.toString().includes(search) || flt.street.includes(search) || flt.house.toString().includes(search))
+                                    .filter(flt => flt.cadastralNumber.toString().includes(search.toLowerCase()) || flt.aimOfEvaluation.toLowerCase().includes(search.toLowerCase()) || flt.area.toString().includes(search.toLowerCase()) || flt.numberOfRooms.toString().includes(search.toLowerCase()) || flt.floor.toString().includes(search.toLowerCase()) || flt.street.toLowerCase().includes(search.toLowerCase()) || flt.house.toString().includes(search.toLowerCase()))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -305,7 +305,7 @@ class Flats extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.filter(flt => flt.cadastralNumber.toString().includes(search) || flt.aimOfEvaluation.includes(search) || flt.area.toString().includes(search) || flt.numberOfRooms.toString().includes(search) || flt.floor.toString().includes(search) || flt.street.includes(search) || flt.house.toString().includes(search)).length}
+                        count={data.filter(flt => flt.cadastralNumber.toString().includes(search.toLowerCase()) || flt.aimOfEvaluation.toLowerCase().includes(search.toLowerCase()) || flt.area.toString().includes(search.toLowerCase()) || flt.numberOfRooms.toString().includes(search.toLowerCase()) || flt.floor.toString().includes(search.toLowerCase()) || flt.street.toLowerCase().includes(search.toLowerCase()) || flt.house.toString().includes(search.toLowerCase())).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{

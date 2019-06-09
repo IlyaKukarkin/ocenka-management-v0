@@ -273,7 +273,7 @@ class Clients extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(clnt => clnt.surname.includes(search) || clnt.name.includes(search) || clnt.patronymic.includes(search) || clnt.dateOfBirth.includes(search) || clnt.street.includes(search) || clnt.house.toString().includes(search))
+                                    .filter(clnt => clnt.surname.toLowerCase().includes(search.toLowerCase()) || clnt.name.toLowerCase().includes(search.toLowerCase()) || clnt.patronymic.toLowerCase().includes(search.toLowerCase()) || clnt.dateOfBirth.includes(search.toLowerCase()) || clnt.street.toLowerCase().includes(search.toLowerCase()) || clnt.house.toString().includes(search.toLowerCase()))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -306,7 +306,7 @@ class Clients extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.filter(clnt => clnt.surname.includes(search) || clnt.name.includes(search) || clnt.patronymic.includes(search) || clnt.dateOfBirth.includes(search) || clnt.street.includes(search) || clnt.house.toString().includes(search)).length}
+                        count={data.filter(clnt => clnt.surname.toLowerCase().includes(search.toLowerCase()) || clnt.name.toLowerCase().includes(search.toLowerCase()) || clnt.patronymic.toLowerCase().includes(search.toLowerCase()) || clnt.dateOfBirth.includes(search.toLowerCase()) || clnt.street.toLowerCase().includes(search.toLowerCase()) || clnt.house.toString().includes(search.toLowerCase())).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{

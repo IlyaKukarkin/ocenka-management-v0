@@ -141,7 +141,7 @@ class Layout extends Component {
                         <MenuText textIndex={12} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/cars" selected={'/cars' === pathname}>
-                        <MenuText textIndex={13} />
+                        <MenuText textIndex={11} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/neural" selected={'/neural' === pathname}>
                         <MenuText textIndex={5} />
@@ -158,9 +158,6 @@ class Layout extends Component {
                 <MenuList>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/" selected={'/' === pathname}>
                         <MenuText textIndex={0} />
-                    </MenuItem>
-                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/users" selected={'/users' === pathname}>
-                        <MenuText textIndex={6} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/appraisers" selected={'/appraisers' === pathname}>
                         <MenuText textIndex={4} />
@@ -187,12 +184,6 @@ class Layout extends Component {
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/clients" selected={'/clients' === pathname}>
                         <MenuText textIndex={2} />
                     </MenuItem>
-                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/appraisers" selected={'/appraisers' === pathname}>
-                        <MenuText textIndex={4} />
-                    </MenuItem>
-                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/address" selected={'/address' === pathname}>
-                        <MenuText textIndex={9} />
-                    </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/flats" selected={'/flats' === pathname}>
                         <MenuText textIndex={10} />
                     </MenuItem>
@@ -200,7 +191,10 @@ class Layout extends Component {
                         <MenuText textIndex={12} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/cars" selected={'/cars' === pathname}>
-                        <MenuText textIndex={13} />
+                        <MenuText textIndex={11} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/users" selected={'/users' === pathname}>
+                        <MenuText textIndex={6} />
                     </MenuItem>
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/neural" selected={'/neural' === pathname}>
                         <MenuText textIndex={5} />

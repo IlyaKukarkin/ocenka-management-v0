@@ -81,7 +81,7 @@ class ShowContractDialog extends React.Component {
                         <Typography component={'span'} variant="body1">
                             Контракт
                         <ul>
-                                <li>Сумма контракта: {Contract.contractSumm} руб.</li>
+                                <li>Сумма договора: {Contract.contractSumm} руб.</li>
                                 <li>Аванс: {Contract.prepaid} руб.</li>
                                 <li>Дата начала: {this.convertData(Contract.startDate)}</li>
                                 <li>Дата окончания: {this.convertData(Contract.finishDate)}</li>

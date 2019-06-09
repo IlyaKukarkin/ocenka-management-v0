@@ -55,7 +55,7 @@ class ShowSalaryDialog extends React.Component {
                                 <li>Фамилия: {Salary.surname}</li>
                                 <li>Имя: {Salary.name}</li>
                                 <li>Отчество: {Salary.patronymic}</li>
-                                <li>Выполнил контрактов: {Salary.contractsCount}</li>
+                                <li>Выполнил договоров: {Salary.contractsCount}</li>
                                 <li>Зарплата: {Salary.salary} руб.</li>
                             </ul>
                         </Typography>
@@ -123,7 +123,7 @@ const convertData = (data) => {
 const Contract = ({ contract }) => {
     return (
         <ul>
-            <li>Сумма контракта: {contract.contractSumm}</li>
+            <li>Сумма договора: {contract.contractSumm}</li>
             <li>Дата начала: {convertData(contract.startDate)}</li>
             <li>Дата окончания: {convertData(contract.finishDate)}</li>
         </ul>

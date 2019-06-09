@@ -118,6 +118,7 @@ class Neural extends React.Component {
             district: '',
             year: '',
             walls: '',
+            price: '',
             livingAreaError: false,
             kitchenAreaError: false,
             numberOfRoomsError: false,
@@ -144,6 +145,8 @@ class Neural extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (this.props.settings !== nextProps.settings)
             this.setState({ data: nextProps.settings[0] });
+        if (this.props.price !== nextProps.price)
+            this.setState({ price: nextProps.price.toString() });
     }
 
     submitHandler() {
@@ -189,31 +192,61 @@ class Neural extends React.Component {
     validateForm() {
         let livingArea = false, kitchenArea = false, numberOfRooms = false, floor = false, numberOfFloors = false, district = false, year = false, walls = false;
 
-        if (this.state.livingArea === "") {
+        if (this.state.livingArea !== "") {
+            if (this.state.livingArea < 1) {
+                this.setState({ livingAreaLabel: "Жилая площадь не равна нулю" });
+                this.setState({ livingAreaError: true });
+                livingArea = true;
+            }
+        } else {
             this.setState({ livingAreaLabel: "Введите жилую площадь" });
             this.setState({ livingAreaError: true });
             livingArea = true;
         }
 
-        if (this.state.kitchenArea === "") {
+        if (this.state.kitchenArea !== "") {
+            if (this.state.kitchenArea < 1) {
+                this.setState({ kitchenAreaLabel: "Площадь кухни не равна нулю" });
+                this.setState({ kitchenAreaError: true });
+                kitchenArea = true;
+            }
+        } else {
             this.setState({ kitchenAreaLabel: "Введите площадь кухни" });
             this.setState({ kitchenAreaError: true });
             kitchenArea = true;
         }
 
-        if (this.state.numberOfRooms === "") {
+        if (this.state.numberOfRooms !== "") {
+            if (this.state.numberOfRooms < 1) {
+                this.setState({ numberOfRoomsLabel: "Кол-во комнат не равно нулю" });
+                this.setState({ numberOfRoomsError: true });
+                numberOfRooms = true;
+            }
+        } else {
             this.setState({ numberOfRoomsLabel: "Введите кол-во комнат" });
             this.setState({ numberOfRoomsError: true });
             numberOfRooms = true;
         }
 
-        if (this.state.floor === "") {
+        if (this.state.floor !== "") {
+            if (this.state.floor < 1) {
+                this.setState({ floorLabel: "Этаж не равен нулю" });
+                this.setState({ floorError: true });
+                floor = true;
+            }
+        } else {
             this.setState({ floorLabel: "Введите этаж" });
             this.setState({ floorError: true });
             floor = true;
         }
 
-        if (this.state.numberOfFloors === "") {
+        if (this.state.numberOfFloors !== "") {
+            if (this.state.numberOfFloors < 1) {
+                this.setState({ numberOfFloorsLabel: "Кол-во этажей не равно нулю" });
+                this.setState({ numberOfFloorsError: true });
+                numberOfFloors = true;
+            }
+        } else {
             this.setState({ numberOfFloorsLabel: "Введите кол-во этажей" });
             this.setState({ numberOfFloorsError: true });
             numberOfFloors = true;
@@ -384,8 +417,8 @@ class Neural extends React.Component {
     }
 
     render() {
-        const { classes, isLoading, price } = this.props;
-        const { data } = this.state;
+        const { classes, isLoading } = this.props;
+        const { data, price } = this.state;
 
         const distr = [
             { value: 'Центр', label: 'Центр' }, { value: 'Разгуляй', label: 'Разгуляй' },
@@ -598,13 +631,25 @@ class Neural extends React.Component {
                                     </MenuItem>
                                 ))}
                             </TextField>
-                            <Typography className={classes.result} variant="h6">Стоимость квартиры (руб): {price === 0 ? 'Н/Д' : parseInt(price, 10)}</Typography>
+                            <Typography className={classes.result} variant="h6">Стоимость квартиры (руб): {price === '' ? 'Н/Д' : getPrice(price)}</Typography>
                         </Grid>
                     </Grid>
                 }
             </div>
         );
     }
+}
+
+function getPrice(price) {
+    let result = "";
+
+    const ind = price.indexOf('.');
+
+    result = price.substring(0, ind);
+
+    result = result.replace(/\B(?=(\d{3})+(?!\d))/g, " ");;
+
+    return result;
 }
 
 export default withStyles(styles)(connect(

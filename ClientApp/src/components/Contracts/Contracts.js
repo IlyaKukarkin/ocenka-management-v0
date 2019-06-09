@@ -281,7 +281,8 @@ class Contracts extends Component {
                 <AddContractDialog
                     isLoading={addIsLoading} indivList={indivList} entList={entList} flatList={flatList} carList={carList} parcelList={parcelList} apprList={apprList}
                     onAddAction={this.handleAddClick.bind(this)} onEditAction={this.handleEditClick.bind(this)} onCancelAction={this.closeAddDialog.bind(this)}
-                    showDialog={showAddDialog} editContract={editContract} />
+                    showDialog={showAddDialog} editContract={editContract}
+                />
                 <ShowContractDialog onCancelAction={this.closeMoreDialog.bind(this)} showDialog={showMoreDialog} Contract={moreContract} />
                 <CreateFileDialog onCancelAction={this.closeFileDialog.bind(this)} showDialog={fileSaved} header={5} />
                 <ErrorFileDialog onCancelAction={this.closeErrorFileDialog.bind(this)} showDialog={fileError} header={5} />
@@ -300,7 +301,7 @@ class Contracts extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(cntr => cntr.contractSumm.toString().includes(search) || cntr.prepaid.toString().includes(search) || cntr.startDate.includes(search) || cntr.finishDate.includes(search) || (cntr.client.surname && cntr.client.surname.includes(search)) || (cntr.client.companyName && cntr.client.companyName.includes(search)) || cntr.appraiser.surname.includes(search))
+                                    .filter(cntr => cntr.contractSumm.toString().toLowerCase().includes(search.toLowerCase()) || cntr.prepaid.toString().toLowerCase().includes(search.toLowerCase()) || cntr.startDate.includes(search.toLowerCase()) || cntr.finishDate.includes(search.toLowerCase()) || (cntr.client.surname && cntr.client.surname.toLowerCase().includes(search.toLowerCase())) || (cntr.client.companyName && cntr.client.companyName.toLowerCase().includes(search.toLowerCase())) || cntr.appraiser.surname.toLowerCase().includes(search.toLowerCase()))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -341,7 +342,7 @@ class Contracts extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.filter(cntr => cntr.contractSumm.toString().includes(search) || cntr.prepaid.toString().includes(search) || cntr.startDate.includes(search) || cntr.finishDate.includes(search) || (cntr.client.surname && cntr.client.surname.includes(search)) || (cntr.client.companyName && cntr.client.companyName.includes(search)) || cntr.appraiser.surname.includes(search)).length}
+                        count={data.filter(cntr => cntr.contractSumm.toString().toLowerCase().includes(search.toLowerCase()) || cntr.prepaid.toString().toLowerCase().includes(search.toLowerCase()) || cntr.startDate.includes(search.toLowerCase()) || cntr.finishDate.includes(search.toLowerCase()) || (cntr.client.surname && cntr.client.surname.toLowerCase().includes(search.toLowerCase())) || (cntr.client.companyName && cntr.client.companyName.toLowerCase().includes(search.toLowerCase())) || cntr.appraiser.surname.toLowerCase().includes(search.toLowerCase())).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{

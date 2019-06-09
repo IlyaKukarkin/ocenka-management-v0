@@ -96,7 +96,7 @@ class AddContractDialog extends React.Component {
             appraiserIdError: false,
             clientIdError: false,
             objectIdError: false,
-            contractSummLabel: "Сумма контракта",
+            contractSummLabel: "Сумма договора",
             prepaidLabel: "Аванс",
             startDateLabel: "Дата начала",
             finishDateLabel: "Дата окончания",
@@ -133,7 +133,7 @@ class AddContractDialog extends React.Component {
         m = data.substring(5, 7);
         d = data.substring(8, 10);
 
-        res = m + '/' + d + '/' + year;
+        res = d + '/' + m + '/' + year;
 
         return res;
     }
@@ -194,7 +194,7 @@ class AddContractDialog extends React.Component {
                 appraiserIdError: false,
                 clientIdError: false,
                 objectIdError: false,
-                contractSummLabel: "Сумма контракта",
+                contractSummLabel: "Сумма договора",
                 prepaidLabel: "Аванс",
                 startDateLabel: "Дата начала",
                 finishDateLabel: "Дата окончания",
@@ -440,7 +440,7 @@ class AddContractDialog extends React.Component {
         }
 
         if (!contractSumm) {
-            this.setState({ contractSummLabel: "Сумма контракта" });
+            this.setState({ contractSummLabel: "Сумма договора" });
             this.setState({ contractSummError: false });
         }
 
@@ -545,7 +545,7 @@ class AddContractDialog extends React.Component {
             appraiserIdError: false,
             clientIdError: false,
             objectIdError: false,
-            contractSummLabel: "Сумма контракта",
+            contractSummLabel: "Сумма договора",
             prepaidLabel: "Аванс",
             startDateLabel: "Дата начала",
             finishDateLabel: "Дата окончания",
@@ -576,7 +576,7 @@ class AddContractDialog extends React.Component {
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle id="alert-dialog-slide-title">
-                    {editContract !== undefined && editContract.id !== undefined ? "Изменить контракт" : "Добавить контракт"}
+                    {editContract !== undefined && editContract.id !== undefined ? "Изменить договор" : "Добавить договор"}
                 </DialogTitle>
                 <DialogContent>
                     {isLoading ? <Grid

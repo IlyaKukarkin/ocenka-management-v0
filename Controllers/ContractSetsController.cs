@@ -335,7 +335,7 @@ namespace ocenka_management.Controllers
             var worksheet = package.Workbook.Worksheets.Add("Договоры");
 
             //First add the headers
-            worksheet.Cells[1, 1].Value = "Сумма контракта";
+            worksheet.Cells[1, 1].Value = "Сумма договора";
             worksheet.Cells[1, 2].Value = "Аванс";
             worksheet.Cells[1, 3].Value = "Дата начала";
             worksheet.Cells[1, 4].Value = "Дата окончания";

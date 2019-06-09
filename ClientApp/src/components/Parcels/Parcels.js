@@ -263,7 +263,7 @@ class Parcels extends Component {
                             />
                             <TableBody>
                                 {stableSort(data, getSorting(order, orderBy))
-                                    .filter(flt => flt.cadastralNumber.toString().includes(search) || flt.aimOfEvaluation.includes(search) || flt.area.toString().includes(search) || flt.usageType.includes(search))
+                                    .filter(flt => flt.cadastralNumber.toString().includes(search.toLowerCase()) || flt.aimOfEvaluation.toLowerCase().includes(search.toLowerCase()) || flt.area.toString().includes(search.toLowerCase()) || flt.usageType.toLowerCase().includes(search.toLowerCase()))
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)                                    
                                     .map(n => {
                                         const isSelected = this.isSelected(n.id);
@@ -295,7 +295,7 @@ class Parcels extends Component {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={data.filter(flt => flt.cadastralNumber.toString().includes(search) || flt.aimOfEvaluation.includes(search) || flt.area.toString().includes(search) || flt.usageType.includes(search)).length}
+                        count={data.filter(flt => flt.cadastralNumber.toString().includes(search.toLowerCase()) || flt.aimOfEvaluation.toLowerCase().includes(search.toLowerCase()) || flt.area.toString().includes(search.toLowerCase()) || flt.usageType.toLowerCase().includes(search.toLowerCase())).length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         backIconButtonProps={{

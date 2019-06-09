@@ -516,6 +516,20 @@ class AddUserDialog extends React.Component {
             }
         }
 
+        if (!surname && !name && !patronymic) {
+            if (this.state.surname === this.state.name || this.state.surname === this.state.patronymic || this.state.patronymic === this.state.name) {
+                this.setState({ surnameLabel: "Фамилия имя и отчество не должны совпадать" });
+                this.setState({ surnameError: true });
+                this.setState({ patronymicLabel: "Фамилия имя и отчество не должны совпадать" });
+                this.setState({ patronymicError: true });
+                this.setState({ nameLabel: "Фамилия имя и отчество не должны совпадать" });
+                this.setState({ nameError: true });
+                surname = true;
+                name = true;
+                patronymic = true;
+            }
+        }
+
         return (surname || name || patronymic || login || password || birthday || worksSince || position || category || salary);
     }
 
