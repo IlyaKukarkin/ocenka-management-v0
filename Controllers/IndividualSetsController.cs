@@ -171,7 +171,7 @@ namespace ocenka_management.Controllers
                 clientsRes.Add(clnt);
             }
 
-            var fileDownloadName = "Клиенты.xlsx";
+            var fileDownloadName = "Физ лица.xlsx";
 
             using (var package = createExcelPackage(clientsRes))
             {

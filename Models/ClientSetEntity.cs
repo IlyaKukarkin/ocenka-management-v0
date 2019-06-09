@@ -8,7 +8,7 @@ namespace ocenka_management.Models
         public string CompanyName { get; set; }
         public long Bin { get; set; }
         public long Inn { get; set; }
-        public int MailAddress { get; set; }
+        public string MailAddress { get; set; }
         public string PaymentAccount { get; set; }
         public int Id { get; set; }
         public int LegalAddressId { get; set; }
