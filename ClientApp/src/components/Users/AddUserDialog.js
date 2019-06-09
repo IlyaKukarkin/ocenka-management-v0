@@ -288,7 +288,11 @@ class AddUserDialog extends React.Component {
     }
 
     clearSalary(salary) {
-        return salary.substring(0, salary.length - 2).replace(/,/g, "");
+        if (salary.includes('₽')) {
+            return salary.substring(0, salary.length - 2).replace(/,/g, "");
+        }
+
+        return salary;
     }
 
     validateForm() {

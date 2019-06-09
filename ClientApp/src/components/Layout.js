@@ -208,6 +208,12 @@ class Layout extends Component {
                     <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/salary" selected={'/salary' === pathname}>
                         <MenuText textIndex={7} />
                     </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/neuralSettings" selected={'/neuralSettings' === pathname}>
+                        <MenuText textIndex={8} />
+                    </MenuItem>
+                    <MenuItem component={Link} onClick={this.handleDrawerToggle} to="/salarySettings" selected={'/salarySettings' === pathname}>
+                        <MenuText textIndex={14} />
+                    </MenuItem>
                 </MenuList>
             </div>
         );

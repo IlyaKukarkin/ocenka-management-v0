@@ -167,6 +167,8 @@ namespace ocenka_management.Controllers
                 {
                     salResult.ElementAt(i).Salary += contr.ContractSumm / 100 * settings.First().ParcelPercent;
                 }
+
+                salResult.ElementAt(i).Salary = Math.Round(salResult.ElementAt(i).Salary, MidpointRounding.ToEven);
             }
 
             if (salResult == null)

@@ -56,7 +56,7 @@ class ShowSalaryDialog extends React.Component {
                                 <li>Имя: {Salary.name}</li>
                                 <li>Отчество: {Salary.patronymic}</li>
                                 <li>Выполнил договоров: {Salary.contractsCount}</li>
-                                <li>Зарплата: {Salary.salary} руб.</li>
+                                <li>Зарплата: {getSalary(Salary.salary.toString())} руб.</li>
                             </ul>
                         </Typography>
                         <Typography component={'span'} variant="body1">
@@ -120,10 +120,18 @@ const convertData = (data) => {
     return res;
 }
 
+function getSalary(salary) {
+    let result = "";
+
+    result = salary.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+    return result;
+}
+
 const Contract = ({ contract }) => {
     return (
         <ul>
-            <li>Сумма договора: {contract.contractSumm}</li>
+            <li>Сумма договора: {getSalary(contract.contractSumm.toString())} руб.</li>
             <li>Дата начала: {convertData(contract.startDate)}</li>
             <li>Дата окончания: {convertData(contract.finishDate)}</li>
         </ul>

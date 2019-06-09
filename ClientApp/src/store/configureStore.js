@@ -5,6 +5,7 @@ import * as AddressReducer from './AddressReducer';
 import * as AppraiserReducer from './AppraiserReducer';
 import * as UserReducer from './UserReducer';
 import * as NeuralReducer from './NeuralReducer';
+import * as NeuralSettingsReducer from './NeuralSettingsReducer';
 import * as LoginReducer from './LoginReducer';
 import * as ClientReducer from './ClientReducer';
 import * as FlatReducer from './FlatReducer';
@@ -13,6 +14,7 @@ import * as SalaryReducer from './SalaryReducer';
 import * as ParcelReducer from './ParcelReducer';
 import * as CarReducer from './CarReducer';
 import * as EntityReducer from './EntityReducer';
+import * as SalarySettingsReducer from './SalarySettingsReducer';
 
 export default function configureStore(history, initialState) {
     const reducers = {
@@ -20,6 +22,7 @@ export default function configureStore(history, initialState) {
         appraisers: AppraiserReducer.reducer,
         users: UserReducer.reducer,
         neural: NeuralReducer.reducer,
+        neuralSettings: NeuralSettingsReducer.reducer,
         login: LoginReducer.reducer,
         clients: ClientReducer.reducer,
         flats: FlatReducer.reducer,
@@ -28,6 +31,7 @@ export default function configureStore(history, initialState) {
         parcels: ParcelReducer.reducer,
         cars: CarReducer.reducer,
         entities: EntityReducer.reducer,
+        salarySettings: SalarySettingsReducer.reducer,
     };
 
     const middleware = [

@@ -641,13 +641,15 @@ class Neural extends React.Component {
 }
 
 function getPrice(price) {
-    let result = "";
+    let result = price;
 
-    const ind = price.indexOf('.');
+    if (price.includes('.')) {
+        const ind = price.indexOf('.');
 
-    result = price.substring(0, ind);
+        result = price.substring(0, ind);
+    }
 
-    result = result.replace(/\B(?=(\d{3})+(?!\d))/g, " ");;
+    result = result.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
     return result;
 }

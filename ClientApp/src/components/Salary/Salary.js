@@ -230,7 +230,7 @@ class Salary extends Component {
                                                 </TableCell>
                                                 <TableCell align="center" className={classes.cell}>{getFio(n.surname, n.name, n.patronymic)}</TableCell>
                                                 <TableCell align="center" className={classes.cell}>{n.contractsCount}</TableCell>
-                                                <TableCell align="center" className={classes.cell}>{n.salary}</TableCell>
+                                                <TableCell align="center" className={classes.cell}>{getSalary(n.salary.toString())}</TableCell>
                                                 <TableCell align="center" className={classes.narrowCell}>{<IconButton onClick={event => this.startEditClick(event, n.id)}>
                                                     <Info fontSize="small" />
                                                 </IconButton>}</TableCell>
@@ -285,6 +285,14 @@ function stableSort(array, cmp) {
 
 function getSorting(order, orderBy) {
     return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
+}
+
+function getSalary(salary) {
+    let result = "";
+
+    result = salary.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+    return result;
 }
 
 export default withStyles(styles)(connect(
