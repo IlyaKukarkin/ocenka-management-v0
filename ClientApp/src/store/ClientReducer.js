@@ -16,7 +16,7 @@ const toExcelError = 'TO_EXCEL_ERROR';
 const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
 const toExcelClose = 'TO_EXCEL_CLOSE';
 const deleteError = 'DELETE_CLIENT_ERROR';
-const deleteErrorClose = 'DELETE_ERROR_CLOSE';
+const deleteErrorClose = 'DELETE_CLIENT_ERROR_CLOSE';
 const clearEditClient = 'CLEAR_EDIT_CLIENT';
 const initialState = { clients: [], editClient: {}, isLoading: false, fileSaved: false, fileError: false, deleteError: false };
 
@@ -37,7 +37,6 @@ export const actionCreators = {
         dispatch({ type: deleteClientStart });
 
         const url2 = `api/ClientSets/${id}`;
-        fetch(url2, { method: 'delete' });
 
         fetch(url2, { method: 'delete' })
             .then(function (response) {

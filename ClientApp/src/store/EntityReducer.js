@@ -16,7 +16,7 @@ const toExcelError = 'TO_EXCEL_ERROR';
 const toExcelErrorClose = 'TO_EXCEL_ERROR_CLOSE';
 const toExcelClose = 'TO_EXCEL_CLOSE';
 const deleteError = 'DELETE_ENTITY_ERROR';
-const deleteErrorClose = 'DELETE_ERROR_CLOSE';
+const deleteErrorClose = 'DELETE_ENTITY_ERROR_CLOSE';
 const clearEditEntity = 'CLEAR_EDIT_ENTITY';
 const initialState = { entities: [], editEntity: {}, isLoading: false, fileSaved: false, fileError: false, deleteError: false };
 
@@ -37,7 +37,6 @@ export const actionCreators = {
         dispatch({ type: deleteEntityStart });
 
         const url2 = `api/ClientSets/${id}`;
-        fetch(url2, { method: 'delete' });
 
         fetch(url2, { method: 'delete' })
             .then(function (response) {

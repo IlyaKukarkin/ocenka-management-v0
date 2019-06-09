@@ -208,8 +208,8 @@ namespace ocenka_management.Controllers
             for (int i = 0; i < clients.Count(); i++)
             {
                 worksheet.Cells[i + 2, 1].Value = clients.ElementAt(i).CompanyName;
-                worksheet.Cells[i + 2, 2].Value = clients.ElementAt(i).Bin;
-                worksheet.Cells[i + 2, 3].Value = clients.ElementAt(i).Inn;
+                worksheet.Cells[i + 2, 2].Value = clients.ElementAt(i).Bin.ToString();
+                worksheet.Cells[i + 2, 3].Value = clients.ElementAt(i).Inn.ToString();
                 worksheet.Cells[i + 2, 4].Value = clients.ElementAt(i).MailAddress;
                 worksheet.Cells[i + 2, 5].Value = clients.ElementAt(i).PaymentAccount;
                 worksheet.Cells[i + 2, 6].Value = clients.ElementAt(i).LegalAddress.City;
