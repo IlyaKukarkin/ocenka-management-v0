@@ -75,11 +75,11 @@ class ShowContractDialog extends React.Component {
                     aria-describedby="alert-dialog-slide-description"
                 >
                     <DialogTitle id="alert-dialog-slide-title">
-                        Контракт - подробно
+                        Договор - подробно
                 </DialogTitle>
                     <DialogContent className={classes.dialog}>
                         <Typography component={'span'} variant="body1">
-                            Контракт
+                            Договор
                         <ul>
                                 <li>Сумма договора: {Contract.contractSumm} руб.</li>
                                 <li>Аванс: {Contract.prepaid} руб.</li>

@@ -31,7 +31,7 @@ class DeleteErrorDialog extends React.Component {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-slide-description">
-                        {headers[header]} состоит в договоре. Для удаления удалите сначала соответсвующий контракт.
+                        {headers[header]} состоит в договоре. Для удаления удалите сначала соответсвующий договор.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

@@ -305,6 +305,13 @@ class AddContractDialog extends React.Component {
                     this.setState({ contractSummLabel: "Сумма слишком большая" });
                     this.setState({ contractSummError: true });
                     contractSumm = true;
+                } else {
+                    const nmb = +summNumber;
+                    if (nmb === 0) {
+                        this.setState({ contractSummLabel: "Сумма не равна 0" });
+                        this.setState({ contractSummError: true });
+                        contractSumm = true;
+                    }
                 }
             }
         } else {

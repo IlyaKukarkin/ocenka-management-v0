@@ -198,12 +198,25 @@ namespace ocenka_management.Controllers
                 return BadRequest(ModelState);
             }
 
+            IEnumerable<AppraiserContract> aprContr = _context.AppraiserContract;
+            AppraiserContract apr = new AppraiserContract();
+
+            for (int i = 0; i < aprContr.Count(); i++)
+            {
+                if (aprContr.ElementAt(i).ContractId == id)
+                {
+                    apr = aprContr.ElementAt(i);
+                    break;
+                }
+            }
+
             var contractSet = await _context.ContractSet.FindAsync(id);
             if (contractSet == null)
             {
                 return NotFound();
             }
 
+            _context.AppraiserContract.Remove(apr);
             _context.ContractSet.Remove(contractSet);
             await _context.SaveChangesAsync();
 

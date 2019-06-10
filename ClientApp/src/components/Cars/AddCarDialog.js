@@ -200,7 +200,7 @@ class AddCarDialog extends React.Component {
         }
 
         if (!mark) {
-            this.setState({ markLabel: "Кадастровый номер" });
+            this.setState({ markLabel: "Марка" });
             this.setState({ markError: false });
         }
 
@@ -210,12 +210,12 @@ class AddCarDialog extends React.Component {
         }
 
         if (!model) {
-            this.setState({ modelLabel: "Площадь" });
+            this.setState({ modelLabel: "Модель" });
             this.setState({ modelError: false });
         }
 
         if (!licenseNumber) {
-            this.setState({ licenseNumberLabel: "Тип использования" });
+            this.setState({ licenseNumberLabel: "Регистрационный знак" });
             this.setState({ licenseNumberError: false });
         }
 
