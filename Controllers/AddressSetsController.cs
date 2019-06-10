@@ -179,7 +179,7 @@ namespace ocenka_management.Controllers
             // Add to table / Add summary row
             var tbl = worksheet.Tables.Add(new ExcelAddressBase(fromRow: 1, fromCol: 1, toRow: addresses.Count() + 1, toColumn: 5), "Data");
             tbl.ShowHeader = true;
-            tbl.TableStyle = TableStyles.Dark9;
+            tbl.TableStyle = TableStyles.Medium15;
 
             // AutoFitColumns
             worksheet.Cells[1, 1, addresses.Count() + 1, 5].AutoFitColumns();
