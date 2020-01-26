@@ -210,7 +210,7 @@ CREATE TABLE [dbo].[ClientSet_Entity] (
     [CompanyName] nvarchar(max)  NOT NULL,
     [BIN] bigint  NOT NULL,
     [INN] bigint  NOT NULL,
-    [MailAddress] int  NOT NULL,
+    [MailAddress] nvarchar(max)  NOT NULL,
     [PaymentAccount] nvarchar(max)  NOT NULL,
     [Id] int  NOT NULL,
     [LegalAddress_Id] int  NOT NULL
